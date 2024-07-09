@@ -10,13 +10,26 @@ const P5Sketch = dynamic(() => import('./components/sketch'), {
 
 export default function Home() {
   const [size, setSize] = useState({ width: 975, height: 750 });
+  const [isMedium, setIsMedium] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      const height = Math.min(window.innerWidth * 0.6, window.innerHeight * 0.8);
-      const width = height * 1.3;
-      setSize({ width: Math.floor(width), height: Math.floor(height) });
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const isMediumScreen = width <= 768; // md breakpoint
+
+      setIsMedium(isMediumScreen);
+
+      if (isMediumScreen) {
+        const newSize = Math.min(width * 0.8, height * 0.8);
+        setSize({ width: newSize, height: newSize });
+      } else {
+        const newHeight = Math.min(width * 0.6, height * 0.8);
+        const newWidth = newHeight * 1.3;
+        setSize({ width: Math.floor(newWidth), height: Math.floor(newHeight) });
+      }
     };
+
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -31,23 +44,22 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
-      <div className="flex items-center">
-        <div className="flex flex-col items-end mr-16">
-          <div className="-rotate-90 justify-start absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/4">
-            <motion.div 
-              initial={{ opacity: 0, x: -100 }}
-              animate={{ opacity: 1, x: 0 }}
+      <div className="flex flex-col md:flex-row md:items-center">
+        <div className="flex flex-col items-center md:items-end mx-16">
+          <div className={`text-9xl font-bold text-gray-800 font-mono whitespace-nowrap ${isMedium ? '' : 'absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/4 -rotate-90'}`}>
+            <motion.div
+              initial={{ opacity: 0, x: isMedium ? 0 : -100, y: isMedium ? -50 : 0 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-9xl font-bold text-gray-800 font-mono whitespace-nowrap"
             >
               0xGlake
             </motion.div>
           </div>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col space-y-4 items-end ml-16"
+            className="flex flex-col space-y-4 items-center md:items-end mt-8 md:mt-0 ml-0 md:ml-16"
           >
             <motion.div variants={linkVariants} whileHover="hover">
               <Link href="/blog" className="text-gray-600 hover:text-gray-200 font-mono hover:underline">Blog</Link>
@@ -63,14 +75,14 @@ export default function Home() {
             </motion.div>
           </motion.div>
         </div>
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          style={{width: size.width, height: size.height}}
-          className="flex items-center"
+          style={{ width: size.width, height: size.height }}
+          className="flex items-center mt-8 md:mt-0"
         >
-          <P5Sketch width={size.width} height={size.height} />
+          <P5Sketch key={`${size.width}-${size.height}`} width={size.width} height={size.height} />
         </motion.div>
       </div>
     </main>
