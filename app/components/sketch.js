@@ -99,7 +99,7 @@ const P5Sketch = ({ width, height }) => {
     return () => {
       p5Instance.remove();
     };
-  }, []);
+  }, [height, width]);
 
   return <div ref={sketchRef} />;
 };
