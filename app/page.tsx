@@ -30,21 +30,19 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4">
+    <main className="flex min-h-screen flex-col items-center justify-center">
       <div className="flex items-center">
-        <div className="flex flex-col items-end mr-16">
-          <motion.div 
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-9xl font-bold text-gray-800 font-mono whitespace-nowrap absolute left-8 bottom-24"
-            style={{ 
-              transform: 'rotate(-90deg)',
-              transformOrigin: 'top left'
-            }}
-          >
-            0xGlake
-          </motion.div>
+        <div className="flex flex-col items-end mr-12">
+          <div className="-rotate-90 justify-start ">
+            <motion.div 
+              initial={{ opacity: 0, x: -100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-9xl font-bold text-gray-800 font-mono whitespace-nowrap"
+            >
+              0xGlake
+            </motion.div>
+          </div>
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -70,6 +68,7 @@ export default function Home() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
           style={{width: size.width, height: size.height}}
+          className="flex items-center"
         >
           <P5Sketch width={size.width} height={size.height} />
         </motion.div>
