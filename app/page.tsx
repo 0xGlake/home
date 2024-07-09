@@ -46,7 +46,7 @@ export default function Home() {
         newSize = { width: newWidth, height: newWidth };
       } else {
         newScreenSize = SCREEN_SIZES.XL;
-        const newHeight = Math.min(width * 0.6, height * 0.7); // Adjusted for better proportions
+        const newHeight = Math.min(width * 0.6, height * 0.7);
         const newWidth = newHeight * 1.7;
         newSize = { width: newWidth, height: newHeight };
       }
@@ -82,7 +82,7 @@ export default function Home() {
     if (screenSize === SCREEN_SIZES.LG) {
       return 'text-9xl absolute left-1/2 top-0 transform -translate-x-1/2';
     }
-    return 'text-9xl absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/3 -rotate-90'; // Adjusted for XL
+    return 'text-9xl absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/3 -rotate-90';
   };
 
   const getLayoutStyle = () => {
@@ -126,7 +126,11 @@ export default function Home() {
           }`}>
             <div className={`font-bold text-gray-800 font-mono whitespace-nowrap ${getTitleStyle()}`}>
               <motion.div
-                initial={{ opacity: 0, x: screenSize === SCREEN_SIZES.MD || screenSize === SCREEN_SIZES.SM ? 0 : -100, y: screenSize === SCREEN_SIZES.MD || screenSize === SCREEN_SIZES.SM ? -50 : 0 }}
+                initial={{ opacity: 0, x: 
+                  screenSize === SCREEN_SIZES.MD || 
+                  screenSize === SCREEN_SIZES.SM ? 0 : -100, y: 
+                  screenSize === SCREEN_SIZES.MD || 
+                  screenSize === SCREEN_SIZES.SM ? -50 : 0 }}
                 animate={{ opacity: 1, x: 0, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
@@ -165,7 +169,9 @@ export default function Home() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
           style={{ width: size.width, height: size.height }}
-          className={`flex items-center justify-center ${screenSize === SCREEN_SIZES.XL ? 'mr-16' : 'mt-8 md:mt-0'} ${screenSize === SCREEN_SIZES.XL ? 'flex-1' : 'w-full'}`}
+          className={`flex items-center justify-center 
+            ${screenSize === SCREEN_SIZES.XL ? 'mr-16' : 'mt-8 md:mt-0'} 
+            ${screenSize === SCREEN_SIZES.XL ? 'flex-1' : 'w-full'}`}
         >
           <P5Sketch key={`${size.width}-${size.height}`} width={size.width} height={size.height} />
         </motion.div>
