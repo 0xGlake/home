@@ -47,11 +47,11 @@ export default function Home() {
       } else {
         newScreenSize = SCREEN_SIZES.XL;
         const newHeight = Math.min(width * 0.6, height * 0.7);
-        const newWidth = newHeight * 1.7;
+        const newWidth = newHeight * 1.4;
         newSize = { width: newWidth, height: newHeight };
       }
 
-      console.log(width, newScreenSize);
+      //console.log(width, newScreenSize);
 
       setScreenSize(newScreenSize);
       setSize({
@@ -94,14 +94,24 @@ export default function Home() {
     } w-full`;
   };
 
-  const getLinkContainerStyle = () => {
+  const getContentContainerStyle = () => {
     if (screenSize === SCREEN_SIZES.XL) {
-      return 'flex flex-col space-y-4 items-end justify-center h-full ml-16 mr-12';
+      return 'flex flex-col space-y-4 items-end justify-center h-full ml-16 mr-12 z-50';
     }
     if (screenSize === SCREEN_SIZES.LG) {
       return 'flex flex-col space-y-4 items-end mt-24 mr-8';
     }
     return 'flex flex-col space-y-4 items-center mt-8';
+  };
+
+  const getAboutMeStyle = () => {
+    if (screenSize === SCREEN_SIZES.XL) {
+      return 'text-right mb-6 max-w-md w-10/12';
+    }
+    if (screenSize === SCREEN_SIZES.LG) {
+      return 'text-right mb-6 max-w-md';
+    }
+    return 'text-center mb-4 max-w-md';
   };
 
   return (
@@ -143,13 +153,27 @@ export default function Home() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className={getLinkContainerStyle()}
+          className={getContentContainerStyle()}
         >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className={getAboutMeStyle()}
+          >
+            <p className="text-gray-400 font-mono width-1/3 z-50">
+            Thanks for dropping by.
+            <br /><br />
+            My current interests are in: defi, full stack dev, DnB, reflexive assets, employability, and more.
+            <br /><br />
+            Please feel free to reach out on twitter.
+            </p>
+          </motion.div>
           {[
-            { href: '/blog', text: 'Blog' },
-            { href: '/portfolio', text: 'Portfolio' },
-            { href: '/readingList', text: 'Reading List' },
-            { href: 'https://twitter.com/0xGlake', text: 'Twitter', external: true },
+            { href: '/blog', text: 'blog' },
+            { href: '/portfolio', text: 'portfolio' },
+            { href: '/readingList', text: 'reading list' },
+            { href: 'https://twitter.com/0xGlake', text: 'twitter', external: true },
           ].map(({ href, text, external }) => (
             <motion.div key={href} variants={linkVariants} whileHover="hover">
               {external ? (
@@ -170,8 +194,9 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           style={{ width: size.width, height: size.height }}
           className={`flex items-center justify-center 
-            ${screenSize === SCREEN_SIZES.XL ? 'mr-16' : 'mt-8 md:mt-0'} 
-            ${screenSize === SCREEN_SIZES.XL ? 'flex-1' : 'w-full'}`}
+            ${screenSize === SCREEN_SIZES.XL ? 'mr-16 flex-1' : 'mt-8 md:mt-0 w-full'}
+            ${screenSize === SCREEN_SIZES.LG ? 'mr-8' : ''}
+            ${screenSize === SCREEN_SIZES.SM ? 'mb-8' : ''}`}
         >
           <P5Sketch key={`${size.width}-${size.height}`} width={size.width} height={size.height} />
         </motion.div>
