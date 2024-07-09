@@ -32,8 +32,8 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <div className="flex items-center">
-        <div className="flex flex-col items-end mr-12">
-          <div className="-rotate-90 justify-start ">
+        <div className="flex flex-col items-end mr-16">
+          <div className="-rotate-90 justify-start absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/4">
             <motion.div 
               initial={{ opacity: 0, x: -100 }}
               animate={{ opacity: 1, x: 0 }}
@@ -47,7 +47,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col space-y-4 items-end"
+            className="flex flex-col space-y-4 items-end ml-16"
           >
             <motion.div variants={linkVariants} whileHover="hover">
               <Link href="/blog" className="text-gray-600 hover:text-gray-200 font-mono hover:underline">Blog</Link>
