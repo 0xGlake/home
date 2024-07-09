@@ -10,7 +10,7 @@ const P5Sketch = ({ width, height }) => {
     const sketch = (p) => {
       let particles = [];
       let colors = [];
-      let parNum = 1000;
+      let parNum = 500;
       let bgColor;
 
       p.setup = () => {
