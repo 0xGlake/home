@@ -12,6 +12,15 @@ interface BlogPostProps {
   };
 }
 
+export async function generateStaticParams() {
+  const postsDirectory = path.join(process.cwd(), 'app', 'content', 'blog');
+  const filenames = fs.readdirSync(postsDirectory);
+
+  return filenames.map(filename => ({
+    slug: filename.replace(/\.md$/, ''),
+  }));
+}
+
 const customRenderers = {
   h1: ({ node, ...props }: any) => <h1 className="text-4xl font-bold mt-6 mb-4" {...props} />,
   h2: ({ node, ...props }: any) => <h2 className="text-2xl font-bold mt-5 mb-3" {...props} />,
