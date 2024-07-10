@@ -4,6 +4,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Link from 'next/link';
 
 interface BlogPostProps {
   params: {
@@ -24,18 +25,20 @@ export default function BlogPost({ params }: BlogPostProps) {
   const { slug } = params;
   const filePath = path.join(process.cwd(), 'app', 'content', 'blog', `${slug}.md`);
   const fileContents = fs.readFileSync(filePath, 'utf8');
-  const { data, content } = matter(fileContents);
+  var { data, content } = matter(fileContents);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">{data.title}</h1>
+    <div className="container mx-auto px-4 py-8 xs:w-full sm:w-9/12 md:w-8/12 lg:w-7/12 xl:w-5/12">
+      <Link href="/blog" className="block text-3xl font-mono font-bold mb-4 hover:text-violet-400">
+        {data.title}
+      </Link>
       <div className="mb-4">
         <span className="text-gray-600 mr-4">{new Date(data.date).toLocaleDateString()}</span>
-        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+        <span className="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded">
           {data.category}
         </span>
       </div>
-      <div className="prose max-w-none">
+      <div className="max-w-none">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </div>
     </div>
