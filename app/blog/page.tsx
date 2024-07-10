@@ -14,8 +14,9 @@ export default function BlogPage() {
   const posts = getBlogPosts();
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-mono font-bold mb-8 pl-5">Blog Posts</h1>
-      <Link href="/" className="text-gray-300 hover:text-violet-400 font-mono hover:underline pl-5">Home</Link>
+      <Link href="/" className="block text-3xl font-mono font-bold mb-2 pl-5 hover:text-violet-400">
+        Glake's Blog
+      </Link>
       <ul className="space-y-2 mt-4">
         {posts.map((post) => (
           <li key={post.slug} className="overflow-x-auto whitespace-nowrap">
