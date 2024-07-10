@@ -125,7 +125,7 @@ export default function Home() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                0xGlake
+                &gt; 0xGlake
               </motion.div>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function Home() {
             <motion.div key={href} variants={linkVariants} whileHover="hover">
               {external ? (
                 <a href={href} target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-200 font-mono hover:underline">
-                  {text}
+                {text}
                 </a>
               ) : (
                 <Link href={href} className="text-gray-600 hover:text-gray-200 font-mono hover:underline">

@@ -1,5 +1,5 @@
 ---
-title: "The Future of Artificial Intelligence"
+title: "The Future of Artificial Intelligence secnd"
 date: "2024-07-05"
 category: "Technology"
 ---

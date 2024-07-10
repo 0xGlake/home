@@ -1,5 +1,5 @@
 ---
-title: "Sustainable Living: Small Changes, Big Impact"
+title: "Sustainable Living: Small Changes, Big Impact third"
 date: "2024-07-10"
 category: "Lifestyle"
 ---
