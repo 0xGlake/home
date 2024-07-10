@@ -53,7 +53,7 @@ export default function BlogPost({ params }: BlogPostProps) {
   return (
     <div className="container mx-auto px-4 py-8 xs:w-full sm:w-9/12 md:w-8/12 lg:w-7/12 xl:w-5/12">
       <Link href="/" className="block text-3xl font-mono font-bold mb-4 hover:text-violet-400">
-      &gt; 0xGlake @('_')@
+      &gt; 0xGlake @(&#39;_&#39;)@
       </Link>
       <Link href="/blog" className="block text-2xl font-mono font-bold mb-4 hover:text-violet-400 text-gray-400">
       Blog
