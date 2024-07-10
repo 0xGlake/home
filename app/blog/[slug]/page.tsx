@@ -36,14 +36,6 @@ const customRenderers = {
     ),
 };
 
-export async function generateStaticParams() {
-  const postsDirectory = path.join(process.cwd(), 'app', 'content', 'blog');
-  const fileNames = fs.readdirSync(postsDirectory);
-  return fileNames.map((fileName) => ({
-    slug: fileName.replace(/\.md$/, ''),
-  }));
-}
-
 export default function BlogPost({ params }: BlogPostProps) {
   const { slug } = params;
   const filePath = path.join(process.cwd(), 'app', 'content', 'blog', `${slug}.md`);
