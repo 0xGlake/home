@@ -164,7 +164,7 @@ export default function Home() {
             <p className="text-gray-400 font-mono width-1/3 z-50">
             Thanks for dropping by.
             <br /><br />
-            My current interests are in: defi, full stack dev, DnB, reflexive assets, employability, and more.
+            My current interests are in: defi, full stack dev, communities, DnB, reflexive assets, green tea, employability, and more. 
             <br /><br />
             Please feel free to reach out on twitter.
             </p>
