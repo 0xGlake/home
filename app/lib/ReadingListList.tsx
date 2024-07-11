@@ -206,5 +206,11 @@ export const readingList: ReadingListItemStruct[] = [
     name: "Lindy (PaulSkallas)",
     url: "https://lindynewsletter.beehiiv.com/",
     category: "Tech"
+  },
+  {
+    name: "Scearpo",
+    url: "https://twitter.com/Scearpo",
+    description: "Hilarious long form takes on general news and crypto.",
+    category: "Crypto"
   }
 ];
