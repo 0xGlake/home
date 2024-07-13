@@ -92,7 +92,9 @@ export const readingList: ReadingListItemStruct[] = [
     url: "https://www.ribbonfarm.com/",
     description: "Interesting ideas around narratives and human interactions in the workplace",
     category: "Career",
-    favouritePosts: ["https://www.ribbonfarm.com/2009/10/07/the-gervais-principle-or-the-office-according-to-the-office/"]
+    favouritePosts: [
+      "https://www.ribbonfarm.com/2009/10/07/the-gervais-principle-or-the-office-according-to-the-office/",
+      "https://studio.ribbonfarm.com/p/superhistory-not-superintelligence"]
   },
   {
     name: "Mochary Method",
