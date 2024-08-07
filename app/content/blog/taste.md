@@ -1,7 +1,7 @@
 ---
 title: "Agency"
 date: "2024-08-05"
-category: "Self Development"
+category: "Misc"
 ---
 # Agency
 ## How Agency and Courage are related
