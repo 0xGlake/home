@@ -174,6 +174,7 @@ export default function Home() {
             { href: '/portfolio', text: 'portfolio' },
             { href: '/readingList', text: 'reading list' },
             { href: 'https://twitter.com/0xGlake', text: 'twitter', external: true },
+            { href: 'https://github.com/0xGlake/', text: 'github', external: true },
           ].map(({ href, text, external }) => (
             <motion.div key={href} variants={linkVariants} whileHover="hover">
               {external ? (
