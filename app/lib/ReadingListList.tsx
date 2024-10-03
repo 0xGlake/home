@@ -28,7 +28,7 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Charlotte Fang",
     url: "https://goldenlight.mirror.xyz/",
-    description: "Dont agree with everything Charlotte Fang does/says but I think they have one of the highest raw intellects in this space and I think they're leading one of the only art movements in the crypto space through remilia. Also has one of if not the best understandinf of deep internet culture.",
+    description: "Milady",
     category: "Crypto",
     favouritePosts: [
       "https://goldenlight.mirror.xyz/qrXKqoUvzXEtcbM_hvezCxmJaJn4t6CjAh2kocDzxNA",
@@ -99,14 +99,14 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Mochary Method",
     url: "https://docs.google.com/document/d/18FiJbYn53fTtPmphfdCKT2TMWH-8Y2L-MLqDk-MFV4s/edit",
-    description: "Succinct posts that helped me understand career related topics and productivity.",
+    description: "Succinct posts related to career and productivity.",
     category: "Career",
     favouritePosts: ["https://docs.google.com/document/d/11UVWJox31Ani8Cq6Ymhm6DiVUiv5vPkOQd8ZdGpYmbs/edit#"]
   },
   {
     name: "Charles Tew",
     url: "https://www.charlestew.com/",
-    description: "Objectivist philosopher who used to make videos a long time ago but re-surfaced with a blog (I wish he'd write more)",
+    description: "Objectivist philosopher who used to make videos a but re-surfaced with a blog (I wish he'd write more)",
     category: "Philosophy",
     favouritePosts: ["https://www.youtube.com/@CharlesTew"]
   },
@@ -135,7 +135,6 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Mindmine (isabelunraveled)",
     url: "https://read.mindmine.xyz/",
-    description: "One of my favourite twitter accounts at the moment.",
     category: "Personal Development",
     favouritePosts: [
       "https://read.mindmine.xyz/p/ideas",
@@ -182,14 +181,14 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Crypto Narratives (thedefivillain)",
     url: "https://substack.com/@cryptonarratives",
-    description: "Crypto news and aggreageted all GCR quotes.",
+    description: "Crypto news",
     category: "Crypto",
     favouritePosts: ["https://cryptonarratives.substack.com/p/compilation-of-the-best-gcr-nuggets"]
   },
   {
     name: "Unenumerated (nickszabo)",
     url: "https://unenumerated.blogspot.com/",
-    description: "Nick Szabo (Satoshi)",
+    description: "Nick Szabo (Satoshi.. probably)",
     category: "Economics"
   },
   {
@@ -201,7 +200,6 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Critical Fallibilism (Elliot Temple)",
     url: "https://criticalfallibilism.com/",
-    description: "Philosophy project thats combining different epistomologies. Same author as: https://curi.us/",
     category: "Philosophy"
   },
   {
