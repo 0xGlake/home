@@ -59,6 +59,15 @@ export const readingList: ReadingListItemStruct[] = [
     category: "Tech"
   },
   {
+    name: "Delusion Damage",
+    url: "https://web.archive.org/web/20120104224226/http://delusiondamage.com/article-index/",
+    description: "Suggestion by Naval",
+    category: "Misc",
+    favouritePosts: [
+
+    ]
+  },
+  {
     name: "Alex Kehayias",
     url: "https://notes.alexkehayias.com/",
     description: "Its someones personal obsidian, when I first found this I got lost for hours its really addicting.",
