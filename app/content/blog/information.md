@@ -29,3 +29,5 @@ remember memory is information + emotion
  • you should audit your information diet and be intentional about how you view the things you consume and how they relate to your goals, the food you consume make up your body, the information you consume make up your mind
 
 information lakes are things that can compound, information rivers are flimsier and harder to compound unless they're actionable
+
+information is useful if it aligns your internal world view to the actual world

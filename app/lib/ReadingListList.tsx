@@ -23,7 +23,10 @@ export const readingList: ReadingListItemStruct[] = [
     url: "https://goodalexander.com/",
     description: "Crypto hopeium",
     category: "Crypto",
-    favouritePosts: ["https://goodalexander.com/posts/investment-philosophy/"]
+    favouritePosts: [
+      "https://goodalexander.com/posts/investment-philosophy/",
+      "https://goodalexander.com/posts/murad_meta_ai_cult/"
+    ]
   },
   {
     name: "Charlotte Fang",
