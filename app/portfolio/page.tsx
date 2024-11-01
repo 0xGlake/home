@@ -41,7 +41,7 @@ export default function ProjectPage() {
           <Link href={`/projects/${project.slug}`} key={project.id} className="group">
             <div className="bg-violet-100 rounded-lg shadow-md overflow-hidden h-full hover:shadow-xl transition-shadow duration-300 hover:text-violet-100 hover:bg-violet-200">
               <div className="p-6">
-                <h2 className="text-violet-900 text-2xl font-mono font-bold mb-4 h-14">{project.title}</h2>
+                <h2 className="text-violet-900 text-2xl font-mono font-bold mb-4">{project.title}</h2>
                 <div className="aspect-video w-full relative mb-4">
                   <iframe
                     src={`https://player.vimeo.com/video/${project.vimeoId}`}
