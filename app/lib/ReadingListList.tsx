@@ -154,6 +154,11 @@ export const readingList: ReadingListItemStruct[] = [
     ]
   },
   {
+    name: "Thinking Directions",
+    url: "https://www.thinkingdirections.com/articles/",
+    category: "Personal Development",
+  },
+  {
     name: "Cyberpatterns (iamjasonlevin)",
     url: "https://www.cyberpatterns.xyz/",
     description: "Interesting views on marketing and the practical side for memetics.",
