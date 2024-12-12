@@ -10,7 +10,7 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Back the Bunny",
     url: "https://backthebunny.substack.com/",
-    description: "One of the most articulate thinkers in crypto. This helped me understand the value proposition of the space more deeply and learn about the basics of the FED amongst other things.",
+    description: "One of the most articulate thinkers in crypto imo. This helped me understand the value proposition of the space in more detail and learn about the basics of the FED amongst other things.",
     category: "Crypto",
     favouritePosts: [
       "https://backthebunny.substack.com/p/elon-yarvin-and-verbal-vs-embodied",
@@ -48,7 +48,7 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Crypto Hayes",
     url: "https://cryptohayes.substack.com/",
-    description: "Crypto main character. Understands markets deeply.",
+    description: "Crypto main character. Understands markets.",
     category: "Crypto",
     favouritePosts: [
       "https://cryptohayes.substack.com/p/chief-story-officer",
@@ -58,11 +58,11 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Naval",
     url: "https://nav.al/archive",
-    description: "Naval. Self explanatory, one of the most prolific thinkers in the space of startups, sparked my interest in startups way back.",
+    description: "Naval. Self explanatory, one of the most prolific thinkers in the space of startups, sparked my initial interest in startups and defi in 2020.",
     category: "Tech"
   },
   {
-    name: "Thinking Directions",
+    name: "Thinking Directions (Jean Moroney)",
     url: "https://www.thinkingdirections.com/",
     description: "Amazing insights into motivation, productivity, and happiness. Jean also has a lot of podcast appearances that are gold mines.",
     category: "Psychology",
@@ -71,7 +71,7 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Delusion Damage",
     url: "https://web.archive.org/web/20120104224226/http://delusiondamage.com/article-index/",
-    description: "Suggestion by Naval",
+    description: "Suggestion in passing by Naval. The first collection of articles are really good, then he goes into anarchist and pick-up artist territory. I like the blog more to see what seeds were planted early on that then shaped internet culture (I'd say this blog was seminal for manosphere content today)", 
     category: "Misc",
     favouritePosts: [
 
@@ -80,7 +80,7 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Alex Kehayias",
     url: "https://notes.alexkehayias.com/",
-    description: "Its someones personal obsidian, when I first found this I got lost for hours its really addicting.",
+    description: "Its someones personal obsidian, when I first found this I got lost for hours its really addicting. Covers a wide range of topics.",
     category: "Tech",
     favouritePosts: [
       "https://notes.alexkehayias.com/ai-multiplies-the-value-of-expertise/",
@@ -91,7 +91,7 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Paul Graham",
     url: "http://www.paulgraham.com/articles.html",
-    description: "Its Paul Graham, pretty self explanatory as the tech bro bible along with Peter Thiel's zero-to-one.",
+    description: "Paul Graham, pretty self explanatory as the tech bro bible along with Peter Thiel's zero-to-one.",
     category: "Tech",
     favouritePosts: [
       "https://www.paulgraham.com/think.html",
@@ -102,7 +102,7 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Nearcyan",
     url: "https://near.blog/",
-    description: "Their \"Links\" tab is what this page aspires to be.",
+    description: "Their \"Links\" tab was this pages inspiration.",
     category: "Tech",
     favouritePosts: ["https://near.blog/how-to-twitter-successfully/"]
   },
@@ -182,13 +182,13 @@ export const readingList: ReadingListItemStruct[] = [
   {
     name: "Sourcegraph",
     url: "https://about.sourcegraph.com/blog",
-    description: "General tech articles, I think I found it through Primeagen.",
+    description: "General tech articles, found through Primeagen.",
     category: "Tech"
   },
   {
     name: "Yacine",
     url: "https://yacine.ca/",
-    description: "Was fun to follow his journey building DingBoard (looks like hes taken it down now)",
+    description: "Was fun to follow his journey building DingBoard (looks like hes taken it down now) update: hes at twitter now",
     category: "Tech"
   },
   {
