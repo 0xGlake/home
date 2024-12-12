@@ -62,6 +62,13 @@ export const readingList: ReadingListItemStruct[] = [
     category: "Tech"
   },
   {
+    name: "Thinking Directions",
+    url: "https://www.thinkingdirections.com/",
+    description: "Amazing insights into motivation, productivity, and happiness. Jean also has a lot of podcast appearances that are gold mines.",
+    category: "Psychology",
+    favouritePosts: []
+  },
+  {
     name: "Delusion Damage",
     url: "https://web.archive.org/web/20120104224226/http://delusiondamage.com/article-index/",
     description: "Suggestion by Naval",
@@ -154,11 +161,6 @@ export const readingList: ReadingListItemStruct[] = [
     ]
   },
   {
-    name: "Thinking Directions",
-    url: "https://www.thinkingdirections.com/articles/",
-    category: "Personal Development",
-  },
-  {
     name: "Cyberpatterns (iamjasonlevin)",
     url: "https://www.cyberpatterns.xyz/",
     description: "Interesting views on marketing and the practical side for memetics.",
@@ -223,11 +225,5 @@ export const readingList: ReadingListItemStruct[] = [
     name: "Lindy (PaulSkallas)",
     url: "https://lindynewsletter.beehiiv.com/",
     category: "Tech"
-  },
-  {
-    name: "Scearpo",
-    url: "https://twitter.com/Scearpo",
-    description: "Hilarious long form takes on general news and crypto.",
-    category: "Crypto"
   }
 ];
