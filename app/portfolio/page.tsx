@@ -1,8 +1,18 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Project data ordered from newest to oldest
 const projects = [
+  {
+    id: 5,
+    title: "Perpetual DEX Analytics",
+    description: "A comprehensive comparison tool for perpetual trading decentralized exchanges, analyzing funding rates, orderbook depth, and open interest distributions across multiple platforms.",
+    type: "screenshot",
+    imageUrl: "/perp-dex-preview.png",
+    tech: ["React", "Next.js", "DeFi", "Real-time Data"],
+    demoUrl: "https://parallax-one-flame.vercel.app/"
+  },
   {
     id: 4,
     title: "Floating Island City",
@@ -47,17 +57,23 @@ export default function ProjectPage() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         {projects.map((project) => (
-          <Link href={`/projects/${project.slug}`} key={project.id} className="group">
+          <Link
+            href={project.demoUrl || `/projects/${project.slug}`}
+            key={project.id}
+            className="group"
+            {...(project.demoUrl && { target: "_blank", rel: "noopener noreferrer" })}
+          >
             <div className="bg-violet-100 rounded-lg shadow-md overflow-hidden h-full hover:shadow-xl transition-shadow duration-300 hover:text-violet-100 hover:bg-violet-200">
               <div className="p-6">
                 <h2 className="text-violet-900 text-2xl font-mono font-bold mb-4">{project.title}</h2>
                 <div className="aspect-video w-full relative mb-4">
-                  {project.type === "sketch" ? (
-                    <div className="w-full h-full flex items-center justify-center bg-black rounded overflow-hidden">
-                      <img
+                  {project.type === "sketch" || project.type === "screenshot" ? (
+                    <div className="w-full h-full flex items-center justify-center bg-black rounded overflow-hidden relative">
+                      <Image
                         src={project.imageUrl}
                         alt={project.title}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     </div>
                   ) : (
