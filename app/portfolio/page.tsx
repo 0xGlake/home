@@ -4,6 +4,15 @@ import Link from 'next/link';
 // Project data ordered from newest to oldest
 const projects = [
   {
+    id: 4,
+    title: "Floating Island City",
+    description: "A procedurally generated isometric city simulation on a floating island. Watch as cities grow, roads connect, and artificial islands emerge from the water.",
+    type: "sketch",
+    imageUrl: "/island-preview.png",
+    tech: ["p5.js", "Procedural Generation", "Isometric"],
+    slug: "island"
+  },
+  {
     id: 3,
     title: "OnlyPerps",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras porttitor metus justo, ut condimentum felis sagittis at.",
@@ -43,18 +52,28 @@ export default function ProjectPage() {
               <div className="p-6">
                 <h2 className="text-violet-900 text-2xl font-mono font-bold mb-4">{project.title}</h2>
                 <div className="aspect-video w-full relative mb-4">
-                  <iframe
-                    src={`https://player.vimeo.com/video/${project.vimeoId}`}
-                    className="absolute top-0 left-0 w-full h-full"
-                    frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture"
-                    allowFullScreen
-                  />
+                  {project.type === "sketch" ? (
+                    <div className="w-full h-full flex items-center justify-center bg-black rounded overflow-hidden">
+                      <img
+                        src={project.imageUrl}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <iframe
+                      src={`https://player.vimeo.com/video/${project.vimeoId}`}
+                      className="absolute top-0 left-0 w-full h-full"
+                      frameBorder="0"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )}
                 </div>
                 <p className="text-gray-600 mb-4">{project.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {project.tech.map((tech) => (
-                    <span 
+                    <span
                       key={tech}
                       className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium"
                     >
