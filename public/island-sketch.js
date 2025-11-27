@@ -2,9 +2,9 @@ const TERRAIN_SIZE = 160;
 const TILE_WIDTH = 6;
 const TILE_HEIGHT = 3;
 const BUILDING_GRID = 70;
-const MAX_BUILDINGS = 300;
+const MAX_BUILDINGS = 220;
 const NUM_CITIES = 5;
-const MAX_BUILDINGS_PER_CITY = 80; // Increased from 50
+const MAX_BUILDINGS_PER_CITY = 50;
 
 let terrain = [];
 let buildings = [];
@@ -13,16 +13,17 @@ let roadQueue = [];
 let cityCenters = [];
 let bridgeSegments = [];
 let islandProjects = [];
-let terraformProjects = [];
-let terraformDust = [];
+let terraformProjects = []; // NEW: city flattening
 let smokeParticles = [];
 let time = 0.35;
 let timeSpeed = 0.0006;
 let simulationSpeed = 2;
 
+// Floating rock parameters
 let rockShape = [];
 let rockSeed = 0;
 
+// Performance caching
 let sortedTerrainOrder = [];
 let sortedBuildings = [];
 let buildingsDirty = true;
@@ -32,8 +33,10 @@ let buildingCandidates = [];
 let candidatesDirty = true;
 let lastCandidateUpdate = 0;
 
+// Stars cache
 let stars = [];
 
+// Growth tracking
 let generation = 1;
 let totalBuilt = 0;
 const GEN_THRESHOLD = 30;
@@ -49,12 +52,12 @@ const ZONE_TYPES = {
     tint: { r: -10, g: -5, b: 5 },
   },
   COMMERCIAL: {
-    buildingWeights: { APARTMENT: 0.2, COMMERCIAL: 0.8, INDUSTRIAL: 0 },
+    buildingWeights: { APARTMENT: 0.15, COMMERCIAL: 0.8, INDUSTRIAL: 0.05 },
     color: { r: 150, g: 180, b: 220 },
     tint: { r: 5, g: 12, b: 20 },
   },
   RESIDENTIAL: {
-    buildingWeights: { APARTMENT: 0.9, COMMERCIAL: 0.1, INDUSTRIAL: 0 },
+    buildingWeights: { APARTMENT: 0.85, COMMERCIAL: 0.1, INDUSTRIAL: 0.05 },
     color: { r: 170, g: 210, b: 170 },
     tint: { r: 8, g: 12, b: 5 },
   },
@@ -106,7 +109,7 @@ const BUILDING_TYPES = {
       { r: 65, g: 75, b: 85 },
     ],
     minHeight: 10,
-    maxHeight: 25,
+    maxHeight: 30,
     buildSpeed: 0.03,
     decayAge: 3000,
     maxAge: 4200,
@@ -228,7 +231,6 @@ function generateWorld() {
   bridgeSegments = [];
   islandProjects = [];
   terraformProjects = [];
-  terraformDust = [];
   smokeParticles = [];
   buildingsDirty = true;
   candidatesDirty = true;
@@ -242,19 +244,22 @@ function generateWorld() {
 
 function generateIslandTerrain() {
   let noiseScale = 0.026;
-  let mountainScale = 0.018;
+  let mountainScale = 0.018; // Slightly larger features
   let coastNoise = 0.05;
 
+  // Guaranteed mountain seed area - pick a spot in the back
   let mountainCenterX = TERRAIN_SIZE * random(0.15, 0.35);
   let mountainCenterY = TERRAIN_SIZE * random(0.15, 0.35);
 
   for (let x = 0; x < TERRAIN_SIZE; x++) {
     terrain[x] = [];
     for (let y = 0; y < TERRAIN_SIZE; y++) {
+      // ELLIPTICAL distance
       let dx = (x - islandCenterX) / (TERRAIN_SIZE * 0.52);
       let dy = (y - islandCenterY) / (TERRAIN_SIZE * 0.38);
       let distFromCenter = sqrt(dx * dx + dy * dy);
 
+      // Organic coastline
       let edgeNoise1 = noise(x * coastNoise + 300, y * coastNoise + 300) * 0.22;
       let edgeNoise2 =
         noise(x * coastNoise * 2.5 + 500, y * coastNoise * 2.5 + 500) * 0.15;
@@ -268,6 +273,7 @@ function generateIslandTerrain() {
         distFromCenter + edgeNoise1 + edgeNoise2 - edgeNoise3 + bayFactor;
       let isWater = islandFactor > 0.92;
 
+      // Lakes
       let lakeNoise = noise(x * 0.06 + 500, y * 0.06 + 500);
       let lakeNoise2 = noise(x * 0.04 + 700, y * 0.04 + 700);
       let isLake =
@@ -275,6 +281,7 @@ function generateIslandTerrain() {
         ((lakeNoise > 0.72 && distFromCenter < 0.5) ||
           (lakeNoise2 > 0.78 && distFromCenter < 0.4));
 
+      // Rivers
       let isRiver = false;
       let riverNoise = noise(x * 0.025 + 100, y * 0.025 + 200);
       let riverNoise2 = noise(x * 0.055 + 400, y * 0.055 + 400) * 0.25;
@@ -304,28 +311,37 @@ function generateIslandTerrain() {
 
         elevation = (base + detail) * 2.5;
 
+        // ====== MOUNTAINS - BIASED TO BACK (TOP-LEFT in isometric) ======
         let mountainX = x / TERRAIN_SIZE;
         let mountainY = y / TERRAIN_SIZE;
-        let backness = 1 - (mountainX * 0.6 + mountainY * 0.6);
-        let mountainFactor = max(0, backness);
 
+        // Mountain factor: HIGH in top-left, ZERO in bottom-right
+        // This creates a gradient from back to front
+        let backness = 1 - (mountainX * 0.6 + mountainY * 0.6); // 0 at front, ~0.8 at back
+        let mountainFactor = max(0, backness); // No mountains in front half
+
+        // Distance to guaranteed mountain center
         let distToMtnCenter =
           dist(x, y, mountainCenterX, mountainCenterY) / TERRAIN_SIZE;
-        let guaranteedMtn = max(0, 1 - distToMtnCenter * 3);
+        let guaranteedMtn = max(0, 1 - distToMtnCenter * 3); // Strong mountain at center
 
         let mountain = noise(x * mountainScale + 200, y * mountainScale + 200);
 
+        // Lower threshold (0.35 instead of 0.45) = more mountains
+        // Higher power = more dramatic peaks
         if (mountain > 0.35 && mountainFactor > 0.1) {
           let mtnHeight =
             pow((mountain - 0.35) * 2.5, 1.8) * 12 * mountainFactor;
           elevation += mtnHeight;
         }
 
+        // Guaranteed mountain range in back
         if (guaranteedMtn > 0) {
           let peakNoise = noise(x * 0.05 + 999, y * 0.05 + 999);
-          elevation += guaranteedMtn * peakNoise * 45;
+          elevation += guaranteedMtn * peakNoise * 15;
         }
 
+        // Secondary mountain range (also biased back)
         let mtn2X = TERRAIN_SIZE * 0.25;
         let mtn2Y = TERRAIN_SIZE * 0.4;
         let distToMtn2 = dist(x, y, mtn2X, mtn2Y) / TERRAIN_SIZE;
@@ -334,18 +350,20 @@ function generateIslandTerrain() {
           elevation += secondaryMtn * 8;
         }
 
+        // Hills (can be anywhere but smaller)
         let hills = noise(x * 0.038 + 600, y * 0.038 + 600);
         if (hills > 0.58) {
           elevation += (hills - 0.58) * 6;
         }
 
+        // Reduce elevation near edges
         elevation *= max(0.2, 1 - distFromCenter * 0.7);
         elevation = constrain(floor(elevation), 0, 18);
       }
 
       terrain[x][y] = {
         elevation,
-        originalElevation: elevation,
+        originalElevation: elevation, // Store for terraforming reference
         isWater,
         isLake,
         isRiver,
@@ -361,18 +379,20 @@ function generateIslandTerrain() {
         inShadow: false,
         grassType: floor(random(3)),
         onRock: false,
-        isCliff: false,
-        terraformed: false,
+        isCliff: false, // NEW: cliff face flag
+        terraforming: false, // NEW: being flattened
       };
     }
   }
 
+  // Mark tiles on rock and calculate water distances
   for (let x = 0; x < TERRAIN_SIZE; x++) {
     for (let y = 0; y < TERRAIN_SIZE; y++) {
       terrain[x][y].onRock = isOnRock(x, y);
     }
   }
 
+  // Calculate water distances and cliff status
   for (let x = 0; x < TERRAIN_SIZE; x++) {
     for (let y = 0; y < TERRAIN_SIZE; y++) {
       if (!terrain[x][y].isWater) {
@@ -387,6 +407,8 @@ function generateIslandTerrain() {
               if (terrain[nx][ny].isWater) {
                 let d = dist(x, y, nx, ny);
                 minDist = min(minDist, d);
+
+                // Check if this is a cliff (high elevation near water)
                 if (d < 2.5 && terrain[x][y].elevation > 3) {
                   nearWaterAndHigh = true;
                 }
@@ -470,13 +492,14 @@ function generateSpreadCities() {
       if (minCityDist < 18) continue;
 
       let score = minCityDist * 0.5;
-      // Prefer lower ground - cities naturally settle in valleys
+      // Prefer lower elevation but don't completely avoid mountains
       score -= terrain[x][y].elevation * 2;
       if (
         terrain[x][y].distanceToWater < 6 &&
         terrain[x][y].distanceToWater > 2
       )
         score += 3;
+      // Prefer front of island (higher x+y)
       score += ((x + y) / TERRAIN_SIZE) * 3;
 
       if (score > bestScore) {
@@ -488,28 +511,21 @@ function generateSpreadCities() {
 
     let zoneType = zoneAssignments[i];
 
-    // Check if this city needs terraforming (on elevated ground)
-    let cityElevation = terrain[floor(bestX)][floor(bestY)].elevation;
-    let needsTerraform = cityElevation > 4;
-
     let city = {
       x: floor(bestX),
       y: floor(bestY),
       name: getZoneName(zoneType, i),
       zoneType,
       population: 0,
-      // Terraformed cities are smaller - limited flat space
-      maxBuildings: needsTerraform
-        ? floor(MAX_BUILDINGS_PER_CITY * 0.5)
-        : MAX_BUILDINGS_PER_CITY,
+      maxBuildings: MAX_BUILDINGS_PER_CITY,
       isIsland: false,
       index: i,
     };
 
     cityCenters.push(city);
 
-    // Only terraform if city is on high ground
-    if (needsTerraform) {
+    // If city is on high ground, start terraforming project
+    if (terrain[floor(bestX)][floor(bestY)].elevation > 4) {
       startTerraformProject(city);
     }
   }
@@ -525,89 +541,49 @@ function startTerraformProject(city) {
     x: city.x,
     y: city.y,
     radius: 0,
-    targetRadius: 6, // Smaller radius - just enough for a small settlement
-    targetElevation: 2,
+    targetRadius: 12, // How far to flatten
+    targetElevation: 2, // Flatten to this level
     progress: 0,
-    active: true,
   });
-
-  // Immediately flatten small center area so city can start building
-  flattenArea(city.x, city.y, 3, 2);
-}
-
-function flattenArea(cx, cy, radius, targetElev) {
-  for (let dx = -radius; dx <= radius; dx++) {
-    for (let dy = -radius; dy <= radius; dy++) {
-      let nx = cx + dx;
-      let ny = cy + dy;
-
-      if (nx >= 0 && nx < TERRAIN_SIZE && ny >= 0 && ny < TERRAIN_SIZE) {
-        let d = dist(cx, cy, nx, ny);
-        if (d <= radius && !terrain[nx][ny].isWater) {
-          let tile = terrain[nx][ny];
-          if (tile.elevation > targetElev) {
-            tile.elevation = targetElev;
-            tile.terraformed = true;
-            tile.isCliff = false;
-          }
-        }
-      }
-    }
-  }
-  candidatesDirty = true;
 }
 
 function updateTerraformProjects() {
-  for (let i = terraformDust.length - 1; i >= 0; i--) {
-    let d = terraformDust[i];
-    d.x += d.vx;
-    d.y += d.vy;
-    d.vy += 0.05;
-    d.life -= 0.04;
-    d.size *= 0.97;
-
-    if (d.life <= 0) {
-      terraformDust.splice(i, 1);
-    }
-  }
-
-  // Just process existing projects - no expansion
   for (let project of terraformProjects) {
-    if (!project.active) continue;
+    if (project.radius >= project.targetRadius) continue;
 
-    project.progress += 0.08 * simulationSpeed; // Slower terraforming
+    project.progress += 0.02 * simulationSpeed;
 
     if (project.progress >= 1) {
       project.progress = 0;
-      project.radius += 1;
+      project.radius += 0.5;
 
-      let r = project.radius;
-      for (let dx = -r - 1; dx <= r + 1; dx++) {
-        for (let dy = -r - 1; dy <= r + 1; dy++) {
+      // Flatten tiles within current radius
+      for (let dx = -ceil(project.radius); dx <= ceil(project.radius); dx++) {
+        for (let dy = -ceil(project.radius); dy <= ceil(project.radius); dy++) {
           let nx = project.x + dx;
           let ny = project.y + dy;
 
           if (nx >= 0 && nx < TERRAIN_SIZE && ny >= 0 && ny < TERRAIN_SIZE) {
             let d = dist(project.x, project.y, nx, ny);
-            if (d <= r && d > r - 1.5 && !terrain[nx][ny].isWater) {
+            if (d <= project.radius && !terrain[nx][ny].isWater) {
               let tile = terrain[nx][ny];
 
+              // Gradually reduce elevation
               if (tile.elevation > project.targetElevation) {
-                let pos = toIso(nx, ny, tile.elevation);
-                for (let p = 0; p < 2; p++) {
-                  terraformDust.push({
-                    x: pos.x + random(-3, 3),
-                    y: pos.y + random(-2, 2),
-                    vx: random(-1, 1),
-                    vy: random(-2, -0.5),
-                    size: random(2, 5),
-                    life: 1,
-                    color: random() > 0.5 ? "brown" : "grey",
-                  });
-                }
+                // Smoother transition at edges
+                let edgeFactor = 1 - d / project.radius;
+                let targetHere = lerp(
+                  tile.originalElevation,
+                  project.targetElevation,
+                  edgeFactor,
+                );
+                tile.elevation = max(
+                  project.targetElevation,
+                  floor(targetHere),
+                );
+                tile.terraforming = true;
 
-                tile.elevation = project.targetElevation;
-                tile.terraformed = true;
+                // Update cliff status
                 tile.isCliff = false;
               }
             }
@@ -616,24 +592,7 @@ function updateTerraformProjects() {
       }
 
       candidatesDirty = true;
-
-      if (project.radius >= project.targetRadius) {
-        project.active = false;
-      }
     }
-  }
-}
-
-function drawTerraformDust() {
-  noStroke();
-  for (let d of terraformDust) {
-    let alpha = d.life * 180 * cachedDaylight;
-    if (d.color === "brown") {
-      fill(140, 110, 70, alpha);
-    } else {
-      fill(100, 100, 105, alpha);
-    }
-    ellipse(d.x, d.y, d.size, d.size * 0.6);
   }
 }
 
@@ -676,37 +635,39 @@ function seedAllCityRoads() {
   for (let city of cityCenters) {
     addRoad(city.x, city.y, "main");
 
-    // More initial roads per city
-    let numInitialRoads = floor(random(5, 8));
-    for (let i = 0; i < numInitialRoads; i++) {
-      let angle = (i / numInitialRoads) * TWO_PI + random(-0.3, 0.3);
+    let quadrantAngles = [
+      random(0, HALF_PI),
+      random(HALF_PI, PI),
+      random(PI, PI + HALF_PI),
+      random(PI + HALF_PI, TWO_PI),
+    ];
+
+    for (let angle of quadrantAngles) {
       roadQueue.push({
         x: city.x,
         y: city.y,
         angle: angle,
         type: "main",
-        energy: random(15, 25),
+        energy: random(12, 20),
         sourceCity: city,
         canBridge: true,
         gridAlign: random() < 0.4,
       });
     }
 
-    // ALWAYS attempt inter-city roads with much higher energy
     for (let other of cityCenters) {
-      if (other !== city) {
+      if (other !== city && random() < 0.35) {
         let toOther = atan2(other.y - city.y, other.x - city.x);
         roadQueue.push({
           x: city.x,
           y: city.y,
           angle: toOther,
           type: "main",
-          energy: random(60, 100), // Much higher energy for inter-city
+          energy: random(18, 30),
           sourceCity: city,
           targetCity: other,
           canBridge: true,
           gridAlign: false,
-          isInterCity: true, // Flag for special handling
         });
       }
     }
@@ -715,17 +676,17 @@ function seedAllCityRoads() {
 
 // ============ SMOKE SYSTEM ============
 
-const MAX_SMOKE = 50;
+const MAX_SMOKE = 40;
 
 function updateSmoke() {
-  if (frameCount % 2 !== 0) return;
+  if (frameCount % 3 !== 0) return;
 
   for (let i = smokeParticles.length - 1; i >= 0; i--) {
     let p = smokeParticles[i];
     p.y -= p.speed;
     p.x += p.drift;
-    p.life -= 0.02;
-    p.size += 0.2;
+    p.life -= 0.03;
+    p.size += 0.1;
 
     if (p.life <= 0) {
       smokeParticles.splice(i, 1);
@@ -741,21 +702,21 @@ function updateSmoke() {
         b.hasSmokestack,
     );
 
-    let toSpawn = min(3, industrials.length);
+    let toSpawn = min(2, industrials.length);
     for (let i = 0; i < toSpawn; i++) {
       let b = industrials[floor(random(industrials.length))];
-      if (b && random() < 0.4) {
+      if (b && random() < 0.3) {
         let t = buildingToTerrain(b.gridX, b.gridY);
         let terrainElev = getBuildingTerrainHeight(b.gridX, b.gridY);
         let pos = toIso(t.x + 0.5, t.y + 0.5, terrainElev);
 
         smokeParticles.push({
-          x: pos.x + random(-3, 3),
-          y: pos.y - b.currentLayer * TILE_HEIGHT - TILE_HEIGHT * 0.5,
-          size: random(4, 7),
+          x: pos.x + random(-2, 2),
+          y: pos.y - b.currentLayer * TILE_HEIGHT - TILE_HEIGHT,
+          size: random(2, 4),
           life: 1,
-          speed: random(0.4, 0.8),
-          drift: random(-0.2, 0.2),
+          speed: random(0.3, 0.6),
+          drift: random(-0.15, 0.15),
         });
       }
     }
@@ -765,11 +726,9 @@ function updateSmoke() {
 function drawSmoke() {
   noStroke();
   for (let p of smokeParticles) {
-    let alpha = p.life * 100 * cachedDaylight;
-    fill(90, 85, 80, alpha);
-    ellipse(p.x, p.y, p.size, p.size * 0.6);
-    fill(70, 65, 60, alpha * 0.5);
-    ellipse(p.x + 1, p.y - 1, p.size * 0.7, p.size * 0.4);
+    let alpha = p.life * 60 * cachedDaylight;
+    fill(80, 75, 70, alpha);
+    ellipse(p.x, p.y, p.size, p.size * 0.7);
   }
 }
 
@@ -889,30 +848,13 @@ function updateIslandProjects() {
           name: `Island ${cityCenters.length - NUM_CITIES + 1}`,
           zoneType: "COMMERCIAL",
           population: 0,
-          maxBuildings: 25,
+          maxBuildings: 15,
           isIsland: true,
           index: cityCenters.length,
         };
         cityCenters.push(newCity);
         updateCityDistances();
         addRoad(project.x, project.y, "main");
-
-        // Seed roads on the island so buildings can spawn
-        for (let i = 0; i < 4; i++) {
-          let angle = (i / 4) * TWO_PI + random(-0.3, 0.3);
-          roadQueue.push({
-            x: project.x,
-            y: project.y,
-            angle: angle,
-            type: "street",
-            energy: random(4, 8),
-            sourceCity: newCity,
-            canBridge: false,
-            gridAlign: false,
-            isIslandRoad: true,
-          });
-        }
-
         tryConnectIsland(project);
       }
     }
@@ -1010,7 +952,8 @@ function addRoad(x, y, type, isBridge = false) {
   if (x < 0 || x >= TERRAIN_SIZE || y < 0 || y >= TERRAIN_SIZE) return false;
   if (terrain[x][y].road) return false;
 
-  if (terrain[x][y].elevation > 6 && !terrain[x][y].terraformed) return false;
+  // Don't build roads on very high terrain (unless terraforming)
+  if (terrain[x][y].elevation > 6 && !terrain[x][y].terraforming) return false;
 
   roads.push({ x, y, type, isBridge });
   terrain[x][y].road = { x, y, type };
@@ -1023,9 +966,8 @@ function addRoad(x, y, type, isBridge = false) {
     terrain[x][y].occupied = true;
   }
 
-  // Increased road influence radius
-  for (let dx = -8; dx <= 8; dx++) {
-    for (let dy = -8; dy <= 8; dy++) {
+  for (let dx = -6; dx <= 6; dx++) {
+    for (let dy = -6; dy <= 6; dy++) {
       let nx = x + dx,
         ny = y + dy;
       if (nx >= 0 && nx < TERRAIN_SIZE && ny >= 0 && ny < TERRAIN_SIZE) {
@@ -1042,22 +984,22 @@ function addRoad(x, y, type, isBridge = false) {
 }
 
 function growRoads() {
-  // More aggressive road spawning
-  if (roadQueue.length < 20 && roads.length > 8 && frameCount % 20 === 0) {
-    // Allow all cities including islands with 0 population
-    let city = random(cityCenters);
+  if (roadQueue.length < 12 && roads.length > 8 && frameCount % 35 === 0) {
+    let city = random(
+      cityCenters.filter((c) => c.population > 0 || !c.isIsland),
+    );
     if (city) {
       let cityRoads = roads.filter((r) => {
         let t = terrain[r.x][r.y];
         return (
           t.nearestCity === city &&
           !t.isWater &&
-          t.distanceToWater > 2 &&
+          t.distanceToWater > 3 &&
           t.elevation <= 5
         );
       });
 
-      if (cityRoads.length > 0 && random() < 0.6) {
+      if (cityRoads.length > 0 && random() < 0.4) {
         let source = random(cityRoads);
         let quadrant = floor(random(4));
         let angle = quadrant * HALF_PI + random(HALF_PI);
@@ -1067,9 +1009,9 @@ function growRoads() {
           y: source.y,
           angle: angle,
           type: "street",
-          energy: random(8, 18), // More energy
+          energy: random(4, 10),
           sourceCity: city,
-          canBridge: random() < 0.2,
+          canBridge: random() < 0.1,
           gridAlign: random() < 0.4,
         });
       }
@@ -1078,7 +1020,7 @@ function growRoads() {
 
   if (roadQueue.length === 0) return;
 
-  let toProcess = min(5, roadQueue.length); // Process more roads per frame
+  let toProcess = min(3, roadQueue.length);
 
   for (let i = 0; i < toProcess; i++) {
     let road = roadQueue.shift();
@@ -1089,29 +1031,22 @@ function growRoads() {
       road.angle = lerp(road.angle, snapped, 0.2);
     }
 
-    // Stronger targeting for inter-city roads
     if (road.targetCity) {
       let toTarget = atan2(
         road.targetCity.y - road.y,
         road.targetCity.x - road.x,
       );
-      let lerpStrength = road.isInterCity ? 0.4 : 0.15; // Much stronger for inter-city
-      road.angle = lerp(road.angle, toTarget, lerpStrength);
+      road.angle = lerp(road.angle, toTarget, 0.15);
     }
     if (road.targetIsland) {
       let toTarget = atan2(
         road.targetIsland.y - road.y,
         road.targetIsland.x - road.x,
       );
-      road.angle = lerp(road.angle, toTarget, 0.35);
+      road.angle = lerp(road.angle, toTarget, 0.25);
     }
 
-    // Less random wandering for targeted roads
-    if (!road.isInterCity) {
-      road.angle += (random() - 0.5) * 0.2;
-    } else {
-      road.angle += (random() - 0.5) * 0.08; // Much less wandering
-    }
+    road.angle += (random() - 0.5) * 0.2;
 
     let nx = round(road.x + cos(road.angle));
     let ny = round(road.y + sin(road.angle));
@@ -1120,20 +1055,15 @@ function growRoads() {
       let tile = terrain[nx][ny];
 
       let nearEdge = tile.distanceToWater < 2;
-      if (
-        nearEdge &&
-        !road.targetIsland &&
-        !road.isInterCity &&
-        !tile.isWater
-      ) {
+      if (nearEdge && !road.targetIsland && !tile.isWater) {
         road.energy = 0;
         continue;
       }
 
-      // Less penalty for elevation on inter-city roads
-      if (tile.elevation > 5 && !tile.terraformed && !road.targetCity) {
-        road.energy -= road.isInterCity ? 0.5 : 2;
-        road.angle += (random() - 0.5) * PI * 0.3;
+      // Avoid steep terrain unless terraformed
+      if (tile.elevation > 5 && !tile.terraforming && !road.targetCity) {
+        road.energy -= 2;
+        road.angle += (random() - 0.5) * PI * 0.5;
         if (road.energy > 0) roadQueue.push(road);
         continue;
       }
@@ -1148,14 +1078,7 @@ function growRoads() {
           }
         }
       }
-
-      // Don't penalize inter-city roads for density
-      if (
-        tooManyRoadsNearby > 6 &&
-        !road.targetCity &&
-        !road.targetIsland &&
-        !road.isInterCity
-      ) {
+      if (tooManyRoadsNearby > 6 && !road.targetCity && !road.targetIsland) {
         road.energy -= 3;
         road.angle += (random() - 0.5) * PI * 0.5;
         if (road.energy > 0) roadQueue.push(road);
@@ -1170,10 +1093,9 @@ function growRoads() {
         addRoad(nx, ny, road.type, needsBridge);
         road.x = nx;
         road.y = ny;
-        road.energy -= needsBridge ? 0.3 : 0.8; // Less energy cost
+        road.energy -= needsBridge ? 0.5 : 1;
 
-        // More branching
-        if (random() < 0.08) {
+        if (random() < 0.05) {
           let branchAngle =
             road.angle +
             (random() > 0.5 ? 1 : -1) * (HALF_PI + random(-0.3, 0.3));
@@ -1182,16 +1104,16 @@ function growRoads() {
             y: ny,
             angle: branchAngle,
             type: "street",
-            energy: random(5, 12),
-            canBridge: random() < 0.15,
+            energy: random(3, 7),
+            canBridge: false,
             gridAlign: random() < 0.3,
           });
         }
 
         if (road.energy > 0) roadQueue.push(road);
       } else {
-        road.angle += (random() - 0.5) * PI * 0.8;
-        road.energy -= road.isInterCity ? 0.3 : 1.5; // Less penalty for inter-city
+        road.angle += (random() - 0.5) * PI;
+        road.energy -= 1.5;
         if (road.energy > 0) roadQueue.push(road);
       }
     }
@@ -1234,7 +1156,7 @@ function updateShadows() {
 // ============ BUILDING CANDIDATES ============
 
 function updateBuildingCandidates() {
-  if (!candidatesDirty && frameCount - lastCandidateUpdate < 30) return; // Update more frequently
+  if (!candidatesDirty && frameCount - lastCandidateUpdate < 70) return;
 
   buildingCandidates = [];
 
@@ -1259,7 +1181,8 @@ function updateBuildingCandidates() {
           }
           let tile = terrain[tx][ty];
           if (tile.occupied || tile.isWater) valid = false;
-          if (tile.elevation > 4 && !tile.terraformed) valid = false;
+          // Allow building on terraformed high ground
+          if (tile.elevation > 4 && !tile.terraforming) valid = false;
           maxElev = max(maxElev, tile.elevation);
           minRoadDist = min(minRoadDist, tile.distanceToRoad);
           if (tile.isArtificial) isArtificial = true;
@@ -1268,9 +1191,7 @@ function updateBuildingCandidates() {
         }
       }
 
-      // Increased road distance threshold, extra lenient for artificial (island) tiles
-      let maxRoadDist = isArtificial ? 10 : 7;
-      if (!valid || minRoadDist > maxRoadDist || !nearestCity) continue;
+      if (!valid || minRoadDist > 4 || !nearestCity) continue;
 
       buildingCandidates.push({
         x: bx,
@@ -1330,23 +1251,12 @@ function createBuilding(bx, by, type, city, distToCenter) {
 
   let isOnIsland = terrain[bx * 2][by * 2].isArtificial;
 
-  // Calculate distance to THIS building's city center (not island center)
-  let distToCityCenter = dist(bx * 2, by * 2, city.x, city.y);
-  let maxCityRadius = 25; // Approximate max city radius
-  let cityProximity = 1 - constrain(distToCityCenter / maxCityRadius, 0, 1);
-
-  let centerBonus = (1 - distToCenter) * 0.4; // Reduced island center bonus
-  let cityBonus = cityProximity * 0.8; // Strong city center bonus
+  let centerBonus = (1 - distToCenter) * 0.7;
   let genBonus = (generation - 1) * 0.08;
-  let heightMult = 0.4 + centerBonus + cityBonus + genBonus;
+  let heightMult = 0.45 + centerBonus + genBonus;
 
-  if (isOnIsland) heightMult += 0.2;
-  if (city.zoneType === "COMMERCIAL") heightMult += 0.15;
-
-  // Extra height boost for buildings very close to city center
-  if (cityProximity > 0.7) {
-    heightMult += 0.25;
-  }
+  if (isOnIsland) heightMult += 0.15;
+  if (city.zoneType === "COMMERCIAL") heightMult += 0.1;
 
   let targetHeight = floor(
     random(config.minHeight, config.maxHeight * heightMult),
@@ -1378,7 +1288,7 @@ function createBuilding(bx, by, type, city, distToCenter) {
     layerVariations.push({
       colorShift: random(-8, 8),
       widthMod: widthMod,
-      hasWindow: random() < 0.85,
+      hasWindow: random() < 0.8,
       windowStyle: floor(random(3)),
       glassPanel: type === "COMMERCIAL" && random() > 0.45,
     });
@@ -1404,7 +1314,6 @@ function createBuilding(bx, by, type, city, distToCenter) {
     buildSpeed: config.buildSpeed * random(0.9, 1.1),
     completed: false,
     city: city,
-    isOnIsland: isOnIsland, // Store this for window drawing
 
     age: 0,
     decayAge: config.decayAge + random(-250, 250),
@@ -1418,7 +1327,7 @@ function createBuilding(bx, by, type, city, distToCenter) {
     roofColor,
     layerVariations,
 
-    hasSmokestack: type === "INDUSTRIAL" && random() > 0.25,
+    hasSmokestack: type === "INDUSTRIAL" && random() > 0.35,
     hasAntenna: type === "COMMERCIAL" && random() > 0.55,
     hasHelipad: type === "COMMERCIAL" && targetHeight > 14 && random() > 0.6,
     roofType: getRoofType(type, commercialStyle, industrialShape),
@@ -1506,54 +1415,33 @@ function trySpawnBuilding() {
   updateBuildingCandidates();
   if (buildingCandidates.length === 0) return false;
 
-  // Remove strict city population limits - allow overflow
   let availableCities = cityCenters.filter(
-    (c) => c.population < c.maxBuildings * 1.5, // Allow 50% overflow
+    (c) => c.population < c.maxBuildings,
   );
+  if (availableCities.length === 0) return false;
 
-  // If all cities are full, still allow building in any city
-  if (availableCities.length === 0) {
-    availableCities = cityCenters;
-  }
-
-  // Prioritize island cities that have no buildings yet
-  let emptyIslands = availableCities.filter(
-    (c) => c.isIsland && c.population === 0,
-  );
-  let city;
-
-  if (emptyIslands.length > 0 && random() < 0.4) {
-    // 40% chance to prioritize empty islands
-    city = random(emptyIslands);
-  } else {
-    availableCities.sort((a, b) => a.population - b.population);
-    city = random(availableCities.slice(0, min(3, availableCities.length)));
-  }
+  availableCities.sort((a, b) => a.population - b.population);
+  let city = random(availableCities.slice(0, min(2, availableCities.length)));
 
   let zoneWeights = ZONE_TYPES[city.zoneType].buildingWeights;
   let type = weightedRandomType(zoneWeights);
 
   let cityCandidates = buildingCandidates.filter((c) => {
     if (terrain[c.x * 2][c.y * 2].occupied) return false;
-    // Allow buildings in neighboring city territories too
-    let d = dist(c.x * 2, c.y * 2, city.x, city.y);
-    return c.nearestCity === city || d < 35;
+    if (c.nearestCity !== city) return false;
+    return true;
   });
 
   if (cityCandidates.length === 0) return false;
 
   for (let c of cityCandidates) {
-    let maxRoadDist = c.isArtificial ? 10 : 7;
-    c.score = (1 - c.roadDist / maxRoadDist) * 1.5;
+    c.score = (1 - c.roadDist / 4) * 1.5;
     c.score += (1 - c.distToCenter) * 0.6;
-    if (c.isArtificial && type === "COMMERCIAL") c.score += 1.5; // Higher bonus for island commercial
-    // Bonus for being close to city center
-    let cityDist = dist(c.x * 2, c.y * 2, city.x, city.y);
-    c.score += (1 - cityDist / 40) * 0.5;
+    if (c.isArtificial && type === "COMMERCIAL") c.score += 1;
   }
 
   cityCandidates.sort((a, b) => b.score - a.score);
-  let spot = random(cityCandidates.slice(0, min(8, cityCandidates.length)));
+  let spot = random(cityCandidates.slice(0, min(5, cityCandidates.length)));
 
   let building = createBuilding(spot.x, spot.y, type, city, spot.distToCenter);
 
@@ -1668,33 +1556,25 @@ function draw() {
   drawSpace();
   drawFloatingRock();
 
-  if (frameCount % 2 === 0) growRoads(); // More frequent road growth
+  if (frameCount % 3 === 0) growRoads();
   if (frameCount % 6 === 0) updateShadows();
   if (frameCount % 10 === 0) {
     updateIslandProjects();
     tryStartIslandProject();
   }
-  if (frameCount % 4 === 0) {
-    updateTerraformProjects();
+  if (frameCount % 8 === 0) {
+    updateTerraformProjects(); // NEW: update city flattening
   }
 
   updateBuildings();
   updateSmoke();
 
-  // More aggressive building spawning
   let activeBuildings = buildings.filter((b) => !b.collapsing).length;
-  if (activeBuildings < MAX_BUILDINGS) {
-    // Spawn multiple buildings per frame when far from max
-    let deficit = MAX_BUILDINGS - activeBuildings;
-    let spawnAttempts = deficit > 100 ? 3 : deficit > 50 ? 2 : 1;
-
-    for (let i = 0; i < spawnAttempts; i++) {
-      trySpawnBuilding();
-    }
+  if (activeBuildings < MAX_BUILDINGS && frameCount % 6 === 0) {
+    trySpawnBuilding();
   }
 
   drawScene();
-  drawTerraformDust();
   drawSmoke();
   drawUI();
 }
@@ -1736,6 +1616,8 @@ function drawSpace() {
 }
 
 function drawFloatingRock() {
+  let centerPos = toIso(islandCenterX, islandCenterY, 0);
+
   noStroke();
 
   let rockDark = lerpColor(
@@ -1746,6 +1628,11 @@ function drawFloatingRock() {
   let rockMid = lerpColor(
     color(35, 32, 40),
     color(70, 65, 75),
+    cachedDaylight * 0.5,
+  );
+  let rockLight = lerpColor(
+    color(45, 42, 50),
+    color(90, 85, 95),
     cachedDaylight * 0.5,
   );
 
@@ -1847,28 +1734,19 @@ function drawScene() {
     }
   }
 
+  // Draw terraforming indicators
   for (let p of terraformProjects) {
-    if (p.active) {
+    if (p.radius < p.targetRadius) {
       let pos = toIso(p.x, p.y, terrain[p.x][p.y].elevation);
       if (isVisible(pos.x, pos.y)) {
-        let pulse = sin(frameCount * 0.15) * 0.3 + 0.7;
         noFill();
-        stroke(255, 180, 80, 80 * pulse);
-        strokeWeight(2);
-        ellipse(
-          pos.x,
-          pos.y + TILE_HEIGHT / 2,
-          p.radius * TILE_WIDTH * 0.7,
-          p.radius * TILE_HEIGHT * 0.7,
-        );
-
-        stroke(255, 220, 120, 60 * pulse);
+        stroke(255, 200, 100, 50 + sin(frameCount * 0.1) * 30);
         strokeWeight(1);
         ellipse(
           pos.x,
           pos.y + TILE_HEIGHT / 2,
-          p.radius * TILE_WIDTH * 0.5,
-          p.radius * TILE_HEIGHT * 0.5,
+          p.radius * TILE_WIDTH * 0.8,
+          p.radius * TILE_HEIGHT * 0.8,
         );
         noStroke();
       }
@@ -1891,29 +1769,37 @@ function drawTerrainTile(x, y, tile, pos) {
   } else if (tile.isArtificial) {
     topColor = lerpColor(color(50, 50, 55), color(145, 145, 140), daylight);
     sideColor = lerpColor(color(40, 40, 45), color(110, 110, 105), daylight);
-  } else if (tile.terraformed) {
+  } else if (tile.terraforming) {
+    // Terraformed ground - slightly different color
     topColor = lerpColor(color(45, 42, 38), color(140, 130, 110), daylight);
     sideColor = lerpColor(color(35, 32, 28), color(100, 90, 70), daylight);
   } else if (tile.isCliff) {
+    // CLIFF FACE - grey rock instead of sand
     topColor = lerpColor(color(40, 42, 48), color(95, 100, 110), daylight);
     sideColor = lerpColor(color(30, 32, 38), color(70, 75, 85), daylight);
   } else if (tile.distanceToWater < 2.2 && elev <= 2) {
+    // BEACH - only on LOW elevation near water
     topColor = lerpColor(color(55, 50, 40), color(200, 185, 150), daylight);
     sideColor = lerpColor(color(45, 40, 30), color(170, 155, 120), daylight);
   } else if (tile.distanceToWater < 2.2 && elev > 2) {
+    // High terrain near water but not marked as cliff - still make it rocky
     topColor = lerpColor(color(42, 44, 50), color(100, 105, 115), daylight);
     sideColor = lerpColor(color(32, 34, 40), color(75, 80, 90), daylight);
   } else if (elev > 9) {
+    // Snow caps
     topColor = lerpColor(color(80, 85, 95), color(240, 245, 250), daylight);
     sideColor = lerpColor(color(60, 65, 75), color(200, 210, 220), daylight);
   } else if (elev > 6) {
+    // Rocky mountains
     topColor = lerpColor(color(45, 45, 50), color(120, 115, 110), daylight);
     sideColor = lerpColor(color(35, 35, 40), color(90, 85, 80), daylight);
   } else if (elev > 3) {
+    // Hills - darker grass
     let grass = color(50 + tile.grassType * 3, 85 + tile.grassType * 4, 45);
     topColor = lerpColor(color(22, 32, 36), grass, daylight);
     sideColor = lerpColor(color(16, 24, 30), color(35, 62, 30), daylight);
   } else {
+    // Lowlands - bright grass
     let grass = color(65 + tile.grassType * 5, 130 + tile.grassType * 6, 55);
     topColor = lerpColor(color(24, 40, 44), grass, daylight);
     sideColor = lerpColor(color(20, 30, 34), color(45, 95, 40), daylight);
@@ -2131,19 +2017,18 @@ function drawBuildingLayer(
   vertex(pos.x, y + bh * variation.widthMod);
   endShape(CLOSE);
 
-  // FIXED WINDOWS - Always draw regardless of width
   if (variation.hasWindow && !b.decaying) {
     let windowCol;
     if (isNight) {
       let litChance = noise(b.gridX * 0.15 + layer * 0.3) > 0.3;
       if (litChance) {
         let warmth = noise(b.gridX + layer) * 50;
-        windowCol = color(255, 235 - warmth, 170 - warmth, 200);
+        windowCol = color(255, 235 - warmth, 170 - warmth, 170);
       } else {
-        windowCol = color(35, 45, 60, 90);
+        windowCol = color(35, 45, 60, 70);
       }
     } else {
-      windowCol = color(140, 190, 240, 180);
+      windowCol = color(160, 200, 245, 120);
     }
 
     fill(windowCol);
@@ -2151,14 +2036,14 @@ function drawBuildingLayer(
     if (b.type === "APARTMENT") {
       let style = variation.windowStyle;
       if (style === 0) {
-        rect(pos.x - w * 0.1, y - layerHeight * 0.5, 2.2, 2.8);
-        rect(pos.x + w * 0.08, y - layerHeight * 0.5, 2.2, 2.8);
+        rect(pos.x - w * 0.08, y - layerHeight * 0.5, 1.8, 2.4);
+        rect(pos.x + w * 0.1, y - layerHeight * 0.5, 1.8, 2.4);
       } else if (style === 1) {
-        rect(pos.x - 0.5, y - layerHeight * 0.5, 3.5, 2.5);
+        rect(pos.x, y - layerHeight * 0.5, 3, 2);
       } else {
-        rect(pos.x - w * 0.14, y - layerHeight * 0.45, 1.5, 2.2);
-        rect(pos.x, y - layerHeight * 0.45, 1.5, 2.2);
-        rect(pos.x + w * 0.14, y - layerHeight * 0.45, 1.5, 2.2);
+        rect(pos.x - w * 0.12, y - layerHeight * 0.45, 1.2, 1.8);
+        rect(pos.x + w * 0.02, y - layerHeight * 0.45, 1.2, 1.8);
+        rect(pos.x + w * 0.16, y - layerHeight * 0.45, 1.2, 1.8);
       }
 
       if (layer % 3 === 0 && layer > 0) {
@@ -2166,25 +2051,18 @@ function drawBuildingLayer(
         rect(pos.x + w * 0.2, y - layerHeight * 0.15, 2, 0.8);
       }
     } else {
-      // Commercial/Industrial - ALWAYS draw windows (removed width conditionals)
-      // Center window - always draw
-      rect(pos.x, y - layerHeight * 0.48, 2, 2.6);
-
-      // Side windows - scale position based on width but always draw
-      if (b.type === "COMMERCIAL") {
-        // Left window
-        rect(pos.x - w * 0.2, y - layerHeight * 0.48, 2, 2.6);
-        // Right window
-        rect(pos.x + w * 0.2, y - layerHeight * 0.48, 2, 2.6);
-      } else {
-        // Industrial - fewer windows
-        rect(pos.x - w * 0.15, y - layerHeight * 0.48, 1.8, 2.2);
+      rect(pos.x + w * 0.05, y - layerHeight * 0.48, 1.5, 2.2);
+      if (w > bw * 0.5) {
+        rect(pos.x - w * 0.12, y - layerHeight * 0.48, 1.5, 2.2);
+      }
+      if (b.type === "COMMERCIAL" && w > bw * 0.7) {
+        rect(pos.x + w * 0.18, y - layerHeight * 0.48, 1.5, 2.2);
       }
     }
   }
 
   if (variation.glassPanel && b.type === "COMMERCIAL") {
-    fill(160, 210, 255, isNight ? 25 : 22);
+    fill(160, 210, 255, isNight ? 25 : 18);
     beginShape();
     vertex(pos.x, y - layerHeight * 0.85);
     vertex(pos.x + (w / 2) * 0.85, y - layerHeight + (h / 2) * 0.85);
@@ -2492,7 +2370,6 @@ function drawUI() {
     (b) => !b.completed && !b.collapsing,
   ).length;
   let decaying = buildings.filter((b) => b.decaying && !b.collapsing).length;
-  let total = apartments + commercial + industrial;
 
   fill(0, 0, 0, 165);
   noStroke();
@@ -2511,13 +2388,7 @@ function drawUI() {
         ? color(255, 180, 80)
         : color(255, 80, 80),
   );
-  let activeTerraform = terraformProjects.filter((p) => p.active).length;
-  let islandCount = cityCenters.filter((c) => c.isIsland).length;
-  text(
-    `FPS: ${floor(fps)} | Buildings: ${total}/${MAX_BUILDINGS} | Roads: ${roads.length} | Islands: ${islandCount} | Terraform: ${activeTerraform}`,
-    12,
-    y,
-  );
+  text(`FPS: ${floor(fps)}`, 12, y);
   y += lh;
 }
 
