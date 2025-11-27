@@ -20,8 +20,8 @@ export default function IslandPage() {
           <div className="w-full flex items-center justify-center">
             <iframe
               src="/sketches/island.html"
-              width={1200}
-              height={900}
+              width={800}
+              height={600}
               style={{
                 border: "none",
                 display: "block",
