@@ -31,3 +31,10 @@ remember memory is information + emotion
 information lakes are things that can compound, information rivers are flimsier and harder to compound unless they're actionable
 
 information is useful if it aligns your internal world view to the actual world
+
+---
+
+> Further reading:
+> - Gabriel Petersson [interview](https://www.youtube.com/watch?v=vq5WhoPCWQ8)
+
+edited 2025-12-1
