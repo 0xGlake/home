@@ -14,10 +14,13 @@ export const customRenderers = {
   blockquote: ({ node, ...props }: any) => (
     <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4" {...props} />
   ),
-  code: ({ node, inline, ...props }: any) => 
+  code: ({ node, inline, ...props }: any) =>
     inline ? (
       <code className="bg-gray-100 rounded px-1 py-0.5" {...props} />
     ) : (
       <code className="block bg-gray-100 rounded p-2 my-2 overflow-x-auto" {...props} />
     ),
+  img: ({ node, ...props }: any) => (
+    <img className="mx-auto my-4" {...props} />
+  ),
 };

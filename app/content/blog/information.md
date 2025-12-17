@@ -32,6 +32,8 @@ information lakes are things that can compound, information rivers are flimsier 
 
 information is useful if it aligns your internal world view to the actual world
 
+
+![Test image](/blog/test-image.png)
 ---
 
 > Further reading:
