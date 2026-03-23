@@ -180,14 +180,14 @@ export default function Home() {
             className={getAboutMeStyle()}
           >
             <p className="text-gray-400 font-mono width-1/3 z-50">
-              Thanks for dropping by.
+              Thanks for dropping by
               <br />
               <br />
-              My current interests are in: defi, full stack dev, communities,
-              DnB, reflexive assets, green tea, emergence, and more.
+              My current interests are: defi, full stack development,
+              communities, DnB, emergence, philosophy and more
               <br />
               <br />
-              Please feel free to reach out on twitter.
+              Please feel free to reach out to me on twitter
             </p>
           </motion.div>
           {[
