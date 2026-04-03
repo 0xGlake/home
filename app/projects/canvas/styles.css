@@ -1,0 +1,350 @@
+/* Canvas Viewer Layout */
+.canvas-viewer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-graph-area {
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* React Flow dark theme override */
+.react-flow {
+  background-color: transparent !important;
+}
+
+/* Node wrapper reset */
+.react-flow__node {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Node Styles */
+.canvas-node {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(100, 100, 100, 0.5);
+  color: white;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  transition: opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.canvas-node-selected {
+  border-width: 2px;
+  border-color: #a78bfa !important;
+  box-shadow: 0 0 16px rgba(167, 139, 250, 0.35);
+}
+
+.canvas-node-connected {
+  border-color: rgba(167, 139, 250, 0.6) !important;
+}
+
+.canvas-node-dimmed {
+  opacity: 0.2;
+}
+
+/* Group Styles */
+.canvas-group {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: rgba(100, 100, 100, 0.1);
+  border: 1px dashed rgba(100, 100, 100, 0.4);
+  position: relative;
+  transition: opacity 0.2s;
+}
+
+.canvas-group-label {
+  position: absolute;
+  top: -20px;
+  left: 8px;
+  color: rgba(200, 200, 200, 0.6);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+/* Handle Styles */
+.canvas-handle {
+  width: 6px !important;
+  height: 6px !important;
+  background: rgba(100, 100, 100, 0.4) !important;
+  border: none !important;
+  min-width: unset !important;
+  min-height: unset !important;
+}
+
+/* Node Markdown Content */
+.canvas-node-markdown p {
+  margin: 0 0 4px;
+}
+
+.canvas-node-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.canvas-node-markdown h1,
+.canvas-node-markdown h2,
+.canvas-node-markdown h3 {
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+
+.canvas-node-markdown h1 {
+  font-size: 16px;
+}
+.canvas-node-markdown h2 {
+  font-size: 14px;
+}
+.canvas-node-markdown h3 {
+  font-size: 13px;
+}
+
+.canvas-node-markdown strong {
+  font-weight: 700;
+}
+.canvas-node-markdown em {
+  font-style: italic;
+}
+
+.canvas-node-markdown code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.canvas-node-markdown a {
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+.canvas-node-markdown ul,
+.canvas-node-markdown ol {
+  padding-left: 16px;
+  margin: 4px 0;
+}
+
+/* Sidebar */
+.sidebar-toggle {
+  position: fixed;
+  top: 12px;
+  z-index: 20;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 30, 30, 0.9);
+  border: 1px solid rgba(100, 100, 100, 0.4);
+  border-radius: 6px;
+  color: rgba(200, 200, 200, 0.8);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, right 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(50, 50, 50, 0.9);
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  background: rgba(20, 20, 20, 0.95);
+  border-left: 1px solid rgba(100, 100, 100, 0.3);
+  z-index: 15;
+  overflow-y: auto;
+  padding: 52px 16px 16px 24px;
+  transition: transform 0.3s ease;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.sidebar-resize-handle {
+  position: fixed;
+  top: 0;
+  width: 12px;
+  height: 100vh;
+  cursor: col-resize;
+  z-index: 30;
+}
+
+.sidebar-resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 3px;
+  width: 4px;
+  height: 100%;
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.sidebar-resize-handle:hover::after,
+.sidebar-resize-handle:active::after {
+  background: rgba(167, 139, 250, 0.5);
+}
+
+.sidebar-open {
+  transform: translateX(0);
+}
+
+.sidebar-closed {
+  transform: translateX(100%);
+}
+
+.sidebar-section {
+  margin-bottom: 20px;
+}
+
+.sidebar-heading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(167, 139, 250, 0.8);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.sidebar-node-preview {
+  padding: 10px 12px;
+  background: rgba(40, 40, 40, 0.8);
+  border-radius: 6px;
+  border-left: 3px solid rgba(167, 139, 250, 0.6);
+}
+
+.sidebar-type-badge {
+  display: inline-block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(150, 150, 150, 0.8);
+  background: rgba(80, 80, 80, 0.5);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-bottom: 6px;
+}
+
+.sidebar-label {
+  color: rgba(230, 230, 230, 0.9);
+  font-size: 13px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-list-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  background: rgba(40, 40, 40, 0.6);
+  border: 1px solid rgba(80, 80, 80, 0.3);
+  border-radius: 4px;
+  color: rgba(200, 200, 200, 0.9);
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: background 0.15s, border-color 0.15s;
+  word-break: break-word;
+}
+
+.sidebar-list-item:hover {
+  background: rgba(60, 60, 60, 0.8);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.sidebar-edge-label {
+  display: block;
+  font-size: 10px;
+  color: rgba(167, 139, 250, 0.7);
+  font-style: italic;
+  margin-bottom: 2px;
+  padding-left: 2px;
+}
+
+.sidebar-item-title {
+  display: block;
+  font-size: 12px;
+  color: rgba(220, 220, 220, 0.95);
+  font-weight: 600;
+}
+
+.sidebar-item-body {
+  display: block;
+  font-size: 11px;
+  color: rgba(160, 160, 160, 0.8);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.sidebar-empty {
+  color: rgba(120, 120, 120, 0.8);
+  font-size: 12px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* React Flow Controls dark theme */
+.react-flow__controls {
+  background: rgba(30, 30, 30, 0.9) !important;
+  border: 1px solid rgba(100, 100, 100, 0.3) !important;
+  border-radius: 6px !important;
+}
+
+.react-flow__controls button {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.2) !important;
+  fill: rgba(200, 200, 200, 0.7) !important;
+}
+
+.react-flow__controls button:hover {
+  background: rgba(60, 60, 60, 0.8) !important;
+}
+
+.react-flow__controls button:last-child {
+  border-bottom: none !important;
+}
+
+/* React Flow MiniMap dark theme */
+.react-flow__minimap {
+  border-radius: 6px !important;
+  border: 1px solid rgba(100, 100, 100, 0.3) !important;
+}
+
+/* Edge label styling */
+.react-flow__edge-text {
+  fill: rgba(200, 200, 200, 0.8) !important;
+  font-size: 11px;
+}
+
+.react-flow__edge-textbg {
+  fill: rgba(20, 20, 20, 0.8) !important;
+}

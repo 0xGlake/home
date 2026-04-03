@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { customRenderers } from '../../lib/CustomRenderers';
+import CanvasPost from './CanvasPost';
 
 interface BlogPostProps {
   params: {
@@ -13,18 +14,64 @@ interface BlogPostProps {
   };
 }
 
-export async function generateStaticParams() {
-  const postsDirectory = path.join(process.cwd(), 'app', 'content', 'blog');
-  const filenames = fs.readdirSync(postsDirectory);
+const CANVAS_SLUG_PREFIX = 'canvas-';
 
-  return filenames.map(filename => ({
-    slug: filename.replace(/\.md$/, ''),
-  }));
+function resolvePost(slug: string): { type: "markdown"; slug: string } | { type: "canvas"; canvasFile: string; title?: string } {
+  if (slug.startsWith(CANVAS_SLUG_PREFIX)) {
+    const canvasName = slug.slice(CANVAS_SLUG_PREFIX.length);
+    const canvasPath = path.join(process.cwd(), 'public', 'canvas', `${canvasName}.canvas`);
+    if (fs.existsSync(canvasPath)) {
+      const data = JSON.parse(fs.readFileSync(canvasPath, 'utf8'));
+      return { type: "canvas", canvasFile: `${canvasName}.canvas`, title: data.title };
+    }
+  }
+  return { type: "markdown", slug };
+}
+
+export async function generateStaticParams() {
+  const params: { slug: string }[] = [];
+
+  const postsDirectory = path.join(process.cwd(), 'app', 'content', 'blog');
+  const mdFiles = fs.readdirSync(postsDirectory);
+  for (const filename of mdFiles) {
+    if (filename.endsWith('.md')) {
+      params.push({ slug: filename.replace(/\.md$/, '') });
+    }
+  }
+
+  const canvasDirectory = path.join(process.cwd(), 'public', 'canvas');
+  try {
+    const canvasFiles = fs.readdirSync(canvasDirectory);
+    for (const filename of canvasFiles) {
+      if (filename.endsWith('.canvas')) {
+        params.push({ slug: CANVAS_SLUG_PREFIX + filename.replace(/\.canvas$/, '') });
+      }
+    }
+  } catch {}
+
+  return params;
 }
 
 export default function BlogPost({ params }: BlogPostProps) {
-  const { slug } = params;
-  const filePath = path.join(process.cwd(), 'app', 'content', 'blog', `${slug}.md`);
+  const post = resolvePost(params.slug);
+
+  if (post.type === "canvas") {
+    return (
+      <div className="h-screen flex flex-col" style={{ background: "rgb(16, 16, 16)" }}>
+        <div className="px-4 py-3 flex items-center gap-4">
+          <Link href="/blog" className="text-lg font-mono font-bold text-violet-400 hover:text-violet-300">
+            &lt; Blog
+          </Link>
+          {post.title && (
+            <span className="text-gray-400 font-mono text-sm">{post.title}</span>
+          )}
+        </div>
+        <CanvasPost canvasFile={post.canvasFile} />
+      </div>
+    );
+  }
+
+  const filePath = path.join(process.cwd(), 'app', 'content', 'blog', `${post.slug}.md`);
   const fileContents = fs.readFileSync(filePath, 'utf8');
   const { data, content } = matter(fileContents);
 
