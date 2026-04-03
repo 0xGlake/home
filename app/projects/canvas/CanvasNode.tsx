@@ -1,5 +1,5 @@
 "use client";
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import ReactMarkdown from "react-markdown";
 import type { CanvasNodeData } from "./parseCanvas";
@@ -19,6 +19,8 @@ function CanvasNodeComponent({ data }: NodeProps) {
   const { label, canvasType, color, url, visualState } =
     data as unknown as CanvasNodeData;
 
+  const isSelected = visualState === "selected";
+
   const stateClass =
     visualState === "selected"
       ? "canvas-node-selected"
@@ -27,6 +29,24 @@ function CanvasNodeComponent({ data }: NodeProps) {
         : visualState === "dimmed"
           ? "canvas-node-dimmed"
           : "";
+
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = nodeRef.current;
+    if (!el || !isSelected) return;
+
+    const handler = (e: WheelEvent) => {
+      e.stopPropagation();
+      // Block pinch-zoom (ctrlKey is set during pinch gestures)
+      if (e.ctrlKey) {
+        e.preventDefault();
+      }
+    };
+
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [isSelected]);
 
   return (
     <>
@@ -40,7 +60,8 @@ function CanvasNodeComponent({ data }: NodeProps) {
         />
       ))}
       <div
-        className={`canvas-node ${stateClass}`}
+        ref={nodeRef}
+        className={`canvas-node ${stateClass} ${isSelected ? "canvas-node-scrollable" : ""}`}
         style={color ? { borderColor: color } : undefined}
       >
         {canvasType === "link" ? (
