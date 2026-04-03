@@ -42,6 +42,7 @@ export default function GraphPane({
       nodesDraggable={false}
       nodesConnectable={false}
       elementsSelectable={false}
+      panOnDrag
       panOnScroll
       zoomOnScroll={false}
       zoomOnPinch

@@ -49,25 +49,32 @@ export default function Sidebar({
     return { title, body: truncatedBody };
   };
 
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
+  const onDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     dragging.current = true;
   }, []);
 
   useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
+    const getClientX = (e: MouseEvent | TouchEvent) =>
+      "touches" in e ? e.touches[0].clientX : e.clientX;
+
+    const onMove = (e: MouseEvent | TouchEvent) => {
       if (!dragging.current) return;
-      const newWidth = window.innerWidth - e.clientX;
+      const newWidth = window.innerWidth - getClientX(e);
       setWidth(Math.max(200, Math.min(newWidth, window.innerWidth * 0.8)));
     };
-    const onMouseUp = () => {
+    const onEnd = () => {
       dragging.current = false;
     };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchmove", onMove);
+    window.addEventListener("touchend", onEnd);
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onEnd);
     };
   }, []);
 
@@ -76,7 +83,7 @@ export default function Sidebar({
       <button
         onClick={onToggle}
         className="sidebar-toggle"
-        style={{ right: open ? width + 4 + "px" : "12px" }}
+        style={{ right: open ? `min(${width + 4}px, calc(100vw - 44px))` : "12px" }}
         aria-label={open ? "Close sidebar" : "Open sidebar"}
       >
         {open ? "\u2715" : "\u2630"}
@@ -86,7 +93,8 @@ export default function Sidebar({
         <div
           className="sidebar-resize-handle"
           style={{ right: width - 6 }}
-          onMouseDown={onMouseDown}
+          onMouseDown={onDragStart}
+          onTouchStart={onDragStart}
         />
       )}
 

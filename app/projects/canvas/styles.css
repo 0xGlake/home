@@ -191,6 +191,13 @@
   height: 100vh;
   cursor: col-resize;
   z-index: 30;
+  touch-action: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar-resize-handle {
+    width: 20px;
+  }
 }
 
 .sidebar-resize-handle::after {
