@@ -15,16 +15,9 @@ const handles = [
   { type: "target" as const, position: Position.Right, id: "right" },
 ];
 
-let nodeRenderCount = 0;
-
 function CanvasNodeComponent({ data }: NodeProps) {
   const { label, canvasType, color, url, isSelected } =
     data as unknown as CanvasNodeData;
-
-  nodeRenderCount++;
-  console.log(
-    `[perf] CanvasNode render #${nodeRenderCount}, label="${label?.slice(0, 30)}...", isSelected=${isSelected}`,
-  );
 
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +39,6 @@ function CanvasNodeComponent({ data }: NodeProps) {
   // Memoize the expensive ReactMarkdown parse — label never changes,
   // so this runs once per node and is reused across all re-renders.
   const content = useMemo(() => {
-    console.log(`[perf] ReactMarkdown PARSE: "${label?.slice(0, 30)}..."`);
     if (canvasType === "link") {
       return (
         <a

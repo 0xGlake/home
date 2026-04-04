@@ -29,7 +29,6 @@ export default memo(function GraphPane({
   onNodeClick,
   onPaneClick,
 }: GraphPaneProps) {
-  console.log(`[perf] GraphPane render: ${nodes.length} nodes, ${edges.length} edges`);
   return (
     <ReactFlow
       nodes={nodes}

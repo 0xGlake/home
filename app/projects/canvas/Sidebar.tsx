@@ -25,9 +25,7 @@ export default memo(function Sidebar({
   const [width, setWidth] = useState(280);
   const dragging = useRef(false);
 
-  console.time("[perf] Sidebar render");
   const selectedData = selectedNodeId ? nodeMap.get(selectedNodeId) : null;
-  console.log(`[perf] Sidebar: open=${open}, selectedId=${selectedNodeId}, labelLen=${selectedData?.label?.length || 0}`);
   const parentIds = selectedNodeId
     ? graphIndex.parents.get(selectedNodeId) || []
     : [];
@@ -88,8 +86,6 @@ export default memo(function Sidebar({
       window.removeEventListener("touchend", onEnd);
     };
   }, []);
-
-  console.timeEnd("[perf] Sidebar render");
 
   return (
     <>

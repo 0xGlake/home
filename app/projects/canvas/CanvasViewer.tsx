@@ -53,11 +53,8 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
   }, [canvasPath]);
 
   const visualNodes = useMemo(() => {
-    const t0 = performance.now();
-    let result: Node[];
-
     if (!selectedNodeId) {
-      result = baseNodes;
+      return baseNodes;
     } else {
       const connected = new Set<string>([
         selectedNodeId,
@@ -65,7 +62,7 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
         ...(graphIndex.children.get(selectedNodeId) || []),
       ]);
 
-      result = baseNodes.map((node) => {
+      return baseNodes.map((node) => {
         if (node.id === selectedNodeId) {
           return {
             ...node,
@@ -79,40 +76,25 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
         };
       });
     }
-
-    console.log(`[perf] visualNodes: ${(performance.now() - t0).toFixed(2)}ms, ${result.length} nodes, selected=${selectedNodeId}`);
-    return result;
   }, [baseNodes, selectedNodeId, graphIndex]);
 
   const visualEdges = useMemo(() => {
-    const t0 = performance.now();
-    let result: Edge[];
-
     if (!selectedNodeId) {
-      result = baseEdges;
-    } else {
-      result = baseEdges.map((edge) => ({
-        ...edge,
-        className:
-          edge.source === selectedNodeId || edge.target === selectedNodeId
-            ? "edge-highlighted"
-            : "edge-dimmed",
-      }));
+      return baseEdges;
     }
 
-    console.log(`[perf] visualEdges: ${(performance.now() - t0).toFixed(2)}ms, ${result.length} edges`);
-    return result;
+    return baseEdges.map((edge) => ({
+      ...edge,
+      className:
+        edge.source === selectedNodeId || edge.target === selectedNodeId
+          ? "edge-highlighted"
+          : "edge-dimmed",
+    }));
   }, [baseEdges, selectedNodeId]);
 
   const handleNodeClick = useCallback((nodeId: string) => {
-    console.time("[perf] node click → render complete");
     setSelectedNodeId(nodeId);
     setSidebarOpen(true);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        console.timeEnd("[perf] node click → render complete");
-      });
-    });
   }, []);
 
   const handlePaneClick = useCallback(() => {
