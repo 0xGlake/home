@@ -83,7 +83,9 @@ export default function Sidebar({
       <button
         onClick={onToggle}
         className="sidebar-toggle"
-        style={{ right: open ? `min(${width + 4}px, calc(100vw - 44px))` : "12px" }}
+        style={{
+          right: open ? `min(${width + 4}px, calc(100vw - 44px))` : "12px",
+        }}
         aria-label={open ? "Close sidebar" : "Open sidebar"}
       >
         {open ? "\u2715" : "\u2630"}
@@ -114,9 +116,6 @@ export default function Sidebar({
                     : undefined
                 }
               >
-                <span className="sidebar-type-badge">
-                  {selectedData.canvasType}
-                </span>
                 <div className="sidebar-label canvas-node-markdown">
                   <ReactMarkdown>{selectedData.label}</ReactMarkdown>
                 </div>
