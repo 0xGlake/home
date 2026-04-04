@@ -47,7 +47,8 @@
   transition: opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
-.canvas-node-selected {
+/* Visual states via wrapper className — no node re-render needed */
+.node-selected .canvas-node {
   border-width: 2px;
   border-color: #a78bfa !important;
   box-shadow: 0 0 16px rgba(167, 139, 250, 0.35);
@@ -57,12 +58,23 @@
   overflow: auto;
 }
 
-.canvas-node-connected {
+.node-connected .canvas-node {
   border-color: rgba(167, 139, 250, 0.6) !important;
 }
 
-.canvas-node-dimmed {
+.node-dimmed .canvas-node,
+.node-dimmed .canvas-group {
   opacity: 0.2;
+}
+
+/* Edge visual states */
+.edge-highlighted .react-flow__edge-path {
+  stroke: #a78bfa !important;
+  stroke-width: 2 !important;
+}
+
+.edge-dimmed {
+  opacity: 0.15;
 }
 
 /* Group Styles */

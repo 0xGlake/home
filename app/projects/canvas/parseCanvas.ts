@@ -7,7 +7,7 @@ export interface CanvasNodeData {
   color?: string;
   url?: string;
   file?: string;
-  visualState: "default" | "selected" | "connected" | "dimmed";
+  isSelected?: boolean;
 }
 
 export interface GraphIndex {
@@ -69,7 +69,6 @@ export function parseCanvas(data: RawCanvasData) {
       color: resolveColor(node.color),
       url: node.url,
       file: node.file,
-      visualState: "default",
     };
     nodeMap.set(node.id, nodeData);
 

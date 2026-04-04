@@ -16,19 +16,8 @@ const handles = [
 ];
 
 function CanvasNodeComponent({ data }: NodeProps) {
-  const { label, canvasType, color, url, visualState } =
+  const { label, canvasType, color, url, isSelected } =
     data as unknown as CanvasNodeData;
-
-  const isSelected = visualState === "selected";
-
-  const stateClass =
-    visualState === "selected"
-      ? "canvas-node-selected"
-      : visualState === "connected"
-        ? "canvas-node-connected"
-        : visualState === "dimmed"
-          ? "canvas-node-dimmed"
-          : "";
 
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +27,6 @@ function CanvasNodeComponent({ data }: NodeProps) {
 
     const handler = (e: WheelEvent) => {
       e.stopPropagation();
-      // Block pinch-zoom (ctrlKey is set during pinch gestures)
       if (e.ctrlKey) {
         e.preventDefault();
       }
@@ -61,7 +49,7 @@ function CanvasNodeComponent({ data }: NodeProps) {
       ))}
       <div
         ref={nodeRef}
-        className={`canvas-node ${stateClass} ${isSelected ? "canvas-node-scrollable" : ""}`}
+        className={`canvas-node ${isSelected ? "canvas-node-scrollable" : ""}`}
         style={color ? { borderColor: color } : undefined}
       >
         {canvasType === "link" ? (
@@ -86,13 +74,11 @@ function CanvasNodeComponent({ data }: NodeProps) {
 }
 
 function CanvasGroupComponent({ data }: NodeProps) {
-  const { label, color, visualState } = data as unknown as CanvasNodeData;
-
-  const stateClass = visualState === "dimmed" ? "canvas-node-dimmed" : "";
+  const { label, color } = data as unknown as CanvasNodeData;
 
   return (
     <div
-      className={`canvas-group ${stateClass}`}
+      className="canvas-group"
       style={
         color
           ? { borderColor: color, backgroundColor: color + "15" }

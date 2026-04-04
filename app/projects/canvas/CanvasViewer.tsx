@@ -54,38 +54,39 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
 
   const visualNodes = useMemo(() => {
     if (!selectedNodeId) return baseNodes;
+
     const connected = new Set<string>([
       selectedNodeId,
       ...(graphIndex.parents.get(selectedNodeId) || []),
       ...(graphIndex.children.get(selectedNodeId) || []),
     ]);
-    return baseNodes.map((node) => ({
-      ...node,
-      data: {
-        ...node.data,
-        visualState:
-          node.id === selectedNodeId
-            ? "selected"
-            : connected.has(node.id)
-              ? "connected"
-              : "dimmed",
-      },
-    }));
+
+    return baseNodes.map((node) => {
+      if (node.id === selectedNodeId) {
+        // Only the selected node gets new data (for scroll behavior)
+        return {
+          ...node,
+          className: "node-selected",
+          data: { ...node.data, isSelected: true },
+        };
+      }
+      // All other nodes: className only, data reference unchanged → memo skips re-render
+      return {
+        ...node,
+        className: connected.has(node.id) ? "node-connected" : "node-dimmed",
+      };
+    });
   }, [baseNodes, selectedNodeId, graphIndex]);
 
   const visualEdges = useMemo(() => {
     if (!selectedNodeId) return baseEdges;
-    return baseEdges.map((edge) => {
-      const isConnected =
-        edge.source === selectedNodeId || edge.target === selectedNodeId;
-      return {
-        ...edge,
-        style: isConnected
-          ? { stroke: "#a78bfa", strokeWidth: 2 }
-          : { stroke: "rgba(150, 150, 150, 0.15)", strokeWidth: 1 },
-        animated: isConnected,
-      };
-    });
+    return baseEdges.map((edge) => ({
+      ...edge,
+      className:
+        edge.source === selectedNodeId || edge.target === selectedNodeId
+          ? "edge-highlighted"
+          : "edge-dimmed",
+    }));
   }, [baseEdges, selectedNodeId]);
 
   const handleNodeClick = useCallback((nodeId: string) => {
