@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { memo, useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useReactFlow } from "@xyflow/react";
 import ReactMarkdown from "react-markdown";
 import type { CanvasNodeData, GraphIndex } from "./parseCanvas";
@@ -13,7 +13,7 @@ interface SidebarProps {
   onSelectNode: (id: string) => void;
 }
 
-export default function Sidebar({
+export default memo(function Sidebar({
   selectedNodeId,
   graphIndex,
   nodeMap,
@@ -25,13 +25,24 @@ export default function Sidebar({
   const [width, setWidth] = useState(280);
   const dragging = useRef(false);
 
+  console.time("[perf] Sidebar render");
   const selectedData = selectedNodeId ? nodeMap.get(selectedNodeId) : null;
+  console.log(`[perf] Sidebar: open=${open}, selectedId=${selectedNodeId}, labelLen=${selectedData?.label?.length || 0}`);
   const parentIds = selectedNodeId
     ? graphIndex.parents.get(selectedNodeId) || []
     : [];
   const childIds = selectedNodeId
     ? graphIndex.children.get(selectedNodeId) || []
     : [];
+
+  const selectedContent = useMemo(() => {
+    if (!selectedData) return null;
+    return (
+      <div className="sidebar-label canvas-node-markdown">
+        <ReactMarkdown>{selectedData.label}</ReactMarkdown>
+      </div>
+    );
+  }, [selectedData?.label]);
 
   const handleConnectionClick = (nodeId: string) => {
     onSelectNode(nodeId);
@@ -78,6 +89,8 @@ export default function Sidebar({
     };
   }, []);
 
+  console.timeEnd("[perf] Sidebar render");
+
   return (
     <>
       <button
@@ -116,9 +129,7 @@ export default function Sidebar({
                     : undefined
                 }
               >
-                <div className="sidebar-label canvas-node-markdown">
-                  <ReactMarkdown>{selectedData.label}</ReactMarkdown>
-                </div>
+                {selectedContent}
               </div>
             </div>
 
@@ -202,4 +213,4 @@ export default function Sidebar({
       </div>
     </>
   );
-}
+});

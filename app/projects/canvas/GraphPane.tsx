@@ -1,4 +1,5 @@
 "use client";
+import { memo } from "react";
 import {
   ReactFlow,
   Controls,
@@ -22,12 +23,13 @@ interface GraphPaneProps {
   onPaneClick: () => void;
 }
 
-export default function GraphPane({
+export default memo(function GraphPane({
   nodes,
   edges,
   onNodeClick,
   onPaneClick,
 }: GraphPaneProps) {
+  console.log(`[perf] GraphPane render: ${nodes.length} nodes, ${edges.length} edges`);
   return (
     <ReactFlow
       nodes={nodes}
@@ -56,4 +58,4 @@ export default function GraphPane({
       <Controls showInteractive={false} />
     </ReactFlow>
   );
-}
+});

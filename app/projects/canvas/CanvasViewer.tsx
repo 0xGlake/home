@@ -53,45 +53,66 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
   }, [canvasPath]);
 
   const visualNodes = useMemo(() => {
-    if (!selectedNodeId) return baseNodes;
+    const t0 = performance.now();
+    let result: Node[];
 
-    const connected = new Set<string>([
-      selectedNodeId,
-      ...(graphIndex.parents.get(selectedNodeId) || []),
-      ...(graphIndex.children.get(selectedNodeId) || []),
-    ]);
+    if (!selectedNodeId) {
+      result = baseNodes;
+    } else {
+      const connected = new Set<string>([
+        selectedNodeId,
+        ...(graphIndex.parents.get(selectedNodeId) || []),
+        ...(graphIndex.children.get(selectedNodeId) || []),
+      ]);
 
-    return baseNodes.map((node) => {
-      if (node.id === selectedNodeId) {
-        // Only the selected node gets new data (for scroll behavior)
+      result = baseNodes.map((node) => {
+        if (node.id === selectedNodeId) {
+          return {
+            ...node,
+            className: "node-selected",
+            data: { ...node.data, isSelected: true },
+          };
+        }
         return {
           ...node,
-          className: "node-selected",
-          data: { ...node.data, isSelected: true },
+          className: connected.has(node.id) ? "node-connected" : "node-dimmed",
         };
-      }
-      // All other nodes: className only, data reference unchanged → memo skips re-render
-      return {
-        ...node,
-        className: connected.has(node.id) ? "node-connected" : "node-dimmed",
-      };
-    });
+      });
+    }
+
+    console.log(`[perf] visualNodes: ${(performance.now() - t0).toFixed(2)}ms, ${result.length} nodes, selected=${selectedNodeId}`);
+    return result;
   }, [baseNodes, selectedNodeId, graphIndex]);
 
   const visualEdges = useMemo(() => {
-    if (!selectedNodeId) return baseEdges;
-    return baseEdges.map((edge) => ({
-      ...edge,
-      className:
-        edge.source === selectedNodeId || edge.target === selectedNodeId
-          ? "edge-highlighted"
-          : "edge-dimmed",
-    }));
+    const t0 = performance.now();
+    let result: Edge[];
+
+    if (!selectedNodeId) {
+      result = baseEdges;
+    } else {
+      result = baseEdges.map((edge) => ({
+        ...edge,
+        className:
+          edge.source === selectedNodeId || edge.target === selectedNodeId
+            ? "edge-highlighted"
+            : "edge-dimmed",
+      }));
+    }
+
+    console.log(`[perf] visualEdges: ${(performance.now() - t0).toFixed(2)}ms, ${result.length} edges`);
+    return result;
   }, [baseEdges, selectedNodeId]);
 
   const handleNodeClick = useCallback((nodeId: string) => {
+    console.time("[perf] node click → render complete");
     setSelectedNodeId(nodeId);
     setSidebarOpen(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        console.timeEnd("[perf] node click → render complete");
+      });
+    });
   }, []);
 
   const handlePaneClick = useCallback(() => {
@@ -102,6 +123,10 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
   const handleSidebarSelectNode = useCallback((nodeId: string) => {
     setSelectedNodeId(nodeId);
     setSidebarOpen(true);
+  }, []);
+
+  const handleSidebarToggle = useCallback(() => {
+    setSidebarOpen((prev) => !prev);
   }, []);
 
   if (loading) {
@@ -139,7 +164,7 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
         graphIndex={graphIndex}
         nodeMap={nodeMap}
         open={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onToggle={handleSidebarToggle}
         onSelectNode={handleSidebarSelectNode}
       />
     </div>

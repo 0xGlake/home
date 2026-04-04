@@ -1,5 +1,5 @@
 "use client";
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import ReactMarkdown from "react-markdown";
 import type { CanvasNodeData } from "./parseCanvas";
@@ -15,9 +15,16 @@ const handles = [
   { type: "target" as const, position: Position.Right, id: "right" },
 ];
 
+let nodeRenderCount = 0;
+
 function CanvasNodeComponent({ data }: NodeProps) {
   const { label, canvasType, color, url, isSelected } =
     data as unknown as CanvasNodeData;
+
+  nodeRenderCount++;
+  console.log(
+    `[perf] CanvasNode render #${nodeRenderCount}, label="${label?.slice(0, 30)}...", isSelected=${isSelected}`,
+  );
 
   const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +43,32 @@ function CanvasNodeComponent({ data }: NodeProps) {
     return () => el.removeEventListener("wheel", handler);
   }, [isSelected]);
 
+  // Memoize the expensive ReactMarkdown parse — label never changes,
+  // so this runs once per node and is reused across all re-renders.
+  const content = useMemo(() => {
+    console.log(`[perf] ReactMarkdown PARSE: "${label?.slice(0, 30)}..."`);
+    if (canvasType === "link") {
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-400 hover:underline break-all"
+        >
+          {label || url}
+        </a>
+      );
+    }
+    if (canvasType === "file") {
+      return <div className="text-gray-300 italic">{label}</div>;
+    }
+    return (
+      <div className="canvas-node-markdown">
+        <ReactMarkdown>{label}</ReactMarkdown>
+      </div>
+    );
+  }, [label, canvasType, url]);
+
   return (
     <>
       {handles.map((h, i) => (
@@ -52,22 +85,7 @@ function CanvasNodeComponent({ data }: NodeProps) {
         className={`canvas-node ${isSelected ? "canvas-node-scrollable" : ""}`}
         style={color ? { borderColor: color } : undefined}
       >
-        {canvasType === "link" ? (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:underline break-all"
-          >
-            {label || url}
-          </a>
-        ) : canvasType === "file" ? (
-          <div className="text-gray-300 italic">{label}</div>
-        ) : (
-          <div className="canvas-node-markdown">
-            <ReactMarkdown>{label}</ReactMarkdown>
-          </div>
-        )}
+        {content}
       </div>
     </>
   );
@@ -90,5 +108,23 @@ function CanvasGroupComponent({ data }: NodeProps) {
   );
 }
 
-export const CanvasNode = memo(CanvasNodeComponent);
-export const CanvasGroup = memo(CanvasGroupComponent);
+function areNodePropsEqual(prev: NodeProps, next: NodeProps) {
+  const p = prev.data as unknown as CanvasNodeData;
+  const n = next.data as unknown as CanvasNodeData;
+  return (
+    p.label === n.label &&
+    p.canvasType === n.canvasType &&
+    p.color === n.color &&
+    p.url === n.url &&
+    p.isSelected === n.isSelected
+  );
+}
+
+function areGroupPropsEqual(prev: NodeProps, next: NodeProps) {
+  const p = prev.data as unknown as CanvasNodeData;
+  const n = next.data as unknown as CanvasNodeData;
+  return p.label === n.label && p.color === n.color;
+}
+
+export const CanvasNode = memo(CanvasNodeComponent, areNodePropsEqual);
+export const CanvasGroup = memo(CanvasGroupComponent, areGroupPropsEqual);
