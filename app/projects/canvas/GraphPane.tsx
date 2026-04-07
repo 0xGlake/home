@@ -48,6 +48,9 @@ export default memo(function GraphPane({
       zoomOnScroll={false}
       zoomOnPinch
       proOptions={{ hideAttribution: true }}
+      // Only mount nodes in the current viewport. Big win when panning
+      // while zoomed in — Safari doesn't have to paint offscreen nodes.
+      onlyRenderVisibleElements
     >
       <Background
         variant={BackgroundVariant.Dots}

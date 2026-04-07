@@ -1,7 +1,6 @@
 "use client";
-import { memo, useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { memo, useState, useCallback } from "react";
 import { useReactFlow } from "@xyflow/react";
-import ReactMarkdown from "react-markdown";
 import type { CanvasNodeData, GraphIndex } from "./parseCanvas";
 
 interface SidebarProps {
@@ -23,7 +22,6 @@ export default memo(function Sidebar({
 }: SidebarProps) {
   const { fitView } = useReactFlow();
   const [width, setWidth] = useState(280);
-  const dragging = useRef(false);
 
   const selectedData = selectedNodeId ? nodeMap.get(selectedNodeId) : null;
   const parentIds = selectedNodeId
@@ -32,15 +30,6 @@ export default memo(function Sidebar({
   const childIds = selectedNodeId
     ? graphIndex.children.get(selectedNodeId) || []
     : [];
-
-  const selectedContent = useMemo(() => {
-    if (!selectedData) return null;
-    return (
-      <div className="sidebar-label canvas-node-markdown">
-        <ReactMarkdown>{selectedData.label}</ReactMarkdown>
-      </div>
-    );
-  }, [selectedData?.label]);
 
   const handleConnectionClick = (nodeId: string) => {
     onSelectNode(nodeId);
@@ -58,34 +47,34 @@ export default memo(function Sidebar({
     return { title, body: truncatedBody };
   };
 
-  const onDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    dragging.current = true;
-  }, []);
+  // Drag listeners attach only while dragging and use passive touch
+  // handlers. Attaching them unconditionally fires a JS callback on every
+  // React Flow touchmove (which is hot on mobile); worse, a non-passive
+  // touchmove blocks iOS's compositor thread on every pan.
+  const onDragStart = useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      e.preventDefault();
 
-  useEffect(() => {
-    const getClientX = (e: MouseEvent | TouchEvent) =>
-      "touches" in e ? e.touches[0].clientX : e.clientX;
+      const getClientX = (ev: MouseEvent | TouchEvent) =>
+        "touches" in ev ? ev.touches[0].clientX : ev.clientX;
 
-    const onMove = (e: MouseEvent | TouchEvent) => {
-      if (!dragging.current) return;
-      const newWidth = window.innerWidth - getClientX(e);
-      setWidth(Math.max(200, Math.min(newWidth, window.innerWidth * 0.8)));
-    };
-    const onEnd = () => {
-      dragging.current = false;
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onEnd);
-    window.addEventListener("touchmove", onMove);
-    window.addEventListener("touchend", onEnd);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onEnd);
-      window.removeEventListener("touchmove", onMove);
-      window.removeEventListener("touchend", onEnd);
-    };
-  }, []);
+      const onMove = (ev: MouseEvent | TouchEvent) => {
+        const newWidth = window.innerWidth - getClientX(ev);
+        setWidth(Math.max(200, Math.min(newWidth, window.innerWidth * 0.8)));
+      };
+      const onEnd = () => {
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseup", onEnd);
+        window.removeEventListener("touchmove", onMove);
+        window.removeEventListener("touchend", onEnd);
+      };
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onEnd);
+      window.addEventListener("touchmove", onMove, { passive: true });
+      window.addEventListener("touchend", onEnd);
+    },
+    [],
+  );
 
   return (
     <>
@@ -125,7 +114,14 @@ export default memo(function Sidebar({
                     : undefined
                 }
               >
-                {selectedContent}
+                {selectedData.html ? (
+                  <div
+                    className="sidebar-label canvas-node-markdown"
+                    dangerouslySetInnerHTML={{ __html: selectedData.html }}
+                  />
+                ) : (
+                  <div className="sidebar-label">{selectedData.label}</div>
+                )}
               </div>
             </div>
 

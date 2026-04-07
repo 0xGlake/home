@@ -33,18 +33,27 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const t0 = performance.now();
     fetch(canvasPath)
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load canvas: ${res.status}`);
         return res.json();
       })
       .then((data) => {
+        const t1 = performance.now();
         const parsed = parseCanvas(data);
+        const t2 = performance.now();
         setBaseNodes(parsed.nodes);
         setBaseEdges(parsed.edges);
         setGraphIndex(parsed.graphIndex);
         setNodeMap(parsed.nodeMap);
         setLoading(false);
+        if (process.env.NODE_ENV !== "production") {
+          // eslint-disable-next-line no-console
+          console.log(
+            `[canvas] nodes=${parsed.nodes.length} edges=${parsed.edges.length} fetch=${(t1 - t0).toFixed(1)}ms parse=${(t2 - t1).toFixed(1)}ms`,
+          );
+        }
       })
       .catch((err) => {
         setError(err.message);
@@ -55,27 +64,26 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
   const visualNodes = useMemo(() => {
     if (!selectedNodeId) {
       return baseNodes;
-    } else {
-      const connected = new Set<string>([
-        selectedNodeId,
-        ...(graphIndex.parents.get(selectedNodeId) || []),
-        ...(graphIndex.children.get(selectedNodeId) || []),
-      ]);
-
-      return baseNodes.map((node) => {
-        if (node.id === selectedNodeId) {
-          return {
-            ...node,
-            className: "node-selected",
-            data: { ...node.data, isSelected: true },
-          };
-        }
-        return {
-          ...node,
-          className: connected.has(node.id) ? "node-connected" : "node-dimmed",
-        };
-      });
     }
+    const connected = new Set<string>([
+      selectedNodeId,
+      ...(graphIndex.parents.get(selectedNodeId) || []),
+      ...(graphIndex.children.get(selectedNodeId) || []),
+    ]);
+
+    // Important: we only change `className`, never `data`. Since the
+    // custom node component's memo comparator only looks at fields in
+    // `data`, the actual node component instance never re-renders on
+    // selection — only its React Flow wrapper div's class changes.
+    return baseNodes.map((node) => {
+      if (node.id === selectedNodeId) {
+        return { ...node, className: "node-selected" };
+      }
+      return {
+        ...node,
+        className: connected.has(node.id) ? "node-connected" : "node-dimmed",
+      };
+    });
   }, [baseNodes, selectedNodeId, graphIndex]);
 
   const visualEdges = useMemo(() => {
