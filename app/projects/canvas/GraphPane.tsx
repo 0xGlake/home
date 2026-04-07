@@ -35,8 +35,12 @@ export default memo(function GraphPane({
       edges={edges}
       nodeTypes={nodeTypes}
       onNodeClick={(_, node) => {
-        // Group nodes are purely aesthetic — ignore clicks on them.
-        if (node.type === "canvasGroup") return;
+        // Group nodes are purely aesthetic — clicking them behaves
+        // exactly like clicking the empty canvas (deselect + close).
+        if (node.type === "canvasGroup") {
+          onPaneClick();
+          return;
+        }
         onNodeClick(node.id);
       }}
       onPaneClick={onPaneClick}
