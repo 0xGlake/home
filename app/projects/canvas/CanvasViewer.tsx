@@ -100,10 +100,19 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
     }));
   }, [baseEdges, selectedNodeId]);
 
-  const handleNodeClick = useCallback((nodeId: string) => {
-    setSelectedNodeId(nodeId);
-    setSidebarOpen(true);
-  }, []);
+  const handleNodeClick = useCallback(
+    (nodeId: string) => {
+      // Clicking the currently-selected node deselects it.
+      if (selectedNodeId === nodeId) {
+        setSelectedNodeId(null);
+        setSidebarOpen(false);
+        return;
+      }
+      setSelectedNodeId(nodeId);
+      setSidebarOpen(true);
+    },
+    [selectedNodeId],
+  );
 
   const handlePaneClick = useCallback(() => {
     setSelectedNodeId(null);

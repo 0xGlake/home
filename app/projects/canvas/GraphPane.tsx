@@ -34,7 +34,11 @@ export default memo(function GraphPane({
       nodes={nodes}
       edges={edges}
       nodeTypes={nodeTypes}
-      onNodeClick={(_, node) => onNodeClick(node.id)}
+      onNodeClick={(_, node) => {
+        // Group nodes are purely aesthetic — ignore clicks on them.
+        if (node.type === "canvasGroup") return;
+        onNodeClick(node.id);
+      }}
       onPaneClick={onPaneClick}
       fitView
       fitViewOptions={{ padding: 0.2 }}
