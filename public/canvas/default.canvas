@@ -2,7 +2,7 @@
 	"title": "Objectivism Concept Map",
 	"date": "2024-08-10",
 	"category": "Philosophy",
-	"description": "An interactive hierarchical map of the Objectivist philosophical system — from the metaphysical axioms through epistemology, ethics, politics, and aesthetics. Visualise concepts and their connections and relations to each other.",
+	"description": "An interactive hierarchical map of the Objectivist philosophical system — from the metaphysical axioms through epistemology, ethics, politics, and aesthetics. Visualise concepts and their relations to each other.",
 	"nodes":[
 		{"id":"epist-wrapper-group","type":"group","x":2144,"y":-8366,"width":4214,"height":7728,"color":"5","label":"EPISTEMOLOGY"},
 		{"id":"eth-wrapper-group","type":"group","x":-839,"y":2751,"width":4618,"height":6780,"color":"4","label":"ETHICS"},
