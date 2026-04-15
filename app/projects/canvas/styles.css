@@ -19,6 +19,83 @@
   height: 100%;
 }
 
+.canvas-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(100, 100, 100, 0.3);
+  border-top-color: rgba(167, 139, 250, 0.7);
+  border-radius: 50%;
+  animation: canvas-spin 0.8s linear infinite;
+}
+
+@keyframes canvas-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Intro overlay — sits on top of the loaded graph */
+.canvas-intro-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.canvas-intro-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 380px;
+  padding: 32px;
+  background: rgba(24, 24, 24, 0.95);
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.canvas-intro-description {
+  color: rgba(200, 200, 200, 0.85);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.canvas-intro-hints {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.canvas-intro-hints span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  color: rgba(150, 150, 150, 0.6);
+  letter-spacing: 0.03em;
+}
+
+.canvas-intro-dismiss {
+  padding: 8px 28px;
+  background: rgba(167, 139, 250, 0.15);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  border-radius: 6px;
+  color: rgba(200, 200, 200, 0.9);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.canvas-intro-dismiss:hover {
+  background: rgba(167, 139, 250, 0.25);
+  border-color: rgba(167, 139, 250, 0.6);
+}
+
 /* React Flow dark theme override */
 .react-flow {
   background-color: transparent !important;

@@ -58,6 +58,10 @@ interface RawCanvasEdge {
 interface RawCanvasData {
   nodes: RawCanvasNode[];
   edges: RawCanvasEdge[];
+  title?: string;
+  date?: string;
+  category?: string;
+  description?: string;
 }
 
 const OBSIDIAN_COLORS: Record<string, string> = {
@@ -233,7 +237,7 @@ export function parseCanvas(data: RawCanvasData) {
 
   const graphIndex = buildGraphIndex(data.edges);
 
-  return { nodes, edges, graphIndex, nodeMap };
+  return { nodes, edges, graphIndex, nodeMap, description: data.description };
 }
 
 function buildGraphIndex(edges: RawCanvasEdge[]): GraphIndex {

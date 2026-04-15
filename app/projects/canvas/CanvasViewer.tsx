@@ -30,6 +30,8 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [description, setDescription] = useState<string | null>(null);
+  const [showIntro, setShowIntro] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
       })
       .then((data) => {
         const t1 = performance.now();
+        if (data.description) setDescription(data.description);
         const parsed = parseCanvas(data);
         const t2 = performance.now();
         setBaseNodes(parsed.nodes);
@@ -128,14 +131,6 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
     setSidebarOpen((prev) => !prev);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="canvas-loading">
-        <span className="text-gray-400 font-mono">Loading canvas...</span>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="canvas-loading">
@@ -144,6 +139,14 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
           Place a .canvas file at{" "}
           <code className="text-gray-400">{canvasPath}</code>
         </p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="canvas-loading">
+        <div className="canvas-loading-spinner" />
       </div>
     );
   }
@@ -158,6 +161,21 @@ function CanvasViewerInner({ canvasPath }: CanvasViewerProps) {
           onPaneClick={handlePaneClick}
         />
       </div>
+      {showIntro && description && (
+        <div className="canvas-intro-overlay" onClick={() => setShowIntro(false)}>
+          <div className="canvas-intro-card" onClick={(e) => e.stopPropagation()}>
+            <p className="canvas-intro-description">{description}</p>
+            <div className="canvas-intro-hints">
+              <span>scroll to pan</span>
+              <span>pinch to zoom</span>
+              <span>tap nodes to explore</span>
+            </div>
+            <button className="canvas-intro-dismiss" onClick={() => setShowIntro(false)}>
+              Enter
+            </button>
+          </div>
+        </div>
+      )}
       <Sidebar
         selectedNodeId={selectedNodeId}
         graphIndex={graphIndex}
