@@ -24,7 +24,6 @@ A simple test for anything you are about to consume: does it connect to somethin
 Information is useful if it aligns your internal world view to the actual world, and the fastest way to test that alignment is to move within the world and see what breaks.
 
 > Further reading:
-> 
 > - Gabriel Petersson [interview](https://www.youtube.com/watch?v=vq5WhoPCWQ8)
 > - Naval, [Do](https://nav.al/do)
 > - near.blog, [Personality Basins](https://near.blog/personality-basins/)
