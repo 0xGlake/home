@@ -3,15 +3,17 @@ title: "Agency"
 date: "2024-08-05"
 category: "Misc"
 ---
+Its stereotypical for every blog to include a post on agency at this point so thought it would be a funny starting point.
+
 # Agency
 
-Agency is the capacity to act and make choices over one's own mind. It is not a hypothesis, a personality trait, or a mood — it is a directly observable fact of consciousness.
+At its core agency is the capacity to act and make choices over one's own mind. It is not a hypothesis, a personality trait, or a mood — it is a directly observable fact of consciousness.
 
 ## The Foundation: Volition
 
-The root of agency is a single irreducible choice: to focus your awareness or to let it drift. This isn't the choice of _what_ to think — your subconscious feeds you thoughts, memories, and associations automatically — but the choice of _whether_ to think at all. Whether to engage your conscious mind with reality, or passively float on whatever impulses and associations bubble up on their own.
+The root of agency is a single choice: to focus your awareness or to let it drift. This isn't the choice of _what_ to think — your subconscious feeds you thoughts, memories, and associations automatically — but the choice of _whether_ to think at all. Whether to engage your conscious mind with reality, or passively float on whatever impulses and associations bubble up.
 
-Think of it as managing a team. Your subconscious sends material up to you constantly. Your fundamental act of agency is deciding what to accept, discard, or file — choosing to be _in focus_ rather than surrendering to autopilot.
+Its like managing a team, your subconscious sends material up to you constantly. Your fundamental act of agency is deciding what to accept, discard, or file — choosing to be _in focus_ rather than surrendering to autopilot.
 
 ## Agency Within Constraints
 
@@ -37,15 +39,13 @@ You can check your premises. You can correct your errors. You can redirect your 
 
 If agency is the choice to focus, then developing it means _strengthening that choice_. Not through willpower alone, but through evidence that focusing works:
 
-Learn how to succeed at specific things. Practice, and register your victories — don't let them slide past unacknowledged. Watch others in similar circumstances succeed through effort. When you fail, treat it as data about what to try differently, not evidence that you belong in category 2.
+Learn how to succeed at specific things. Practice, and register your victories (don't let them slide past unacknowledged). Watch others in similar circumstances succeed through effort. When you fail, treat it as data about what to try differently, not evidence that you belong in category 2.
 
-Each of these builds the conviction that hard problems yield to sustained focus. That conviction isn't hope in the passive sense — it's _earned confidence_ in a capacity you can observe directly in yourself every time you choose to engage rather than drift.
+Each of these builds the conviction that hard problems yield to sustained focus. That conviction isn't hope in the passive sense, it's _earned confidence_ in a capacity you can observe directly in yourself every time you choose to engage rather than drift. This builds self-esteem and helps sustain momentum in your goals and life.
 
 ## The Contagion
 
-Agency is contagious — not because optimism is infectious, but because watching someone exercise genuine cognitive self-direction is powerful evidence that _you can too_. Seek out people who treat hard problems as solvable. Their example makes your own choice to focus easier to sustain.
-
-Agency is not a feeling. It is the defining characteristic of a rational consciousness — the fact that makes you a being of self-made soul. Use it.
+Agency is contagious: not because optimism is infectious, but because watching someone exercise genuine cognitive self-direction is powerful evidence that _you can too_. Seek out people who treat hard problems as solvable. Their example makes your own choice to focus easier to sustain.
 
 ---
 
