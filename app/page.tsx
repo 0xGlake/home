@@ -195,6 +195,7 @@ export default function Home() {
             { href: "/portfolio", text: "portfolio" },
             { href: "/readingList", text: "reading list" },
             { href: "/movies", text: "movies" },
+            { href: "/qr", text: "qr code" },
             {
               href: "https://twitter.com/0xGlake",
               text: "twitter",
