@@ -31,5 +31,3 @@ Information is useful if it aligns your internal world view to the actual world,
 > - Dmitry, [Biofoundationalism: Truth is Found Through Motion](https://thedosagemakesitso.substack.com/p/biofoundationalism-truth-is-found)
 > - Elliot Temple, [Accumulating Progress](https://criticalfallibilism.com/accumulating-progress/)
 > - Paul Graham, [Island](https://www.paulgraham.com/island.html)
-
-edited 2025-12-1
