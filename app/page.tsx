@@ -184,7 +184,7 @@ export default function Home() {
               <br />
               <br />
               My current interests are: defi, full stack development,
-              communities, emergence, philosophy and more
+              communities, emergence, philosophy, humour and more
               <br />
               <br />
               Please feel free to reach out to me on twitter
