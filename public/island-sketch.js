@@ -44,6 +44,10 @@ let terrainDaylight = 0;
 let cropStage = 0; // 0 tilled, 1 sprout, 2 green, 3 ripe — advances each day
 let hamlets = [];
 let hamletsDirty = true;
+let civics = [];
+let civicsDirty = true;
+let stadiumCount = 0;
+const MAX_STADIUMS = 2;
 let sortedActors = [];
 let cityLinks = []; // completed highway links as [indexA, indexB]
 let highwayMST = []; // planned backbone edges {a, b}
@@ -288,6 +292,9 @@ function generateWorld() {
   smokeParticles = [];
   hamlets = [];
   hamletsDirty = true;
+  civics = [];
+  civicsDirty = true;
+  stadiumCount = 0;
   cityLinks = [];
   highwayMST = [];
   e_retry = {};
@@ -2590,6 +2597,9 @@ function draw() {
   updateEvents();
   updateHamlets();
   if (frameCount % 20 === 0 && hamlets.length < 70) trySpawnHamlet();
+  updateCivics();
+  if (frameCount % 25 === 0) trySpawnCivic();
+  if (frameCount % 90 === 0) trySpawnStadium();
 
   // ---- render ----
   drawSpace();
@@ -2730,10 +2740,14 @@ function isVisible(sx, sy, margin = 18) {
 }
 
 function drawScene() {
-  if (buildingsDirty || hamletsDirty) {
-    sortedActors = buildings.concat(hamlets).sort((a, b) => a.depth - b.depth);
+  if (buildingsDirty || hamletsDirty || civicsDirty) {
+    sortedActors = buildings
+      .concat(hamlets)
+      .concat(civics)
+      .sort((a, b) => a.depth - b.depth);
     buildingsDirty = false;
     hamletsDirty = false;
+    civicsDirty = false;
   }
 
   // Terrain + floating rock are pre-rendered to an off-screen buffer
@@ -2743,6 +2757,7 @@ function drawScene() {
   for (let i = 0; i < sortedActors.length; i++) {
     let a = sortedActors[i];
     if (a.isHamlet) drawHamletHouse(a);
+    else if (a.isCivic) drawCivic(a);
     else drawBuilding(a);
   }
 
@@ -4073,5 +4088,296 @@ function drawHamletHouse(h) {
     if (h.hasLight) fill(255, 225, 150, 200);
     else fill(40, 45, 60, 90);
     rect(pos.x - 0.5, pos.y - wallH * 0.55, 1.1, 1.3);
+  }
+}
+
+
+// ============ CIVIC LANDMARKS (district identity: parks, plazas, ports, stadiums) ============
+// Each city earns a small number of signature low-rise landmarks tied to its
+// zone, so districts read distinctly instead of as one uniform field of towers.
+// They occupy a building plot (2x2 terrain), draw as depth-sorted actors
+// alongside buildings/hamlets, and animate in with a short grow.
+
+const CIVIC_BY_ZONE = {
+  COMMERCIAL: ["plaza", "plaza", "park"],
+  MIXED: ["plaza", "park", "plaza"],
+  RESIDENTIAL: ["park", "park", "plaza"],
+  INDUSTRIAL: ["depot", "depot", "park"],
+};
+
+function cityCivicCap(city) {
+  if (city.isIsland) return 1;
+  return city.zoneType === "RESIDENTIAL" ? 3 : 2;
+}
+
+function pickCivicKind(city) {
+  let list = CIVIC_BY_ZONE[city.zoneType] || ["park"];
+  let kind = random(list);
+  // Industrial districts touching the coast get a port instead of a depot.
+  if (city.zoneType === "INDUSTRIAL" && kind === "depot") {
+    let near = terrain[city.x] && terrain[city.x][city.y];
+    if (near && near.distanceToWater < 9 && random() < 0.6) kind = "port";
+  }
+  return kind;
+}
+
+function trySpawnCivic() {
+  updateBuildingCandidates();
+  if (buildingCandidates.length === 0) return;
+
+  let cities = cityCenters.filter(
+    (c) => c.population >= 5 && (c.civicCount || 0) < cityCivicCap(c),
+  );
+  if (cities.length === 0) return;
+  let city = random(cities);
+
+  // Prefer plots a little out from the dense core so a plaza/park has room.
+  let cands = buildingCandidates.filter(
+    (cc) =>
+      cc.nearestCity === city && !terrain[cc.x * 2][cc.y * 2].occupied,
+  );
+  if (cands.length === 0) return;
+
+  let kind = pickCivicKind(city);
+  // ports must be adjacent to water
+  if (kind === "port") {
+    cands = cands.filter((cc) => terrain[cc.x * 2][cc.y * 2].distanceToWater < 4);
+    if (cands.length === 0) return;
+  }
+
+  cands.sort((a, b) => a.distToCenter - b.distToCenter);
+  // plazas central, parks/depots a bit looser
+  let pickPool =
+    kind === "plaza"
+      ? cands.slice(0, max(1, floor(cands.length * 0.4)))
+      : cands.slice(0, max(1, floor(cands.length * 0.7)));
+  let spot = random(pickPool);
+
+  let t = buildingToTerrain(spot.x, spot.y);
+  let footprint = kind === "stadium" || kind === "park" ? 2 : 1;
+  // mark footprint occupied
+  for (let dx = 0; dx < footprint * 2; dx++) {
+    for (let dy = 0; dy < footprint * 2; dy++) {
+      let tx = t.x + dx,
+        ty = t.y + dy;
+      if (tx < TERRAIN_SIZE && ty < TERRAIN_SIZE) terrain[tx][ty].occupied = true;
+    }
+  }
+
+  civics.push({
+    isCivic: true,
+    kind: kind,
+    gridX: spot.x,
+    gridY: spot.y,
+    footprint: footprint,
+    grow: 0,
+    seed: random(1000),
+    depth: spot.x * 2 + spot.y * 2 + 0.4,
+    city: city,
+  });
+  city.civicCount = (city.civicCount || 0) + 1;
+  civicsDirty = true;
+}
+
+// True only if the whole f*2 x f*2 terrain block anchored at building plot
+// (bx,by) is unoccupied, on land, low and buildable — so big landmarks never
+// clip into existing buildings or hang off a cliff.
+function plotBlockFree(bx, by, f) {
+  let t = buildingToTerrain(bx, by);
+  for (let dx = 0; dx < f * 2; dx++) {
+    for (let dy = 0; dy < f * 2; dy++) {
+      let tx = t.x + dx,
+        ty = t.y + dy;
+      if (tx >= TERRAIN_SIZE || ty >= TERRAIN_SIZE) return false;
+      let tile = terrain[tx][ty];
+      if (tile.isWater || tile.occupied || tile.road) return false;
+      if (tile.elevation > 4 && !tile.terraforming) return false;
+    }
+  }
+  return true;
+}
+
+// Stadiums are rare MAP landmarks (not per-zone civics): a large 6x6 arena that
+// the first mature city earns, placed INLAND (away from the coast) where there's
+// open room. Reliable like monoliths, capped per map.
+function trySpawnStadium() {
+  if (stadiumCount >= MAX_STADIUMS) return;
+  updateBuildingCandidates();
+  if (buildingCandidates.length === 0) return;
+
+  let cities = cityCenters.filter((c) => !c.isIsland && c.population >= 10);
+  if (cities.length === 0) return;
+
+  let F = 3; // footprint -> 6x6 terrain
+  let best = null;
+  let bestScore = -Infinity;
+  for (let cc of buildingCandidates) {
+    let city = cc.nearestCity;
+    if (!city || city.isIsland || city.population < 10) continue;
+    if (city.hasStadium) continue;
+    if (!plotBlockFree(cc.x, cc.y, F)) continue;
+    let t = buildingToTerrain(cc.x, cc.y);
+    let tile = terrain[t.x][t.y];
+    // prefer INLAND (far from water) and a little out from the dense core
+    let score = tile.distanceToWater - cc.distToCenter * 4 + random(-1, 1);
+    if (score > bestScore) {
+      bestScore = score;
+      best = cc;
+    }
+  }
+  if (!best) return;
+
+  let city = best.nearestCity;
+  let t = buildingToTerrain(best.x, best.y);
+  for (let dx = 0; dx < F * 2; dx++) {
+    for (let dy = 0; dy < F * 2; dy++) {
+      let tx = t.x + dx,
+        ty = t.y + dy;
+      if (tx < TERRAIN_SIZE && ty < TERRAIN_SIZE) terrain[tx][ty].occupied = true;
+    }
+  }
+  civics.push({
+    isCivic: true,
+    kind: "stadium",
+    gridX: best.x,
+    gridY: best.y,
+    footprint: F,
+    grow: 0,
+    seed: random(1000),
+    depth: best.x * 2 + best.y * 2 + 0.4,
+    city: city,
+  });
+  city.hasStadium = true;
+  stadiumCount++;
+  civicsDirty = true;
+}
+
+function updateCivics() {
+  for (let c of civics) {
+    if (c.grow < 1) {
+      c.grow += 0.05 * simulationSpeed;
+      if (c.grow > 1) c.grow = 1;
+    }
+  }
+}
+
+// Civic landmarks are dynamic actors drawn on the MAIN canvas (not the terrain
+// buffer), so this paints an isometric ground pad directly with global p5 calls.
+function civicGround(pos, w, h, col) {
+  fill(col);
+  noStroke();
+  beginShape();
+  vertex(pos.x, pos.y - h / 2);
+  vertex(pos.x + w / 2, pos.y);
+  vertex(pos.x, pos.y + h / 2);
+  vertex(pos.x - w / 2, pos.y);
+  endShape(CLOSE);
+}
+
+function drawCivic(c) {
+  let t = buildingToTerrain(c.gridX, c.gridY);
+  let elev = getBuildingTerrainHeight(c.gridX, c.gridY);
+  let pos = toIso(t.x + c.footprint * 0.5, t.y + c.footprint * 0.5, elev);
+  if (!isVisible(pos.x, pos.y, 60)) return;
+
+  let dl = cachedDaylight;
+  let night = cachedIsNight;
+  let grow = c.grow;
+  let w = TILE_WIDTH * (1.4 + c.footprint * 0.7);
+  let h = TILE_HEIGHT * (1.4 + c.footprint * 0.7);
+
+  if (c.kind === "park") {
+    // grass pad + pond + scattered trees
+    civicGround(pos, w, h, lerpColor(color(22, 40, 22), color(70, 130, 60), dl));
+    fill(lerpColor(color(20, 45, 70), color(70, 130, 175), dl));
+    noStroke();
+    ellipse(pos.x + w * 0.12, pos.y + h * 0.05, w * 0.32, h * 0.32);
+    let n = floor(3 + grow * 4);
+    for (let i = 0; i < n; i++) {
+      let a = (i / 6) * TWO_PI + c.seed;
+      let tx = pos.x + cos(a) * w * 0.28;
+      let ty = pos.y + sin(a) * h * 0.28;
+      let sz = 2 + (i % 3);
+      fill(lerpColor(color(18, 30, 16), color(45, 95, 40), dl));
+      triangle(tx, ty - sz * 1.6, tx + sz * 0.7, ty, tx - sz * 0.7, ty);
+    }
+    return;
+  }
+
+  if (c.kind === "plaza") {
+    // paved diamond + radial paths + central fountain/monument
+    civicGround(pos, w, h, lerpColor(color(40, 40, 46), color(150, 145, 140), dl));
+    stroke(lerpColor(color(30, 30, 34), color(120, 116, 110), dl));
+    strokeWeight(0.5);
+    line(pos.x, pos.y - h / 2, pos.x, pos.y + h / 2);
+    line(pos.x - w / 2, pos.y, pos.x + w / 2, pos.y);
+    noStroke();
+    // fountain
+    fill(lerpColor(color(30, 50, 70), color(90, 150, 190), dl));
+    ellipse(pos.x, pos.y, w * 0.22, h * 0.22);
+    let mh = (TILE_HEIGHT * 2.2) * grow;
+    fill(lerpColor(color(60, 60, 66), color(200, 195, 185), dl));
+    rect(pos.x - 0.7, pos.y - mh, 1.4, mh);
+    if (night) {
+      fill(255, 220, 150, 200);
+      ellipse(pos.x, pos.y - mh, 2, 2);
+    }
+    return;
+  }
+
+  if (c.kind === "stadium") {
+    // oval bowl: outer ring + field
+    fill(lerpColor(color(45, 45, 52), color(150, 148, 150), dl));
+    noStroke();
+    ellipse(pos.x, pos.y, w * 1.05, h * 1.05);
+    fill(lerpColor(color(20, 45, 22), color(60, 130, 55), dl));
+    ellipse(pos.x, pos.y, w * 0.7, h * 0.7);
+    // rim wall (grows)
+    let rim = (TILE_HEIGHT * 1.6) * grow;
+    fill(lerpColor(color(55, 55, 62), color(120, 118, 122), dl));
+    for (let a = 0; a < TWO_PI; a += PI / 6) {
+      let rx = pos.x + cos(a) * w * 0.5;
+      let ry = pos.y + sin(a) * h * 0.5;
+      rect(rx - 0.8, ry - rim, 1.6, rim);
+    }
+    if (night) {
+      // floodlights
+      for (let a = 0; a < TWO_PI; a += PI / 2) {
+        let rx = pos.x + cos(a + 0.4) * w * 0.5;
+        let ry = pos.y + sin(a + 0.4) * h * 0.5;
+        fill(255, 250, 210, 200);
+        ellipse(rx, ry - rim, 1.6, 1.6);
+      }
+    }
+    return;
+  }
+
+  if (c.kind === "port" || c.kind === "depot") {
+    // hardstand + stacked containers + a gantry crane
+    civicGround(pos, w, h, lerpColor(color(38, 36, 38), color(120, 115, 110), dl));
+    let cols = [
+      color(150, 70, 60), color(70, 110, 150), color(160, 150, 70),
+      color(80, 140, 100), color(120, 90, 140),
+    ];
+    let rows = floor(2 + grow * 2);
+    for (let i = 0; i < rows * 2; i++) {
+      let gx = pos.x - w * 0.3 + (i % 4) * (w * 0.16);
+      let gy = pos.y - h * 0.2 + floor(i / 4) * (h * 0.22);
+      let stack = 1 + ((i + floor(c.seed)) % 3);
+      for (let k = 0; k < stack; k++) {
+        let cc = cols[(i + k) % cols.length];
+        fill(lerpColor(lerpColor(color(20, 20, 24), cc, dl), color(0), 0.05));
+        rect(gx, gy - k * 1.6 - 1.6, 3, 1.6);
+      }
+    }
+    // gantry crane
+    let chx = pos.x + w * 0.28;
+    let chTop = pos.y - h * 0.2 - TILE_HEIGHT * 3 * grow;
+    stroke(lerpColor(color(80, 70, 40), color(210, 170, 60), dl));
+    strokeWeight(1);
+    line(chx, pos.y, chx, chTop);
+    line(chx, chTop, chx - w * 0.4, chTop);
+    noStroke();
+    return;
   }
 }
