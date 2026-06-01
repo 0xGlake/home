@@ -5,6 +5,10 @@ const BUILDING_GRID = 70;
 const MAX_BUILDINGS = 220;
 const NUM_CITIES = 5;
 const MAX_BUILDINGS_PER_CITY = 50;
+const MAX_BUILDING_HEIGHT = 32; // absolute ceiling; generation bonus is capped
+const MAX_MONOLITH_HEIGHT = 52; // rare landmark towers exceed the normal cap
+const MAX_MONOLITHS = 4;
+let monolithCount = 0;
 
 let terrain = [];
 let buildings = [];
@@ -17,7 +21,7 @@ let terraformProjects = []; // NEW: city flattening
 let smokeParticles = [];
 let time = 0.35;
 let timeSpeed = 0.0006;
-let simulationSpeed = 2;
+let simulationSpeed = 3;
 
 // Floating rock parameters
 let rockShape = [];
@@ -32,6 +36,48 @@ let cachedIsNight = false;
 let buildingCandidates = [];
 let candidatesDirty = true;
 let lastCandidateUpdate = 0;
+let terrainColorsDirty = true;
+let lastTerrainDaylight = -1;
+let terrainLayer = null;
+let waterDrawList = [];
+let terrainDaylight = 0;
+let cropStage = 0; // 0 tilled, 1 sprout, 2 green, 3 ripe — advances each day
+let hamlets = [];
+let hamletsDirty = true;
+let sortedActors = [];
+let cityLinks = []; // completed highway links as [indexA, indexB]
+let highwayMST = []; // planned backbone edges {a, b}
+
+// ---- Adaptive quality + ambient effects ----
+const FPS_FLOOR = 30;
+let quality = {
+  level: 3,
+  nightlife: true,
+  clouds: true,
+  aurora: true,
+  birds: true,
+  weatherFog: true,
+  boats: true,
+  water: true,
+  reflections: true,
+  weatherRain: true,
+  fireworks: true,
+};
+let qualityCooldown = 0;
+
+let clouds = [];
+let raindrops = [];
+let cars = [];
+let birds = [];
+let boats = [];
+let fireworks = [];
+let lighthouses = [];
+let weatherState = "clear";
+let weatherTimer = 0;
+let weatherIntensity = 0;
+let eventState = "none";
+let eventTimer = 0;
+let sunMoon = { x: 400, y: 120, isSun: true };
 
 // Stars cache
 let stars = [];
@@ -174,6 +220,14 @@ function setup() {
   generateRockShape();
   generateWorld();
   computeTerrainDrawOrder();
+
+  terrainLayer = createGraphics(width, height);
+  terrainLayer.noSmooth();
+
+  computeDecorations();
+
+  applyQuality(3);
+  initEffects();
 }
 
 function generateStars() {
@@ -232,8 +286,16 @@ function generateWorld() {
   islandProjects = [];
   terraformProjects = [];
   smokeParticles = [];
+  hamlets = [];
+  hamletsDirty = true;
+  cityLinks = [];
+  highwayMST = [];
+  e_retry = {};
+  e_stuck = {};
+  monolithCount = 0;
   buildingsDirty = true;
   candidatesDirty = true;
+  terrainColorsDirty = true;
   generation = 1;
   totalBuilt = 0;
 
@@ -592,6 +654,7 @@ function updateTerraformProjects() {
       }
 
       candidatesDirty = true;
+      terrainColorsDirty = true;
     }
   }
 }
@@ -655,23 +718,292 @@ function seedAllCityRoads() {
       });
     }
 
-    for (let other of cityCenters) {
-      if (other !== city && random() < 0.35) {
-        let toOther = atan2(other.y - city.y, other.x - city.x);
-        roadQueue.push({
-          x: city.x,
-          y: city.y,
-          angle: toOther,
-          type: "main",
-          energy: random(18, 30),
-          sourceCity: city,
-          targetCity: other,
-          canBridge: true,
-          gridAlign: false,
-        });
+  }
+  planCityHighways();
+}
+
+// ============ INTERCITY HIGHWAYS (guaranteed connectivity) ============
+// Build a minimum spanning tree over the cities and seed a high-energy highway
+// agent for each backbone edge. Highways steer hard toward their target, cut
+// gentle grades through hills, bridge water, and register a link on arrival so
+// the whole map ends up connected. growRoads() re-seeds any edge whose agent
+// died before completing.
+
+function planCityHighways() {
+  highwayMST = [];
+  let land = cityCenters.filter((c) => !c.isIsland);
+  if (land.length < 2) return;
+  let inTree = [land[0].index];
+  let remaining = land.slice(1).map((c) => c.index);
+  while (remaining.length > 0) {
+    let best = null;
+    let bestD = Infinity;
+    for (let ai of inTree) {
+      let a = cityByIndex(ai);
+      for (let bi of remaining) {
+        let b = cityByIndex(bi);
+        let d = dist(a.x, a.y, b.x, b.y);
+        if (d < bestD) {
+          bestD = d;
+          best = { a: ai, b: bi };
+        }
+      }
+    }
+    if (!best) break;
+    highwayMST.push(best);
+    inTree.push(best.b);
+    remaining = remaining.filter((i) => i !== best.b);
+  }
+  for (let e of highwayMST) seedHighway(cityByIndex(e.a), cityByIndex(e.b));
+}
+
+function cityByIndex(idx) {
+  for (let c of cityCenters) if (c.index === idx) return c;
+  return null;
+}
+
+function seedHighway(a, b) {
+  if (!a || !b) return;
+  let d = dist(a.x, a.y, b.x, b.y);
+  roadQueue.push({
+    x: a.x,
+    y: a.y,
+    angle: atan2(b.y - a.y, b.x - a.x),
+    type: "main",
+    energy: d * 2.4 + 30,
+    sourceCity: a,
+    targetCity: b,
+    srcI: a.index,
+    dstI: b.index,
+    canBridge: true,
+    gridAlign: false,
+    highway: true,
+  });
+}
+
+function reseedHighway(ai, bi) {
+  let a = cityByIndex(ai);
+  let b = cityByIndex(bi);
+  if (!a || !b) return;
+
+  // find the road tile nearest the target that belongs to a's network side
+  let best = null;
+  let bestD = Infinity;
+  for (let r of roads) {
+    if (terrain[r.x][r.y].isWater) continue;
+    let d = dist(r.x, r.y, b.x, b.y);
+    if (d < bestD) {
+      bestD = d;
+      best = r;
+    }
+  }
+  let sx = best ? best.x : a.x;
+  let sy = best ? best.y : a.y;
+
+  e_retry[ai + "_" + bi] = (e_retry[ai + "_" + bi] || 0) + 1;
+  let retry = e_retry[ai + "_" + bi];
+
+  roadQueue.push({
+    x: sx,
+    y: sy,
+    angle: atan2(b.y - sy, b.x - sx),
+    type: "main",
+    energy: dist(sx, sy, b.x, b.y) * 3 + 40 + retry * 30,
+    sourceCity: a,
+    targetCity: b,
+    srcI: ai,
+    dstI: bi,
+    canBridge: true,
+    gridAlign: false,
+    highway: true,
+  });
+}
+
+let e_retry = {};
+let e_stuck = {};
+
+function carveRoadTile(x, y) {
+  let tile = terrain[x] && terrain[x][y];
+  if (!tile) return;
+  if (tile.isWater) {
+    addRoad(x, y, "main", true); // forced bridge over any water span
+  } else {
+    if (tile.elevation > 6) {
+      tile.elevation = 5;
+      tile.terraforming = true;
+      terrainColorsDirty = true;
+    }
+    addRoad(x, y, "main");
+  }
+}
+
+// Deterministic last-resort connector. Lays a CONTINUOUS road all the way from
+// city A's center to city B's center (both already have local roads), so the two
+// road NETWORKS genuinely merge — bridging any water and grading any hills en
+// route. The earlier version started next to B and connected nothing; this
+// walks the whole span so the link is real and visible.
+function carveHighway(ai, bi) {
+  let a = cityByIndex(ai);
+  let b = cityByIndex(bi);
+  if (!a || !b) return;
+
+  let cx = a.x;
+  let cy = a.y;
+  let guard = 0;
+  while ((cx !== b.x || cy !== b.y) && guard < TERRAIN_SIZE * 3) {
+    guard++;
+    let stepX = b.x > cx ? 1 : b.x < cx ? -1 : 0;
+    let stepY = b.y > cy ? 1 : b.y < cy ? -1 : 0;
+    if (stepX !== 0) {
+      cx += stepX;
+      carveRoadTile(cx, cy);
+    }
+    if (stepY !== 0) {
+      cy += stepY;
+      carveRoadTile(cx, cy);
+    }
+  }
+  registerLink(a, b);
+}
+
+function linkExists(ai, bi) {
+  for (let l of cityLinks) {
+    if ((l[0] === ai && l[1] === bi) || (l[0] === bi && l[1] === ai)) return true;
+  }
+  return false;
+}
+
+function registerLink(a, b) {
+  if (!a || !b || a.index === b.index) return;
+  if (!linkExists(a.index, b.index)) cityLinks.push([a.index, b.index]);
+}
+
+// Flood fill the real road network from a seed tile; returns a Set of "x,y" keys.
+function floodRoadNetwork(sx, sy) {
+  let seen = new Set();
+  if (!terrain[sx] || !terrain[sx][sy] || !terrain[sx][sy].road) {
+    // seed from nearest road tile to the city center
+    let best = null;
+    let bd = Infinity;
+    for (let r of roads) {
+      let d = (r.x - sx) * (r.x - sx) + (r.y - sy) * (r.y - sy);
+      if (d < bd) {
+        bd = d;
+        best = r;
+      }
+    }
+    if (!best) return seen;
+    sx = best.x;
+    sy = best.y;
+  }
+  let stack = [[sx, sy]];
+  seen.add(sx + "," + sy);
+  while (stack.length) {
+    let cur = stack.pop();
+    let x = cur[0];
+    let y = cur[1];
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        if (!dx && !dy) continue;
+        let nx = x + dx;
+        let ny = y + dy;
+        if (nx < 0 || ny < 0 || nx >= TERRAIN_SIZE || ny >= TERRAIN_SIZE) continue;
+        let k = nx + "," + ny;
+        if (seen.has(k)) continue;
+        if (terrain[nx][ny].road) {
+          seen.add(k);
+          stack.push([nx, ny]);
+        }
       }
     }
   }
+  return seen;
+}
+
+function cityOnNetwork(city, net) {
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (net.has(city.x + dx + "," + (city.y + dy))) return true;
+    }
+  }
+  return false;
+}
+
+// Ensure every land city is physically reachable on roads from the primary
+// network. Unreachable cities are first given an organic highway attempt; if
+// they have already had a couple of frames to connect, a road is carved.
+function healCityConnectivity() {
+  let land = cityCenters.filter((c) => !c.isIsland);
+  if (land.length < 2) return;
+  let hub = land[0];
+  let net = floodRoadNetwork(hub.x, hub.y);
+
+  for (let i = 1; i < land.length; i++) {
+    let c = land[i];
+    let key = "h" + c.index;
+    if (cityOnNetwork(c, net)) {
+      e_stuck[key] = 0;
+      continue;
+    }
+    e_stuck[key] = (e_stuck[key] || 0) + 1;
+    if (e_stuck[key] >= 3) {
+      // carve from this city to the nearest city already on the network
+      let target = hub;
+      let bd = dist(c.x, c.y, hub.x, hub.y);
+      for (let j = 0; j < land.length; j++) {
+        if (j === i) continue;
+        if (cityOnNetwork(land[j], net)) {
+          let d = dist(c.x, c.y, land[j].x, land[j].y);
+          if (d < bd) {
+            bd = d;
+            target = land[j];
+          }
+        }
+      }
+      carveHighway(c.index, target.index);
+      net = floodRoadNetwork(hub.x, hub.y); // refresh after carving
+      e_stuck[key] = 0;
+    } else if (!hasQueuedHighwayTo(c.index)) {
+      seedHighway(hub, c);
+    }
+  }
+}
+
+function hasQueuedHighwayTo(idx) {
+  for (let r of roadQueue) {
+    if (r.highway && (r.srcI === idx || r.dstI === idx)) return true;
+  }
+  return false;
+}
+
+function citiesConnected(ai, bi) {
+  // BFS over cityLinks
+  if (ai === bi) return true;
+  let seen = { [ai]: true };
+  let stack = [ai];
+  while (stack.length) {
+    let cur = stack.pop();
+    for (let l of cityLinks) {
+      let nxt = l[0] === cur ? l[1] : l[1] === cur ? l[0] : null;
+      if (nxt !== null && !seen[nxt]) {
+        if (nxt === bi) return true;
+        seen[nxt] = true;
+        stack.push(nxt);
+      }
+    }
+  }
+  return false;
+}
+
+function hasQueuedHighway(ai, bi) {
+  for (let r of roadQueue) {
+    if (
+      r.highway &&
+      ((r.srcI === ai && r.dstI === bi) || (r.srcI === bi && r.dstI === ai))
+    )
+      return true;
+  }
+  return false;
 }
 
 // ============ SMOKE SYSTEM ============
@@ -833,6 +1165,7 @@ function updateIslandProjects() {
               terrain[nx][ny].occupied = false;
               terrain[nx][ny].distanceToWater = 1;
               candidatesDirty = true;
+              terrainColorsDirty = true;
             }
           }
         }
@@ -898,7 +1231,7 @@ function createBridge(x, y) {
   return bridge;
 }
 
-function drawBridge(bridge, pos, daylight) {
+function drawBridge_unused(bridge, pos, daylight) {
   let deckColor = lerpColor(color(50, 50, 55), color(110, 105, 100), daylight);
   let pillarColor = lerpColor(color(40, 40, 45), color(80, 80, 85), daylight);
 
@@ -927,7 +1260,7 @@ function drawBridge(bridge, pos, daylight) {
 
 // ============ ROAD SYSTEM ============
 
-function canBridgeTo(x, y, fromX, fromY) {
+function canBridgeTo(x, y, fromX, fromY, maxSpan = 12) {
   if (x < 0 || x >= TERRAIN_SIZE || y < 0 || y >= TERRAIN_SIZE) return false;
   if (!terrain[x][y].isWater) return false;
 
@@ -938,7 +1271,7 @@ function canBridgeTo(x, y, fromX, fromY) {
   dx /= len;
   dy /= len;
 
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= maxSpan; i++) {
     let cx = round(x + dx * i),
       cy = round(y + dy * i);
     if (cx >= 0 && cx < TERRAIN_SIZE && cy >= 0 && cy < TERRAIN_SIZE) {
@@ -980,10 +1313,18 @@ function addRoad(x, y, type, isBridge = false) {
   }
 
   candidatesDirty = true;
+  terrainColorsDirty = true;
   return true;
 }
 
 function growRoads() {
+  // Connectivity maintenance based on the ACTUAL road network (flood fill over
+  // road tiles), not a link registry. Cities are given some time to connect
+  // organically; any still physically unreachable get a guaranteed carved road.
+  if (frameCount % 120 === 0 && roads.length > 20) {
+    healCityConnectivity();
+  }
+
   if (roadQueue.length < 12 && roads.length > 8 && frameCount % 35 === 0) {
     let city = random(
       cityCenters.filter((c) => c.population > 0 || !c.isIsland),
@@ -1032,18 +1373,35 @@ function growRoads() {
     }
 
     if (road.targetCity) {
+      // Arrived? Register the link and retire the agent.
+      let dd = dist(road.x, road.y, road.targetCity.x, road.targetCity.y);
+      if (dd <= 3) {
+        if (road.highway) registerLink(road.sourceCity, road.targetCity);
+        continue;
+      }
       let toTarget = atan2(
         road.targetCity.y - road.y,
         road.targetCity.x - road.x,
       );
-      road.angle = lerp(road.angle, toTarget, 0.15);
+      road.angle = lerp(road.angle, toTarget, road.highway ? 0.45 : 0.15);
     }
     if (road.targetIsland) {
+      // Once the connecting road actually reaches the island, stop. Letting it
+      // keep wandering/branching fills the small island with road tiles (all
+      // marked occupied), leaving no free plots for buildings.
+      let onArtificial =
+        terrain[road.x] &&
+        terrain[road.x][road.y] &&
+        terrain[road.x][road.y].isArtificial;
+      let dd = dist(road.x, road.y, road.targetIsland.x, road.targetIsland.y);
+      if (onArtificial || dd <= 2) {
+        continue;
+      }
       let toTarget = atan2(
         road.targetIsland.y - road.y,
         road.targetIsland.x - road.x,
       );
-      road.angle = lerp(road.angle, toTarget, 0.25);
+      road.angle = lerp(road.angle, toTarget, 0.4);
     }
 
     road.angle += (random() - 0.5) * 0.2;
@@ -1055,7 +1413,7 @@ function growRoads() {
       let tile = terrain[nx][ny];
 
       let nearEdge = tile.distanceToWater < 2;
-      if (nearEdge && !road.targetIsland && !tile.isWater) {
+      if (nearEdge && !road.targetIsland && !road.targetCity && !tile.isWater) {
         road.energy = 0;
         continue;
       }
@@ -1085,9 +1443,18 @@ function growRoads() {
         continue;
       }
 
-      let canBuild = !tile.road && tile.elevation <= 6;
+      if (road.highway && !tile.isWater && tile.elevation > 5) {
+        // grade a cut so highways can cross hills instead of dying on them
+        tile.elevation = 5;
+        tile.terraforming = true;
+        terrainColorsDirty = true;
+      }
+      let maxBuildElev = road.highway ? 7 : 6;
+      let canBuild = !tile.road && tile.elevation <= maxBuildElev;
       let needsBridge =
-        tile.isWater && road.canBridge && canBridgeTo(nx, ny, road.x, road.y);
+        tile.isWater &&
+        road.canBridge &&
+        canBridgeTo(nx, ny, road.x, road.y, road.highway ? 30 : 12);
 
       if (canBuild && (!tile.isWater || needsBridge)) {
         addRoad(nx, ny, road.type, needsBridge);
@@ -1095,7 +1462,7 @@ function growRoads() {
         road.y = ny;
         road.energy -= needsBridge ? 0.5 : 1;
 
-        if (random() < 0.05) {
+        if (random() < 0.05 && !terrain[nx][ny].isArtificial) {
           let branchAngle =
             road.angle +
             (random() > 0.5 ? 1 : -1) * (HALF_PI + random(-0.3, 0.3));
@@ -1151,6 +1518,7 @@ function updateShadows() {
   }
 
   candidatesDirty = true;
+  terrainColorsDirty = true;
 }
 
 // ============ BUILDING CANDIDATES ============
@@ -1237,7 +1605,9 @@ function getBuildingTerrainHeight(bx, by) {
   return maxElev;
 }
 
-function createBuilding(bx, by, type, city, distToCenter) {
+function createBuilding(bx, by, type, city, distToCenter, opts) {
+  let isMonolith = !!(opts && opts.isMonolith);
+  if (isMonolith) type = "COMMERCIAL";
   let config = BUILDING_TYPES[type];
   let baseColor = random(config.colors);
   let roofColor = random(config.roofColors);
@@ -1252,24 +1622,33 @@ function createBuilding(bx, by, type, city, distToCenter) {
   let isOnIsland = terrain[bx * 2][by * 2].isArtificial;
 
   let centerBonus = (1 - distToCenter) * 0.7;
-  let genBonus = (generation - 1) * 0.08;
+  // Cap the generation contribution so towers stop creeping ever taller over
+  // long runs (generation increments forever).
+  let genBonus = min(generation - 1, 6) * 0.05;
   let heightMult = 0.45 + centerBonus + genBonus;
 
   if (isOnIsland) heightMult += 0.15;
   if (city.zoneType === "COMMERCIAL") heightMult += 0.1;
 
-  let targetHeight = floor(
-    random(config.minHeight, config.maxHeight * heightMult),
-  );
-  targetHeight = constrain(
-    targetHeight,
-    config.minHeight,
-    config.maxHeight + floor(generation * 0.5),
-  );
+  let targetHeight;
+  if (isMonolith) {
+    targetHeight = floor(random(MAX_BUILDING_HEIGHT + 6, MAX_MONOLITH_HEIGHT));
+    config = Object.assign({}, config, { buildSpeed: 0.06 });
+  } else {
+    targetHeight = floor(
+      random(config.minHeight, config.maxHeight * heightMult),
+    );
+    targetHeight = constrain(
+      targetHeight,
+      config.minHeight,
+      min(config.maxHeight + min(generation, 8), MAX_BUILDING_HEIGHT),
+    );
+  }
 
   let layerVariations = [];
   let commercialStyle =
     type === "COMMERCIAL" ? random(COMMERCIAL_STYLES) : null;
+  if (isMonolith) commercialStyle = random(["tapered", "setback_deco", "crystal"]);
   let industrialShape =
     type === "INDUSTRIAL" ? random(INDUSTRIAL_SHAPES) : null;
   let baseWidthMod = type === "COMMERCIAL" ? random(0.85, 1.15) : 1.0;
@@ -1316,8 +1695,8 @@ function createBuilding(bx, by, type, city, distToCenter) {
     city: city,
 
     age: 0,
-    decayAge: config.decayAge + random(-250, 250),
-    maxAge: config.maxAge + random(-250, 250),
+    decayAge: isMonolith ? 1e9 : config.decayAge + random(-250, 250),
+    maxAge: isMonolith ? 1e9 : config.maxAge + random(-250, 250),
     decaying: false,
     collapsing: false,
     collapseProgress: 0,
@@ -1338,6 +1717,7 @@ function createBuilding(bx, by, type, city, distToCenter) {
     scaffolding: true,
     scaffoldingAlpha: 255,
     generation: generation,
+    isMonolith: isMonolith,
 
     depth: bx * 2 + by * 2 + 1,
   };
@@ -1423,8 +1803,41 @@ function trySpawnBuilding() {
   availableCities.sort((a, b) => a.population - b.population);
   let city = random(availableCities.slice(0, min(2, availableCities.length)));
 
+  // Monolith landmark: once a downtown passes a population milestone it earns a
+  // single supertall tower. We look across ALL eligible cities (not just the
+  // least-populated spawn pick) and, when one qualifies, target it directly so
+  // the landmark reliably appears. Still capped overall and one per city.
+  let makeMonolith = false;
+  if (monolithCount < MAX_MONOLITHS) {
+    // Prefer a downtown/midtown; fall back to the most-populous mainland city so
+    // a landmark reliably appears even if zone roles landed awkwardly.
+    let monoCity = null;
+    let fallback = null;
+    for (let c of availableCities) {
+      if (c.hasMonolith || c.isIsland || c.population < 4) continue;
+      if (c.zoneType === "COMMERCIAL" || c.zoneType === "MIXED") {
+        if (!monoCity || c.population > monoCity.population) monoCity = c;
+      }
+      if (!fallback || c.population > fallback.population) fallback = c;
+    }
+    let chosen =
+      monoCity || (fallback && fallback.population >= 8 ? fallback : null);
+    if (chosen) {
+      // Only commit if that city actually has a free plot, so the opportunity
+      // isn't wasted on a saturated core.
+      let hasPlot = buildingCandidates.some(
+        (cc) =>
+          cc.nearestCity === chosen && !terrain[cc.x * 2][cc.y * 2].occupied,
+      );
+      if (hasPlot) {
+        city = chosen;
+        makeMonolith = true;
+      }
+    }
+  }
+
   let zoneWeights = ZONE_TYPES[city.zoneType].buildingWeights;
-  let type = weightedRandomType(zoneWeights);
+  let type = makeMonolith ? "COMMERCIAL" : weightedRandomType(zoneWeights);
 
   let cityCandidates = buildingCandidates.filter((c) => {
     if (terrain[c.x * 2][c.y * 2].occupied) return false;
@@ -1443,7 +1856,13 @@ function trySpawnBuilding() {
   cityCandidates.sort((a, b) => b.score - a.score);
   let spot = random(cityCandidates.slice(0, min(5, cityCandidates.length)));
 
-  let building = createBuilding(spot.x, spot.y, type, city, spot.distToCenter);
+  let building = createBuilding(spot.x, spot.y, type, city, spot.distToCenter, {
+    isMonolith: makeMonolith,
+  });
+  if (makeMonolith) {
+    monolithCount++;
+    city.hasMonolith = true;
+  }
 
   let t = buildingToTerrain(spot.x, spot.y);
   for (let dx = 0; dx < 2; dx++) {
@@ -1501,6 +1920,10 @@ function updateBuildings() {
           }
 
           if (b.city) b.city.population = max(0, b.city.population - 1);
+          if (b.isMonolith) {
+            if (b.city) b.city.hasMonolith = false;
+            monolithCount = max(0, monolithCount - 1);
+          }
           buildings.splice(i, 1);
           buildingsDirty = true;
           candidatesDirty = true;
@@ -1540,6 +1963,583 @@ function updateBuildings() {
   }
 }
 
+// ============ ADAPTIVE QUALITY ============
+
+function applyQuality(lvl) {
+  quality.level = lvl;
+  quality.nightlife = lvl >= 1;
+  quality.clouds = lvl >= 2;
+  quality.aurora = lvl >= 2;
+  quality.birds = lvl >= 2;
+  quality.weatherFog = lvl >= 2;
+  quality.boats = lvl >= 2;
+  quality.water = lvl >= 2;
+  quality.reflections = lvl >= 3;
+  quality.weatherRain = lvl >= 3;
+  quality.fireworks = lvl >= 3;
+}
+
+function updateQuality() {
+  if (qualityCooldown > 0) {
+    qualityCooldown--;
+    return;
+  }
+  if (fps < FPS_FLOOR - 3 && quality.level > 0) {
+    applyQuality(quality.level - 1);
+    qualityCooldown = 45;
+  } else if (fps > FPS_FLOOR + 18 && quality.level < 3) {
+    applyQuality(quality.level + 1);
+    qualityCooldown = 60;
+  }
+}
+
+// ============ EFFECTS: SETUP + HELPERS ============
+
+function initEffects() {
+  initClouds();
+  cars = [];
+  birds = [];
+  boats = [];
+  fireworks = [];
+  raindrops = [];
+  initLighthouses();
+  weatherState = "clear";
+  weatherTimer = random(300, 600);
+  weatherIntensity = 0;
+  eventState = "none";
+  eventTimer = random(400, 800);
+
+  for (let x = 0; x < TERRAIN_SIZE; x++) {
+    for (let y = 0; y < TERRAIN_SIZE; y++) {
+      let t = terrain[x][y];
+      t.coastalWater = false;
+      if (t.isWater && t.onRock) {
+        if (
+          (x > 0 && !terrain[x - 1][y].isWater) ||
+          (x < TERRAIN_SIZE - 1 && !terrain[x + 1][y].isWater) ||
+          (y > 0 && !terrain[x][y - 1].isWater) ||
+          (y < TERRAIN_SIZE - 1 && !terrain[x][y + 1].isWater)
+        ) {
+          t.coastalWater = true;
+        }
+      }
+    }
+  }
+}
+
+function roadNeighbors(x, y) {
+  let out = [];
+  if (x > 0 && terrain[x - 1][y].road) out.push({ x: x - 1, y: y });
+  if (x < TERRAIN_SIZE - 1 && terrain[x + 1][y].road) out.push({ x: x + 1, y: y });
+  if (y > 0 && terrain[x][y - 1].road) out.push({ x: x, y: y - 1 });
+  if (y < TERRAIN_SIZE - 1 && terrain[x][y + 1].road) out.push({ x: x, y: y + 1 });
+  return out;
+}
+
+function randomWaterTileOnRock() {
+  for (let i = 0; i < 20; i++) {
+    let x = floor(random(TERRAIN_SIZE));
+    let y = floor(random(TERRAIN_SIZE));
+    if (terrain[x][y].isWater && terrain[x][y].onRock) return { x: x, y: y };
+  }
+  return null;
+}
+
+function festColor() {
+  const cols = [
+    [255, 80, 80],
+    [255, 200, 90],
+    [120, 255, 120],
+    [120, 200, 255],
+    [220, 120, 255],
+    [255, 255, 255],
+  ];
+  let c = cols[floor(random(cols.length))];
+  return { r: c[0], g: c[1], b: c[2] };
+}
+
+// ============ EFFECTS: SKY (sun/moon, aurora) ============
+
+function drawSkyBody() {
+  let isSun = time >= 0.18 && time <= 0.82;
+  let p;
+  if (isSun) {
+    p = (time - 0.18) / 0.64;
+  } else {
+    let nt = time < 0.18 ? time + (1 - 0.82) : time - 0.82;
+    p = nt / 0.36;
+  }
+  let bx = lerp(width * 0.1, width * 0.9, p);
+  let by = height * 0.44 - sin(p * PI) * height * 0.32;
+  sunMoon.x = bx;
+  sunMoon.y = by;
+  sunMoon.isSun = isSun;
+
+  noStroke();
+  if (isSun) {
+    for (let r = 30; r > 0; r -= 7) {
+      fill(255, 220, 150, map(r, 0, 30, 70, 0));
+      ellipse(bx, by, r * 2.4, r * 2.4);
+    }
+    fill(255, 240, 200);
+    ellipse(bx, by, 16, 16);
+  } else {
+    for (let r = 22; r > 0; r -= 6) {
+      fill(200, 210, 235, map(r, 0, 22, 45, 0));
+      ellipse(bx, by, r * 2.4, r * 2.4);
+    }
+    fill(228, 232, 246);
+    ellipse(bx, by, 12, 12);
+    fill(205, 210, 228);
+    ellipse(bx + 3, by - 2, 4, 4);
+    ellipse(bx - 2, by + 2, 2.5, 2.5);
+  }
+}
+
+function drawAurora() {
+  if (!quality.aurora || cachedDaylight > 0.35) return;
+  let a = (0.35 - cachedDaylight) / 0.35;
+  noStroke();
+  for (let i = 0; i < 3; i++) {
+    let yy = height * 0.1 + i * 13;
+    for (let x = 0; x <= width; x += 30) {
+      let h = sin(x * 0.01 + frameCount * 0.01 + i) * 10;
+      fill(60 + i * 30, 180 - i * 30, 150, 11 * a);
+      ellipse(x, yy + h, 30, 42);
+    }
+  }
+}
+
+// ============ EFFECTS: CLOUDS ============
+
+function initClouds() {
+  clouds = [];
+  for (let i = 0; i < 5; i++) {
+    clouds.push({
+      x: random(width),
+      y: random(height * 0.35, height * 0.78),
+      w: random(60, 140),
+      h: random(28, 56),
+      spd: random(0.1, 0.35),
+      op: random(8, 20),
+    });
+  }
+}
+
+function updateClouds() {
+  for (let c of clouds) {
+    c.x += c.spd * simulationSpeed * 0.4;
+    if (c.x - c.w > width) c.x = -c.w;
+  }
+}
+
+function drawCloudShadows() {
+  noStroke();
+  let a = cachedDaylight;
+  if (a < 0.05) return;
+  for (let c of clouds) {
+    fill(18, 22, 38, c.op * a);
+    ellipse(c.x, c.y, c.w, c.h);
+    ellipse(c.x + c.w * 0.3, c.y + 5, c.w * 0.6, c.h * 0.7);
+  }
+}
+
+// ============ EFFECTS: WEATHER ============
+
+function updateWeather() {
+  weatherTimer -= simulationSpeed;
+  if (weatherTimer <= 0) {
+    if (weatherState === "clear") {
+      let r = random();
+      weatherState = r < 0.18 ? "fog" : r < 0.32 ? "rain" : "clear";
+      weatherTimer = random(300, 600);
+    } else {
+      weatherState = "clear";
+      weatherTimer = random(1400, 2600);
+    }
+  }
+  let target = weatherState === "clear" ? 0 : 1;
+  weatherIntensity = lerp(weatherIntensity, target, 0.02);
+
+  if (weatherState === "rain" && quality.weatherRain && raindrops.length < 120) {
+    for (let i = 0; i < 6; i++) {
+      raindrops.push({
+        x: random(width),
+        y: random(-20, 0),
+        len: random(6, 12),
+        spd: random(8, 14),
+      });
+    }
+  }
+  for (let i = raindrops.length - 1; i >= 0; i--) {
+    let d = raindrops[i];
+    d.y += d.spd;
+    d.x += 2;
+    if (d.y > height) raindrops.splice(i, 1);
+  }
+}
+
+function drawWeather() {
+  if (weatherIntensity > 0.01) {
+    noStroke();
+    fill(150, 160, 175, weatherIntensity * 22 * max(cachedDaylight, 0.3));
+    rect(0, 0, width, height);
+  }
+  if (quality.weatherRain && raindrops.length > 0) {
+    stroke(170, 190, 210, weatherIntensity * 120);
+    strokeWeight(1);
+    for (let d of raindrops) line(d.x, d.y, d.x - 2, d.y + d.len);
+    noStroke();
+  }
+}
+
+// ============ EFFECTS: NIGHT TRAFFIC ============
+
+function updateCars() {
+  if (!cachedIsNight) {
+    if (cars.length) cars.length = 0;
+    return;
+  }
+  let target = min(14, floor(roads.length / 8));
+  while (cars.length < target && roads.length > 2) {
+    let r = random(roads);
+    cars.push({
+      px: r.x,
+      py: r.y,
+      tx: r.x,
+      ty: r.y,
+      t: 1,
+      warm: random() < 0.55,
+    });
+  }
+  for (let c of cars) {
+    c.t += 0.05 * simulationSpeed;
+    if (c.t >= 1) {
+      c.px = c.tx;
+      c.py = c.ty;
+      let nbrs = roadNeighbors(c.tx, c.ty);
+      if (nbrs.length) {
+        let nn = random(nbrs);
+        c.tx = nn.x;
+        c.ty = nn.y;
+        c.t = 0;
+      } else {
+        c.t = 1;
+      }
+    }
+  }
+}
+
+function drawCars() {
+  noStroke();
+  for (let c of cars) {
+    let gx = lerp(c.px, c.tx, c.t);
+    let gy = lerp(c.py, c.ty, c.t);
+    let rx = round(gx);
+    let ry = round(gy);
+    if (rx < 0 || ry < 0 || rx >= TERRAIN_SIZE || ry >= TERRAIN_SIZE) continue;
+    let p = toIso(gx, gy, terrain[rx][ry].elevation);
+    if (c.warm) fill(255, 240, 180, 230);
+    else fill(255, 95, 75, 230);
+    ellipse(p.x, p.y + TILE_HEIGHT / 2, 1.7, 1.7);
+  }
+}
+
+// ============ EFFECTS: LIGHTHOUSES ============
+
+function initLighthouses() {
+  lighthouses = [];
+  let cand = [];
+  for (let x = 2; x < TERRAIN_SIZE - 2; x += 3) {
+    for (let y = 2; y < TERRAIN_SIZE - 2; y += 3) {
+      let t = terrain[x][y];
+      if (
+        !t.isWater &&
+        t.onRock &&
+        t.distanceToWater < 2.5 &&
+        t.elevation >= 2 &&
+        t.elevation <= 7
+      ) {
+        cand.push({ x: x, y: y });
+      }
+    }
+  }
+  for (let i = 0; i < 2 && cand.length > 0; i++) {
+    let c = cand.splice(floor(random(cand.length)), 1)[0];
+    lighthouses.push({ x: c.x, y: c.y, angle: random(TWO_PI) });
+  }
+}
+
+function drawLighthouses() {
+  for (let lh of lighthouses) {
+    lh.angle += 0.03 * simulationSpeed;
+    let base = toIso(lh.x, lh.y, terrain[lh.x][lh.y].elevation);
+    let topY = base.y - TILE_HEIGHT * 3;
+
+    noStroke();
+    fill(200, 200, 210, 210);
+    rect(base.x - 1.5, topY, 3, TILE_HEIGHT * 3);
+
+    let beamLen = 64;
+    let bx = cos(lh.angle);
+    let by = sin(lh.angle) * 0.5;
+    fill(255, 245, 200, 24);
+    triangle(
+      base.x,
+      topY,
+      base.x + bx * beamLen - by * 9,
+      topY + by * beamLen + bx * 9,
+      base.x + bx * beamLen + by * 9,
+      topY + by * beamLen - bx * 9,
+    );
+    fill(255, 250, 210, 230);
+    ellipse(base.x, topY, 3, 3);
+  }
+}
+
+// ============ EFFECTS: BIRDS ============
+
+function spawnFlock() {
+  let dir = random() < 0.5 ? 1 : -1;
+  return {
+    x: dir > 0 ? -40 : width + 40,
+    y: random(height * 0.14, height * 0.45),
+    vx: dir * random(0.6, 1.2),
+    vy: random(-0.1, 0.1),
+    n: floor(random(4, 8)),
+    ph: random(10),
+  };
+}
+
+function updateBirds() {
+  if (random() < 0.006 && birds.length < 3) birds.push(spawnFlock());
+  for (let i = birds.length - 1; i >= 0; i--) {
+    let f = birds[i];
+    f.x += f.vx * simulationSpeed;
+    f.y += f.vy * simulationSpeed + sin(frameCount * 0.05 + f.ph) * 0.1;
+    if (f.x < -60 || f.x > width + 60) birds.splice(i, 1);
+  }
+}
+
+function drawBirds() {
+  stroke(20, 20, 30, 160 * cachedDaylight + 40);
+  strokeWeight(0.8);
+  noFill();
+  for (let f of birds) {
+    for (let i = 0; i < f.n; i++) {
+      let ox = (i - f.n / 2) * 5;
+      let oy = (i % 2) * 3 + sin(frameCount * 0.2 + i) * 0.6;
+      let bx = f.x + ox;
+      let by = f.y + oy;
+      let sz = 1.7;
+      line(bx - sz, by, bx, by - sz * 0.6);
+      line(bx, by - sz * 0.6, bx + sz, by);
+    }
+  }
+  noStroke();
+}
+
+// ============ EFFECTS: BOATS ============
+
+function updateBoats() {
+  if (boats.length < 3 && random() < 0.012) {
+    let wt = randomWaterTileOnRock();
+    if (wt) {
+      boats.push({
+        x: wt.x,
+        y: wt.y,
+        ang: random(TWO_PI),
+        turn: random(-0.02, 0.02),
+        life: random(400, 800),
+      });
+    }
+  }
+  for (let i = boats.length - 1; i >= 0; i--) {
+    let b = boats[i];
+    b.ang += b.turn;
+    let nx = b.x + cos(b.ang) * 0.3 * simulationSpeed;
+    let ny = b.y + sin(b.ang) * 0.3 * simulationSpeed;
+    let cx = round(nx);
+    let cy = round(ny);
+    if (
+      cx < 0 ||
+      cy < 0 ||
+      cx >= TERRAIN_SIZE ||
+      cy >= TERRAIN_SIZE ||
+      !terrain[cx][cy].isWater ||
+      !terrain[cx][cy].onRock
+    ) {
+      b.ang += PI * 0.5 + random(-0.3, 0.3);
+      b.life -= 20;
+    } else {
+      b.x = nx;
+      b.y = ny;
+    }
+    b.life -= simulationSpeed;
+    if (b.life <= 0) boats.splice(i, 1);
+  }
+}
+
+function drawBoats() {
+  noStroke();
+  for (let b of boats) {
+    let p = toIso(b.x, b.y, -0.1);
+    fill(255, 255, 255, 35);
+    ellipse(p.x, p.y + TILE_HEIGHT + 1, 5, 2.2);
+    fill(45, 45, 55, 230);
+    ellipse(p.x, p.y + TILE_HEIGHT, 3.2, 1.7);
+    fill(225, 225, 215, 230);
+    rect(p.x - 0.5, p.y + TILE_HEIGHT - 2.4, 1, 2.4);
+  }
+}
+
+// ============ EFFECTS: EVENTS (festival / blackout / fireworks) ============
+
+function updateEvents() {
+  eventTimer -= simulationSpeed;
+  if (eventTimer <= 0) {
+    if (eventState === "none") {
+      let r = random();
+      if (cachedIsNight && r < 0.5) {
+        eventState = "festival";
+        eventTimer = random(300, 600);
+      } else if (r < 0.65) {
+        eventState = "blackout";
+        eventTimer = random(150, 300);
+      } else {
+        eventTimer = random(500, 1000);
+      }
+    } else {
+      eventState = "none";
+      eventTimer = random(800, 1600);
+    }
+  }
+
+  if (
+    eventState === "festival" &&
+    quality.fireworks &&
+    cachedIsNight &&
+    frameCount % 12 === 0
+  ) {
+    spawnFirework();
+  }
+  for (let i = fireworks.length - 1; i >= 0; i--) {
+    updateFirework(fireworks[i]);
+    if (fireworks[i].dead) fireworks.splice(i, 1);
+  }
+}
+
+function spawnFirework() {
+  fireworks.push({
+    stage: 0,
+    x: random(width * 0.2, width * 0.8),
+    y: height * 0.75,
+    vy: -random(4, 6),
+    ty: random(height * 0.12, height * 0.4),
+    parts: [],
+    color: festColor(),
+    dead: false,
+  });
+}
+
+function updateFirework(f) {
+  if (f.stage === 0) {
+    f.y += f.vy;
+    if (f.y <= f.ty) {
+      f.stage = 1;
+      for (let i = 0; i < 26; i++) {
+        let a = random(TWO_PI);
+        let sp = random(1, 3.2);
+        f.parts.push({
+          x: f.x,
+          y: f.y,
+          vx: cos(a) * sp,
+          vy: sin(a) * sp,
+          life: 1,
+        });
+      }
+    }
+  } else {
+    let alive = false;
+    for (let p of f.parts) {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.vx *= 0.98;
+      p.life -= 0.02;
+      if (p.life > 0) alive = true;
+    }
+    if (!alive) f.dead = true;
+  }
+}
+
+function drawFireworks() {
+  noStroke();
+  for (let f of fireworks) {
+    if (f.stage === 0) {
+      fill(255, 230, 180, 220);
+      ellipse(f.x, f.y, 2, 2);
+    } else {
+      for (let p of f.parts) {
+        if (p.life > 0) {
+          fill(f.color.r, f.color.g, f.color.b, p.life * 255);
+          ellipse(p.x, p.y, 2, 2);
+        }
+      }
+    }
+  }
+}
+
+// ============ EFFECTS: COLOR GRADING (golden hour + era) ============
+
+const ERA_TINTS = [
+  { r: 0, g: 0, b: 0, a: 0 },
+  { r: 120, g: 90, b: 40, a: 9 },
+  { r: 60, g: 80, b: 120, a: 9 },
+  { r: 120, g: 60, b: 120, a: 11 },
+  { r: 40, g: 120, b: 120, a: 9 },
+  { r: 140, g: 120, b: 60, a: 9 },
+];
+
+function drawGrading() {
+  noStroke();
+  let warm = 0;
+  if (time > 0.08 && time < 0.28) warm = sin(((time - 0.08) / 0.2) * PI);
+  else if (time > 0.78 && time < 0.92) warm = sin(((time - 0.78) / 0.14) * PI);
+  if (warm > 0.01) {
+    fill(255, 150, 60, warm * 32);
+    rect(0, 0, width, height);
+  }
+  let er = ERA_TINTS[generation % ERA_TINTS.length];
+  if (er && er.a > 0) {
+    fill(er.r, er.g, er.b, er.a);
+    rect(0, 0, width, height);
+  }
+}
+
+// ============ EFFECTS: WATER SHIMMER + REFLECTIONS ============
+
+function drawWaterShimmer(x, y, pos) {
+  let lum = sunMoon.isSun ? cachedDaylight : 0.55;
+  let ph = sin(frameCount * 0.05 + (x + y) * 0.7) * 0.5 + 0.5;
+  let glint =
+    max(0, 1 - abs(pos.x - sunMoon.x) / 45) *
+    max(0, 1 - abs(pos.y - sunMoon.y) / 220);
+  let a = (ph * 0.1 + glint * 0.7) * lum;
+  if (quality.reflections && terrain[x][y].coastalWater) a += 0.05 * lum;
+  if (a <= 0.02) return;
+
+  noStroke();
+  if (sunMoon.isSun) fill(255, 245, 210, a * 255);
+  else fill(205, 215, 245, a * 255);
+  beginShape();
+  vertex(pos.x, pos.y + TILE_HEIGHT * 0.18);
+  vertex(pos.x + TILE_WIDTH * 0.32, pos.y + TILE_HEIGHT * 0.5);
+  vertex(pos.x, pos.y + TILE_HEIGHT * 0.82);
+  vertex(pos.x - TILE_WIDTH * 0.32, pos.y + TILE_HEIGHT * 0.5);
+  endShape(CLOSE);
+}
+
 // ============ MAIN LOOP ============
 
 function draw() {
@@ -1547,35 +2547,77 @@ function draw() {
   fps = lerp(fps, 1000 / (currentTime - lastFrameTime), 0.1);
   lastFrameTime = currentTime;
 
+  updateQuality();
+
   time += timeSpeed * simulationSpeed;
-  if (time > 1) time -= 1;
+  if (time > 1) {
+    time -= 1;
+    cropStage = (cropStage + 1) % 4; // farms grow & get harvested over days
+    terrainColorsDirty = true;
+  }
 
   cachedDaylight = getDaylightFactor();
-  cachedIsNight = time < 0.12 || time > 0.88;
+  cachedIsNight = time < 0.16 || time > 0.78;
 
-  drawSpace();
-  drawFloatingRock();
-
-  if (frameCount % 3 === 0) growRoads();
+  // ---- simulation ----
+  if (frameCount % 2 === 0) growRoads();
   if (frameCount % 6 === 0) updateShadows();
   if (frameCount % 10 === 0) {
     updateIslandProjects();
     tryStartIslandProject();
   }
   if (frameCount % 8 === 0) {
-    updateTerraformProjects(); // NEW: update city flattening
+    updateTerraformProjects();
   }
 
   updateBuildings();
   updateSmoke();
 
-  let activeBuildings = buildings.filter((b) => !b.collapsing).length;
-  if (activeBuildings < MAX_BUILDINGS && frameCount % 6 === 0) {
-    trySpawnBuilding();
+  if (frameCount % 4 === 0) {
+    let activeBuildings = 0;
+    for (let i = 0; i < buildings.length; i++) {
+      if (!buildings[i].collapsing) activeBuildings++;
+    }
+    if (activeBuildings < MAX_BUILDINGS) trySpawnBuilding();
   }
 
+  // ---- ambient effect state (cheap; quality-gated) ----
+  if (quality.clouds) updateClouds();
+  if (quality.weatherFog || quality.weatherRain) updateWeather();
+  if (quality.nightlife) updateCars();
+  if (quality.birds) updateBirds();
+  if (quality.boats) updateBoats();
+  updateEvents();
+  updateHamlets();
+  if (frameCount % 20 === 0 && hamlets.length < 70) trySpawnHamlet();
+
+  // ---- render ----
+  drawSpace();
+  // Quantize daylight so the static terrain buffer rebuilds only a handful of
+  // times across a sunrise/sunset sweep instead of every frame. The per-step
+  // color delta is imperceptible (and the grading overlay sits on top anyway).
+  let tq = round(cachedDaylight * 8) / 8;
+  if (terrainColorsDirty || tq !== lastTerrainDaylight) {
+    terrainDaylight = tq;
+    renderTerrainLayer();
+    lastTerrainDaylight = tq;
+    terrainColorsDirty = false;
+  }
+  image(terrainLayer, 0, 0);
+  drawWaterShimmerPass();
   drawScene();
   drawSmoke();
+
+  if (quality.boats) drawBoats();
+  if (cachedIsNight && quality.nightlife) {
+    drawCars();
+    drawLighthouses();
+  }
+  if (quality.clouds) drawCloudShadows();
+  if (quality.weatherFog || quality.weatherRain) drawWeather();
+  if (quality.birds) drawBirds();
+  if (quality.fireworks) drawFireworks();
+  drawGrading();
   drawUI();
 }
 
@@ -1609,13 +2651,17 @@ function drawSpace() {
     circle(star.x, star.y, star.size);
   }
 
+  drawAurora();
+
   fill(60, 55, 70, 40);
   ellipse(width * 0.85, height * 0.15, 80, 80);
   fill(80, 75, 90, 30);
   ellipse(width * 0.12, height * 0.25, 40, 40);
+
+  drawSkyBody();
 }
 
-function drawFloatingRock() {
+function drawFloatingRock_unused() {
   let centerPos = toIso(islandCenterX, islandCenterY, 0);
 
   noStroke();
@@ -1684,37 +2730,20 @@ function isVisible(sx, sy, margin = 18) {
 }
 
 function drawScene() {
-  if (buildingsDirty) {
-    sortedBuildings = buildings.slice().sort((a, b) => a.depth - b.depth);
+  if (buildingsDirty || hamletsDirty) {
+    sortedActors = buildings.concat(hamlets).sort((a, b) => a.depth - b.depth);
     buildingsDirty = false;
+    hamletsDirty = false;
   }
 
-  let bIdx = 0;
-  let numB = sortedBuildings.length;
-
-  for (let i = 0; i < sortedTerrainOrder.length; i++) {
-    let t = sortedTerrainOrder[i];
-
-    while (bIdx < numB && sortedBuildings[bIdx].depth <= t.depth) {
-      drawBuilding(sortedBuildings[bIdx]);
-      bIdx++;
-    }
-
-    let tile = terrain[t.x][t.y];
-
-    if (!tile.onRock && tile.isWater) continue;
-
-    let pos = toIso(t.x, t.y, tile.isWater ? -0.15 : tile.elevation);
-
-    if (isVisible(pos.x, pos.y, 25)) {
-      drawTerrainTile(t.x, t.y, tile, pos);
-      if (tile.bridge) drawBridge(tile.bridge, pos, cachedDaylight);
-    }
-  }
-
-  while (bIdx < numB) {
-    drawBuilding(sortedBuildings[bIdx]);
-    bIdx++;
+  // Terrain + floating rock are pre-rendered to an off-screen buffer
+  // (renderTerrainLayer) and blitted once per frame in draw(). Here we draw the
+  // dynamic actors layered on top — buildings and roadside hamlet houses sorted
+  // back-to-front together — then in-progress project markers.
+  for (let i = 0; i < sortedActors.length; i++) {
+    let a = sortedActors[i];
+    if (a.isHamlet) drawHamletHouse(a);
+    else drawBuilding(a);
   }
 
   for (let p of islandProjects) {
@@ -1754,9 +2783,9 @@ function drawScene() {
   }
 }
 
-function drawTerrainTile(x, y, tile, pos) {
+function computeTerrainColors(tile) {
   let elev = tile.elevation;
-  let daylight = cachedDaylight;
+  let daylight = terrainDaylight;
   let topColor, sideColor;
 
   if (tile.isWater) {
@@ -1809,7 +2838,16 @@ function drawTerrainTile(x, y, tile, pos) {
     topColor = lerpColor(topColor, color(30, 30, 35), 0.2);
   }
 
-  fill(topColor);
+  tile.cachedTop = topColor;
+  tile.cachedSide = sideColor;
+  tile.cachedSideDark = lerpColor(sideColor, color(0), 0.12);
+}
+
+function drawTerrainTile_unused(x, y, tile, pos, recolor) {
+  let elev = tile.elevation;
+  if (recolor || tile.cachedTop === undefined) computeTerrainColors(tile);
+
+  fill(tile.cachedTop);
   noStroke();
   beginShape();
   vertex(pos.x, pos.y);
@@ -1822,7 +2860,7 @@ function drawTerrainTile(x, y, tile, pos) {
   if (drawHeight > 0) {
     let sideH = drawHeight * TILE_HEIGHT;
 
-    fill(sideColor);
+    fill(tile.cachedSide);
     beginShape();
     vertex(pos.x, pos.y + TILE_HEIGHT);
     vertex(pos.x + TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2);
@@ -1830,7 +2868,7 @@ function drawTerrainTile(x, y, tile, pos) {
     vertex(pos.x, pos.y + TILE_HEIGHT + sideH);
     endShape(CLOSE);
 
-    fill(lerpColor(sideColor, color(0), 0.12));
+    fill(tile.cachedSideDark);
     beginShape();
     vertex(pos.x, pos.y + TILE_HEIGHT);
     vertex(pos.x - TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2);
@@ -1838,6 +2876,8 @@ function drawTerrainTile(x, y, tile, pos) {
     vertex(pos.x, pos.y + TILE_HEIGHT + sideH);
     endShape(CLOSE);
   }
+
+  if (tile.isWater && quality.water) drawWaterShimmer(x, y, pos);
 }
 
 function drawBuilding(b) {
@@ -1854,6 +2894,10 @@ function drawBuilding(b) {
   let layersToDraw = b.collapsing ? b.collapseLayer : b.currentLayer;
   let bw = TILE_WIDTH * 1.7;
   let bh = TILE_HEIGHT * 1.7;
+  if (b.isMonolith) {
+    bw *= 1.4;
+    bh *= 1.4;
+  }
 
   for (let layer = 0; layer < layersToDraw; layer++) {
     drawBuildingLayer(b, pos, layer, daylight, decayFactor, isNight, bw, bh);
@@ -2020,10 +3064,24 @@ function drawBuildingLayer(
   if (variation.hasWindow && !b.decaying) {
     let windowCol;
     if (isNight) {
-      let litChance = noise(b.gridX * 0.15 + layer * 0.3) > 0.3;
-      if (litChance) {
+      // Windows light up gradually as it gets darker, with occasional flicker.
+      let base = noise(b.gridX * 0.15 + layer * 0.3);
+      let depth = 1 - cachedDaylight;
+      let lit = base > 0.62 - depth * 0.42;
+      if (eventState === "blackout") {
+        lit = lit && noise(b.gridX + layer + frameCount * 0.01) > 0.8;
+      }
+      if (lit) {
         let warmth = noise(b.gridX + layer) * 50;
-        windowCol = color(255, 235 - warmth, 170 - warmth, 170);
+        let flick =
+          noise(b.gridX * 2 + layer + frameCount * 0.02) > 0.95 ? 0.35 : 1;
+        let festBoost = eventState === "festival" ? 1.15 : 1;
+        windowCol = color(
+          255,
+          235 - warmth,
+          170 - warmth,
+          min(220, 170 * flick * festBoost),
+        );
       } else {
         windowCol = color(35, 45, 60, 70);
       }
@@ -2162,7 +3220,8 @@ function drawRoof(b, pos, daylight, decayFactor, bw, bh) {
     endShape(CLOSE);
 
     if (cachedIsNight) {
-      fill(255, 70, 70, 175);
+      let blink = 90 + (sin(frameCount * 0.12 + b.gridX) * 0.5 + 0.5) * 150;
+      fill(255, 70, 70, blink);
       circle(pos.x, topY - TILE_HEIGHT * 2.8, 2);
     }
   } else if (b.roofType === "crown") {
@@ -2337,6 +3396,11 @@ function drawRoof(b, pos, daylight, decayFactor, bw, bh) {
       strokeWeight(0.55);
       line(pos.x, topY, pos.x, topY - TILE_HEIGHT * 0.55);
       noStroke();
+      if (cachedIsNight) {
+        let blink = 80 + (sin(frameCount * 0.1 + b.gridX * 2) * 0.5 + 0.5) * 160;
+        fill(255, 80, 80, blink);
+        circle(pos.x, topY - TILE_HEIGHT * 0.55, 1.4);
+      }
     }
 
     if (b.hasHelipad) {
@@ -2347,39 +3411,23 @@ function drawRoof(b, pos, daylight, decayFactor, bw, bh) {
 }
 
 function getDaylightFactor() {
-  if (time < 0.08) return 0.1;
-  if (time < 0.18) return map(time, 0.08, 0.18, 0.1, 0.52);
-  if (time < 0.28) return map(time, 0.18, 0.28, 0.52, 1);
-  if (time < 0.78) return 1;
-  if (time < 0.85) return map(time, 0.78, 0.85, 1, 0.52);
-  if (time < 0.92) return map(time, 0.85, 0.92, 0.52, 0.1);
+  // Night is intentionally long: full daylight occupies only ~0.30-0.62 of the
+  // cycle, with extended dark on either side.
+  if (time < 0.12) return 0.1;
+  if (time < 0.22) return map(time, 0.12, 0.22, 0.1, 0.52);
+  if (time < 0.3) return map(time, 0.22, 0.3, 0.52, 1);
+  if (time < 0.62) return 1;
+  if (time < 0.7) return map(time, 0.62, 0.7, 1, 0.52);
+  if (time < 0.8) return map(time, 0.7, 0.8, 0.52, 0.1);
   return 0.1;
 }
 
 function drawUI() {
-  let apartments = buildings.filter(
-    (b) => b.type === "APARTMENT" && !b.collapsing,
-  ).length;
-  let commercial = buildings.filter(
-    (b) => b.type === "COMMERCIAL" && !b.collapsing,
-  ).length;
-  let industrial = buildings.filter(
-    (b) => b.type === "INDUSTRIAL" && !b.collapsing,
-  ).length;
-  let underConstruction = buildings.filter(
-    (b) => !b.completed && !b.collapsing,
-  ).length;
-  let decaying = buildings.filter((b) => b.decaying && !b.collapsing).length;
-
-  fill(0, 0, 0, 165);
+  // Only the FPS readout is rendered; the per-type building tallies that used
+  // to be computed here every frame were never drawn, so they were removed.
   noStroke();
-
-  fill(255);
   textSize(10);
   textAlign(LEFT, TOP);
-
-  let y = 11;
-  let lh = 11;
 
   fill(
     fps > 18
@@ -2388,8 +3436,7 @@ function drawUI() {
         ? color(255, 180, 80)
         : color(255, 80, 80),
   );
-  text(`FPS: ${floor(fps)}`, 12, y);
-  y += lh;
+  text(`FPS: ${floor(fps)}`, 12, 11);
 }
 
 function getTimeString() {
@@ -2398,4 +3445,633 @@ function getTimeString() {
   let ampm = hours >= 12 ? "PM" : "AM";
   hours = hours % 12 || 12;
   return `${hours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+}
+
+
+// ============ OFF-SCREEN TERRAIN BUFFER ============
+// The terrain grid (up to ~25k tiles) and the floating rock are static between
+// terrain edits and daylight changes. Rendering them to a cached graphics layer
+// and blitting once per frame replaces tens of thousands of canvas draw calls
+// with a single image() call. Rebuild happens only when terrainColorsDirty is
+// set (roads/shadows/terraforming/islands) or the daylight value moves.
+
+function drawRockInto(g) {
+  let rockDark = lerpColor(
+    color(25, 22, 30),
+    color(50, 45, 55),
+    terrainDaylight * 0.5,
+  );
+  let rockMid = lerpColor(
+    color(35, 32, 40),
+    color(70, 65, 75),
+    terrainDaylight * 0.5,
+  );
+
+  g.noStroke();
+  for (let i = 0; i < rockShape.length; i++) {
+    let r1 = rockShape[i];
+    let r2 = rockShape[(i + 1) % rockShape.length];
+
+    let x1 = islandCenterX + cos(r1.angle) * r1.radiusX;
+    let y1 = islandCenterY + sin(r1.angle) * r1.radiusY;
+    let x2 = islandCenterX + cos(r2.angle) * r2.radiusX;
+    let y2 = islandCenterY + sin(r2.angle) * r2.radiusY;
+
+    let pos1 = toIso(x1, y1, 0);
+    let pos2 = toIso(x2, y2, 0);
+    let pos1Bottom = toIso(x1, y1, -r1.depth);
+    let pos2Bottom = toIso(x2, y2, -r2.depth);
+
+    let angle = (r1.angle + r2.angle) / 2;
+    if (angle > PI * 0.25 && angle < PI * 1.25) {
+      g.fill(rockMid);
+    } else {
+      g.fill(rockDark);
+    }
+
+    g.beginShape();
+    g.vertex(pos1.x, pos1.y + TILE_HEIGHT);
+    g.vertex(pos2.x, pos2.y + TILE_HEIGHT);
+    g.vertex(pos2Bottom.x, pos2Bottom.y + TILE_HEIGHT);
+    g.vertex(pos1Bottom.x, pos1Bottom.y + TILE_HEIGHT);
+    g.endShape(CLOSE);
+  }
+
+  g.fill(rockDark);
+  g.beginShape();
+  for (let i = 0; i < rockShape.length; i++) {
+    let r = rockShape[i];
+    let x = islandCenterX + cos(r.angle) * r.radiusX * 0.7;
+    let y = islandCenterY + sin(r.angle) * r.radiusY * 0.7;
+    let pos = toIso(x, y, -r.depth - 5);
+    g.vertex(pos.x, pos.y + TILE_HEIGHT);
+  }
+  g.endShape(CLOSE);
+}
+
+function drawTerrainTileInto(g, tile, pos) {
+  let elev = tile.elevation;
+  computeTerrainColors(tile);
+
+  g.fill(tile.cachedTop);
+  g.noStroke();
+  g.beginShape();
+  g.vertex(pos.x, pos.y);
+  g.vertex(pos.x + TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2);
+  g.vertex(pos.x, pos.y + TILE_HEIGHT);
+  g.vertex(pos.x - TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2);
+  g.endShape(CLOSE);
+
+  let drawHeight = tile.isWater ? 0.15 : elev;
+  if (drawHeight > 0) {
+    let sideH = drawHeight * TILE_HEIGHT;
+
+    g.fill(tile.cachedSide);
+    g.beginShape();
+    g.vertex(pos.x, pos.y + TILE_HEIGHT);
+    g.vertex(pos.x + TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2);
+    g.vertex(pos.x + TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2 + sideH);
+    g.vertex(pos.x, pos.y + TILE_HEIGHT + sideH);
+    g.endShape(CLOSE);
+
+    g.fill(tile.cachedSideDark);
+    g.beginShape();
+    g.vertex(pos.x, pos.y + TILE_HEIGHT);
+    g.vertex(pos.x - TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2);
+    g.vertex(pos.x - TILE_WIDTH / 2, pos.y + TILE_HEIGHT / 2 + sideH);
+    g.vertex(pos.x, pos.y + TILE_HEIGHT + sideH);
+    g.endShape(CLOSE);
+  }
+}
+
+// Group contiguous bridge tiles into spans; long spans become "mega" bridges
+// with raised decks and suspension pylons. Cheap: bridgeSegments is small and
+// this only runs on terrain-buffer rebuilds.
+function computeBridgeSpans() {
+  for (let b of bridgeSegments) {
+    b.mega = false;
+    b.pylon = false;
+    b.pier = false;
+    b.deckH = b.height;
+  }
+  let map = {};
+  const key = (x, y) => x + "," + y;
+  for (let b of bridgeSegments) map[key(b.x, b.y)] = b;
+  let visited = new Set();
+  for (let b of bridgeSegments) {
+    let k0 = key(b.x, b.y);
+    if (visited.has(k0)) continue;
+    let comp = [];
+    let stack = [b];
+    visited.add(k0);
+    while (stack.length) {
+      let cur = stack.pop();
+      comp.push(cur);
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          if (!dx && !dy) continue;
+          let nb = map[key(cur.x + dx, cur.y + dy)];
+          if (nb) {
+            let nk = key(nb.x, nb.y);
+            if (!visited.has(nk)) {
+              visited.add(nk);
+              stack.push(nb);
+            }
+          }
+        }
+      }
+    }
+    comp.sort((p, q) => p.x + p.y - (q.x + q.y));
+    // Piers (full-height supports) only at the ends and every 3rd tile, so the
+    // deck spans open water/land between them instead of forming a continuous
+    // grey wall under straight (axis-aligned) bridges.
+    for (let i = 0; i < comp.length; i++) {
+      if (i === 0 || i === comp.length - 1 || i % 3 === 1) comp[i].pier = true;
+    }
+    if (comp.length >= 5) {
+      let deckH = min(5, 2 + floor(comp.length / 4));
+      for (let i = 0; i < comp.length; i++) {
+        comp[i].mega = true;
+        comp[i].deckH = deckH;
+        if (i === 0 || i === comp.length - 1 || i % 4 === 2) comp[i].pylon = true;
+      }
+    }
+  }
+}
+
+function drawBridgeInto(g, bridge, pos, daylight) {
+  // The deck always sits at the normal bridge height so the roadway rests just
+  // over the water (no tall grey support box). "Mega" character comes purely
+  // from suspension PYLONS that rise ABOVE the deck plus cable stays + a steel
+  // tint — nothing is drawn in the transparent gap beneath the deck.
+  let h = bridge.height;
+  let steel = bridge.mega ? 0.4 : 0;
+  let deckColor = lerpColor(
+    lerpColor(color(50, 50, 55), color(110, 105, 100), daylight),
+    lerpColor(color(70, 72, 80), color(150, 152, 165), daylight),
+    steel,
+  );
+  let pillarColor = lerpColor(color(40, 40, 45), color(80, 80, 85), daylight);
+
+  let deckY = pos.y - h * TILE_HEIGHT;
+
+  // Support pier down to the waterline — drawn only on designated pier tiles so
+  // the deck reads as a span floating over open water between supports rather
+  // than a solid grey wall. Two iso faces keep it correct in both orientations.
+  if (bridge.pier) {
+    let baseY = pos.y + TILE_HEIGHT;
+    let pierW = TILE_WIDTH * 0.16;
+    g.noStroke();
+    g.fill(pillarColor);
+    g.beginShape();
+    g.vertex(pos.x, deckY + TILE_HEIGHT);
+    g.vertex(pos.x + pierW, deckY + TILE_HEIGHT + TILE_HEIGHT * 0.2);
+    g.vertex(pos.x + pierW, baseY);
+    g.vertex(pos.x, baseY + TILE_HEIGHT * 0.2);
+    g.endShape(CLOSE);
+    g.fill(lerpColor(pillarColor, color(0), 0.22));
+    g.beginShape();
+    g.vertex(pos.x, deckY + TILE_HEIGHT);
+    g.vertex(pos.x - pierW, deckY + TILE_HEIGHT + TILE_HEIGHT * 0.2);
+    g.vertex(pos.x - pierW, baseY);
+    g.vertex(pos.x, baseY + TILE_HEIGHT * 0.2);
+    g.endShape(CLOSE);
+  }
+
+  // deck top
+  g.fill(deckColor);
+  g.beginShape();
+  g.vertex(pos.x, deckY);
+  g.vertex(pos.x + TILE_WIDTH / 2, deckY + TILE_HEIGHT / 2);
+  g.vertex(pos.x, deckY + TILE_HEIGHT);
+  g.vertex(pos.x - TILE_WIDTH / 2, deckY + TILE_HEIGHT / 2);
+  g.endShape(CLOSE);
+
+  // deck side shading
+  g.fill(lerpColor(deckColor, color(0), 0.18));
+  g.beginShape();
+  g.vertex(pos.x, deckY + TILE_HEIGHT);
+  g.vertex(pos.x + TILE_WIDTH / 2, deckY + TILE_HEIGHT / 2);
+  g.vertex(pos.x + TILE_WIDTH / 2, deckY + TILE_HEIGHT);
+  g.vertex(pos.x, deckY + TILE_HEIGHT * 1.3);
+  g.endShape(CLOSE);
+
+  // tall suspension pylon + fanned cable stays rising above the deck
+  if (bridge.mega && bridge.pylon) {
+    let deckMid = deckY + TILE_HEIGHT * 0.5;
+    let towerTop = deckMid - TILE_HEIGHT * (3 + bridge.deckH);
+    let cableCol = lerpColor(color(55, 58, 66), color(170, 173, 185), daylight);
+    // cable stays first (behind tower)
+    g.stroke(cableCol);
+    g.strokeWeight(0.5);
+    for (let s2 = 1; s2 <= 3; s2++) {
+      let off = (TILE_WIDTH * 0.55) * s2 * 0.55;
+      g.line(pos.x, towerTop, pos.x + off, deckMid);
+      g.line(pos.x, towerTop, pos.x - off, deckMid);
+    }
+    // tower
+    g.stroke(cableCol);
+    g.strokeWeight(1.6);
+    g.line(pos.x, deckMid, pos.x, towerTop);
+    g.noStroke();
+    // beacon at night
+    if (daylight < 0.4) {
+      g.fill(255, 90, 80, 230);
+      g.ellipse(pos.x, towerTop, 2, 2);
+    }
+  }
+}
+
+function renderTerrainLayer() {
+  const g = terrainLayer;
+  if (!g) return;
+  g.clear();
+  computeBridgeSpans();
+  drawRockInto(g);
+
+  waterDrawList = [];
+  for (let i = 0; i < sortedTerrainOrder.length; i++) {
+    let t = sortedTerrainOrder[i];
+    let tile = terrain[t.x][t.y];
+    if (!tile.onRock && tile.isWater) continue;
+
+    let pos = toIso(t.x, t.y, tile.isWater ? -0.15 : tile.elevation);
+    if (!isVisible(pos.x, pos.y, 25)) continue;
+
+    drawTerrainTileInto(g, tile, pos);
+    if (tile.bridge) drawBridgeInto(g, tile.bridge, pos, terrainDaylight);
+    if (tile.isWater) waterDrawList.push({ x: t.x, y: t.y, sx: pos.x, sy: pos.y });
+    else if (
+      tile.decor &&
+      !tile.road &&
+      !tile.occupied &&
+      !tile.isArtificial &&
+      !tile.terraforming
+    ) {
+      drawDecorInto(g, tile, pos);
+    }
+  }
+}
+
+function drawWaterShimmerPass() {
+  if (!quality.water) return;
+  for (let i = 0; i < waterDrawList.length; i++) {
+    let w = waterDrawList[i];
+    drawWaterShimmer(w.x, w.y, { x: w.sx, y: w.sy });
+  }
+}
+
+
+// ============ GREENERY (forests, parks, farms — baked into terrain buffer) ============
+// Decoration is computed once per tile with a deterministic hash (independent of
+// p5's runtime noise seed) so trees never flicker between buffer rebuilds and
+// cost nothing per frame. Drawing is gated dynamically: a tile that becomes a
+// road or gets a building simply stops drawing its trees.
+
+function hash2(x, y, salt) {
+  let h = (x * 374761393 + y * 668265263 + salt * 2147483647) | 0;
+  h = (h ^ (h >>> 13)) * 1274126177;
+  h = h ^ (h >>> 16);
+  return ((h >>> 0) % 100000) / 100000;
+}
+
+// Biome is decided per coarse BLOCK so farmland forms big square fields and
+// forests form coherent stands, instead of a single-tile checkerboard.
+const DECOR_BLOCK = 6;
+
+function blockBiome(bx, by) {
+  let h = hash2(bx, by, 101);
+  if (h < 0.22) return "farm";
+  if (h < 0.62) return "forest";
+  return "wild"; // sparse scatter — keeps open nature
+}
+
+function computeDecorations() {
+  for (let x = 0; x < TERRAIN_SIZE; x++) {
+    for (let y = 0; y < TERRAIN_SIZE; y++) {
+      let tile = terrain[x][y];
+      tile.decor = null;
+      if (tile.isWater || tile.isArtificial || tile.isCliff) continue;
+      let elev = tile.elevation;
+      if (elev > 9) continue; // snow caps stay bare
+
+      let bx = floor(x / DECOR_BLOCK);
+      let by = floor(y / DECOR_BLOCK);
+      let biome = blockBiome(bx, by);
+      let local = hash2(x, y, 7);
+
+      // Farmland: only on gentle low ground. Fill the WHOLE block so fields read
+      // as solid squares. Furrow direction is per-block for a tidy look.
+      if (biome === "farm" && elev <= 3) {
+        let dir = hash2(bx, by, 303) < 0.5 ? 0 : 1; // furrow orientation
+        let off = floor(hash2(bx, by, 404) * 4); // per-field growth phase offset
+        tile.decor = { kind: "farm", dir: dir, off: off };
+        continue;
+      }
+
+      // Forest / wild scatter. Density varies by elevation; species + look vary
+      // per tile for diversity.
+      let density;
+      if (biome === "forest") density = elev > 6 ? 0.45 : 0.8;
+      else density = elev > 6 ? 0.08 : 0.18; // wild
+      if (local > density) continue;
+
+      let count = 1 + (hash2(x, y, 5) > 0.55 ? 1 : 0) + (biome === "forest" && hash2(x, y, 9) > 0.75 ? 1 : 0);
+      let trees = [];
+      for (let i = 0; i < count; i++) {
+        // species selection, biased by elevation (more conifers up high)
+        let sp = hash2(x, y, 70 + i);
+        let species;
+        if (elev > 6) species = sp < 0.85 ? "pine" : "snowpine";
+        else if (elev > 3) species = sp < 0.55 ? "pine" : sp < 0.85 ? "round" : "poplar";
+        else species = sp < 0.45 ? "round" : sp < 0.7 ? "poplar" : sp < 0.9 ? "pine" : "bush";
+
+        // color variety: a few green tones plus occasional autumn / deep pine
+        let cv = hash2(x, y, 90 + i);
+
+        trees.push({
+          ox: (hash2(x, y, 20 + i) - 0.5) * TILE_WIDTH * 0.55,
+          oy: (hash2(x, y, 40 + i) - 0.5) * TILE_HEIGHT * 0.45,
+          size: 1.5 + hash2(x, y, 60 + i) * 3.4, // wider height range
+          h: 0.8 + hash2(x, y, 80 + i) * 1.0, // trunk/canopy height multiplier
+          species: species,
+          cv: cv,
+        });
+      }
+      // draw bigger trees last (front) for a touch of depth
+      trees.sort((a, b) => a.size - b.size);
+      tile.decor = { kind: "tree", trees: trees };
+    }
+  }
+}
+
+// Palette helper: returns a {dark, light} canopy pair given species + variant.
+function canopyPalette(species, cv) {
+  if (species === "snowpine")
+    return { d: color(180, 195, 205), l: color(225, 235, 245) };
+  if (species === "pine") {
+    if (cv < 0.15) return { d: color(20, 40, 30), l: color(45, 70, 50) }; // deep
+    return { d: color(16, 46, 28), l: color(38, 86, 52) };
+  }
+  // broadleaf: round/poplar/bush
+  if (cv < 0.1) return { d: color(70, 50, 18), l: color(160, 110, 40) }; // autumn gold
+  if (cv < 0.18) return { d: color(80, 35, 25), l: color(170, 70, 45) }; // autumn red
+  if (cv < 0.55) return { d: color(20, 38, 22), l: color(70, 120, 58) }; // green
+  if (cv < 0.8) return { d: color(28, 46, 24), l: color(96, 140, 60) }; // light green
+  return { d: color(18, 44, 30), l: color(60, 115, 80) }; // blue-green
+}
+
+function drawDecorInto(g, tile, pos) {
+  let dl = terrainDaylight;
+  let cx = pos.x;
+  let cy = pos.y + TILE_HEIGHT / 2;
+
+  if (tile.decor.kind === "farm") {
+    // Whole tile-top diamond so adjacent farm tiles merge into a square field.
+    // Color reflects the current growth stage; a per-field offset means the
+    // landscape shows soil/sprout/green/ripe patches simultaneously and they
+    // visibly cycle day to day.
+    let stage = (cropStage + tile.decor.off) % 4;
+    let lo, hi;
+    if (stage === 0) { lo = color(46, 34, 24); hi = color(122, 92, 64); }       // tilled soil
+    else if (stage === 1) { lo = color(30, 40, 22); hi = color(92, 128, 60); }  // sprouts
+    else if (stage === 2) { lo = color(34, 50, 22); hi = color(120, 162, 66); } // green
+    else { lo = color(64, 50, 18); hi = color(196, 168, 78); }                  // ripe gold
+    let fieldCol = lerpColor(lo, hi, dl);
+
+    g.noStroke();
+    g.fill(fieldCol);
+    g.beginShape();
+    g.vertex(cx, cy - TILE_HEIGHT * 0.5);
+    g.vertex(cx + TILE_WIDTH * 0.5, cy);
+    g.vertex(cx, cy + TILE_HEIGHT * 0.5);
+    g.vertex(cx - TILE_WIDTH * 0.5, cy);
+    g.endShape(CLOSE);
+
+    let rowCol;
+    if (stage === 0) rowCol = lerpColor(color(30, 22, 16), color(96, 72, 50), dl);
+    else if (stage === 3) rowCol = lerpColor(color(70, 56, 20), color(225, 200, 110), dl);
+    else rowCol = lerpColor(color(24, 40, 18), color(70, 130, 50), dl);
+
+    g.stroke(rowCol);
+    g.strokeWeight(stage === 3 ? 0.55 : 0.4);
+    if (tile.decor.dir === 0) {
+      for (let k = -2; k <= 2; k++) {
+        let fx = k * (TILE_WIDTH * 0.18);
+        g.line(cx + fx, cy - TILE_HEIGHT * 0.5 + Math.abs(fx) * (TILE_HEIGHT / TILE_WIDTH),
+               cx + fx, cy + TILE_HEIGHT * 0.5 - Math.abs(fx) * (TILE_HEIGHT / TILE_WIDTH));
+      }
+    } else {
+      for (let k = -2; k <= 2; k++) {
+        let fy = k * (TILE_HEIGHT * 0.18);
+        g.line(cx - TILE_WIDTH * 0.5 + Math.abs(fy) * (TILE_WIDTH / TILE_HEIGHT), cy + fy,
+               cx + TILE_WIDTH * 0.5 - Math.abs(fy) * (TILE_WIDTH / TILE_HEIGHT), cy + fy);
+      }
+    }
+    g.noStroke();
+    return;
+  }
+
+  for (let tr of tile.decor.trees) {
+    let tx = cx + tr.ox;
+    let ty = cy + tr.oy;
+    let sz = tr.size;
+    let hh = tr.h;
+    let pal = canopyPalette(tr.species, tr.cv);
+    let canDark = lerpColor(color(12, 16, 14), pal.d, dl);
+    let canLight = lerpColor(color(20, 26, 22), pal.l, dl);
+    let trunkCol = lerpColor(color(18, 14, 12), color(74, 52, 34), dl);
+
+    g.noStroke();
+
+    if (tr.species === "pine" || tr.species === "snowpine") {
+      // tapered conifer: 2-3 stacked tiers, height-varied
+      g.fill(trunkCol);
+      g.rect(tx - 0.3, ty - sz * 0.3, 0.6, sz * 0.5);
+      let tiers = sz > 3 ? 3 : 2;
+      let top = ty - sz * (1.2 + hh * 0.9);
+      for (let t = 0; t < tiers; t++) {
+        let f = t / tiers;
+        let tierY = lerp(top, ty, f);
+        let tierW = lerp(sz * 0.35, sz * 0.85, f);
+        let tierH = sz * (0.7 + hh * 0.3);
+        g.fill(t % 2 === 0 ? canDark : canLight);
+        g.triangle(tx, tierY - tierH, tx + tierW, tierY, tx - tierW, tierY);
+      }
+    } else if (tr.species === "poplar") {
+      // tall slim tree
+      g.fill(trunkCol);
+      g.rect(tx - 0.3, ty - sz * 0.5, 0.6, sz * 0.7);
+      g.fill(canDark);
+      g.ellipse(tx, ty - sz * (1.0 + hh * 0.5), sz * 0.9, sz * (1.9 + hh));
+      g.fill(canLight);
+      g.ellipse(tx - sz * 0.12, ty - sz * (1.15 + hh * 0.5), sz * 0.5, sz * (1.2 + hh * 0.6));
+    } else if (tr.species === "bush") {
+      // low shrub, no trunk
+      g.fill(canDark);
+      g.ellipse(tx, ty - sz * 0.2, sz * 1.3, sz * 0.9);
+      g.fill(canLight);
+      g.ellipse(tx + sz * 0.2, ty - sz * 0.35, sz * 0.7, sz * 0.5);
+    } else {
+      // round broadleaf, height-varied
+      g.fill(trunkCol);
+      g.rect(tx - 0.35, ty - sz * 0.4, 0.7, sz * 0.6);
+      let canopyY = ty - sz * (0.7 + hh * 0.4);
+      g.fill(canDark);
+      g.ellipse(tx, canopyY, sz * 1.6, sz * (1.4 + hh * 0.4));
+      g.fill(canLight);
+      g.ellipse(tx + sz * 0.28, canopyY - sz * 0.2, sz * 0.95, sz * 0.9);
+    }
+  }
+  g.noStroke();
+}
+
+
+// ============ ROADSIDE HAMLETS (sparse clusters between cities) ============
+// Small houses that settle on free land beside intercity roads (far from any
+// city center). They draw merged with the building list by depth, animate in
+// with a quick grow, and light their windows at night. Kept deliberately sparse
+// so the wilderness still dominates and skylines don't homogenize.
+
+const HAMLET_COLORS = [
+  { r: 200, g: 180, b: 150 },
+  { r: 185, g: 170, b: 155 },
+  { r: 170, g: 160, b: 150 },
+  { r: 205, g: 190, b: 165 },
+  { r: 160, g: 165, b: 170 },
+];
+const HAMLET_ROOFS = [
+  { r: 120, g: 70, b: 55 },
+  { r: 95, g: 80, b: 70 },
+  { r: 80, g: 85, b: 90 },
+  { r: 110, g: 95, b: 60 },
+];
+
+function updateHamlets() {
+  for (let h of hamlets) {
+    if (h.grow < 1) {
+      h.grow += 0.04 * simulationSpeed;
+      if (h.grow > 1) h.grow = 1;
+    }
+  }
+}
+
+function trySpawnHamlet() {
+  if (roads.length < 40) return;
+  if (random() > 0.55) return;
+
+  for (let attempt = 0; attempt < 12; attempt++) {
+    let r = random(roads);
+    let rt = terrain[r.x][r.y];
+    if (rt.isWater) continue;
+    if (rt.distanceToCity < 16) continue; // only the empty land between cities
+
+    let tooClose = false;
+    for (let h of hamlets) {
+      if (dist(r.x, r.y, h.tx, h.ty) < 8) {
+        tooClose = true;
+        break;
+      }
+    }
+    if (tooClose) continue;
+
+    let count = floor(random(2, 5));
+    let placed = 0;
+    for (let k = 0; k < count * 4 && placed < count; k++) {
+      let nx = r.x + floor(random(-3, 4));
+      let ny = r.y + floor(random(-3, 4));
+      if (nx < 1 || ny < 1 || nx >= TERRAIN_SIZE - 1 || ny >= TERRAIN_SIZE - 1)
+        continue;
+      let nt = terrain[nx][ny];
+      if (nt.isWater || nt.occupied || nt.road || nt.hamlet) continue;
+      if (nt.elevation > 5) continue;
+      if (nt.distanceToRoad > 3) continue;
+
+      nt.hamlet = true;
+      nt.occupied = true;
+      hamlets.push({
+        isHamlet: true,
+        tx: nx,
+        ty: ny,
+        depth: nx + ny + 0.5,
+        height: random() < 0.3 ? 2 : 1,
+        grow: 0,
+        baseColor: random(HAMLET_COLORS),
+        roofColor: random(HAMLET_ROOFS),
+        hasLight: random() < 0.7,
+      });
+      placed++;
+    }
+    if (placed > 0) {
+      hamletsDirty = true;
+      break;
+    }
+  }
+}
+
+function drawHamletHouse(h) {
+  let elev = terrain[h.tx][h.ty].elevation;
+  let pos = toIso(h.tx + 0.5, h.ty + 0.5, elev);
+  if (!isVisible(pos.x, pos.y, 40)) return;
+
+  let dl = cachedDaylight;
+  let grow = h.grow < 1 ? h.grow : 1;
+  let bw = TILE_WIDTH * 0.92;
+  let bh = TILE_HEIGHT * 0.92;
+  let wallH = h.height * TILE_HEIGHT * grow;
+  if (wallH < 0.4) return;
+
+  let baseCol = lerpColor(
+    color(18, 18, 24),
+    color(h.baseColor.r, h.baseColor.g, h.baseColor.b),
+    dl,
+  );
+  let shade = lerpColor(baseCol, color(0), 0.2);
+  let topY = pos.y - wallH;
+
+  // right wall
+  noStroke();
+  fill(shade);
+  beginShape();
+  vertex(pos.x, topY + bh);
+  vertex(pos.x + bw / 2, topY + bh / 2);
+  vertex(pos.x + bw / 2, pos.y + bh / 2);
+  vertex(pos.x, pos.y + bh);
+  endShape(CLOSE);
+
+  // left wall
+  fill(lerpColor(shade, color(0), 0.1));
+  beginShape();
+  vertex(pos.x, topY + bh);
+  vertex(pos.x - bw / 2, topY + bh / 2);
+  vertex(pos.x - bw / 2, pos.y + bh / 2);
+  vertex(pos.x, pos.y + bh);
+  endShape(CLOSE);
+
+  // pitched roof
+  let roofCol = lerpColor(
+    color(14, 14, 20),
+    color(h.roofColor.r, h.roofColor.g, h.roofColor.b),
+    dl,
+  );
+  fill(roofCol);
+  beginShape();
+  vertex(pos.x, topY - bh * 0.7);
+  vertex(pos.x + bw / 2, topY + bh / 2);
+  vertex(pos.x, topY + bh);
+  vertex(pos.x - bw / 2, topY + bh / 2);
+  endShape(CLOSE);
+  fill(lerpColor(roofCol, color(0), 0.18));
+  beginShape();
+  vertex(pos.x, topY - bh * 0.7);
+  vertex(pos.x + bw / 2, topY + bh / 2);
+  vertex(pos.x, topY + bh);
+  endShape(CLOSE);
+
+  // window glow at night
+  if (grow >= 1 && cachedIsNight) {
+    if (h.hasLight) fill(255, 225, 150, 200);
+    else fill(40, 45, 60, 90);
+    rect(pos.x - 0.5, pos.y - wallH * 0.55, 1.1, 1.3);
+  }
 }
