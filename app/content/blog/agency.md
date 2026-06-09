@@ -1,53 +1,28 @@
 ---
-title: "Agency"
+title: "Agency: Eyes on the road"
 date: "2024-08-05"
 category: "Misc"
 ---
-Its stereotypical for every blog to include a post on agency at this point so thought it would be a funny starting point.
+It's basically a rite of passage at this point: every blog gets an agency post. This is mine.
 
-# Agency
+I'm writing it anyway because I think they are missing something important. Implicit in many essays I've read is that agency is something you have: a trait, like height, that some people get more of. Find the high-agency people, hire the high-agency people, why can't I be more like those high-agency people? The moment you believe agency is something people have, you've quietly answered the question of whether you have it and most people, on most days, answer no. That answer is the actual problem. Not your wiring. The belief.
 
-At its core agency is the capacity to act and make choices over one's own mind. It is not a hypothesis, a personality trait, or a mood — it is a directly observable fact of consciousness.
+Agency isn't a thing you have. It's a choice you make in every waking moment, one specific choice, over and over: whether to engage your mind with what's important or let it idle. Different from the choice of what to think. Thoughts, memories, associations can bubble up on their own, you don't necessarily summon them. The choice is whether to do anything with them. It's like managing a team: your subconscious sends material up constantly, and your actual job is deciding what to accept, discard, or file. You can verify this without taking my word for it. Notice what your attention is doing right now, reading this. Then notice that you just chose to check. To be clear, the checking isn't the point. It's just the cheapest demonstration that your attention has a steering wheel and your hands can be on it. The real act is what you do next: aiming your mind at what matters (like finishing this blog) instead of whatever happens to be passing through. That aiming, that's the locus of the whole thing. Everything anyone admires as "high agency" is downstream of doing it more often.
 
-## The Foundation: Volition
+This isn't without constraints. The choice operates within your circumstances, your knowledge, what you're actually working with. At any moment you face a real but finite set of options, and wishing doesn't add to them. But finite doesn't mean fixed. Roughly every problem you'll ever face sorts into three categories of tasks:
+1. easy (walk to the kitchen, drink water, open instagram, little focus required)
+2. hard (won't yield today, will yield to sustained, directed effort). Almost everything that matters lives in this category.
+3. impossible (build a perpetual motion machine, physics says no)
+Much of the low-agency experience boils down to a filing error mistaking something that is hard for something that is easy or impossible. You know your context best so it's up to you to determine which categories your tasks fit in, for example the ship has probably sailed on me becoming a professional tennis player, and finding a wife won't be easy but I like to think that's possible.
 
-The root of agency is a single choice: to focus your awareness or to let it drift. This isn't the choice of _what_ to think — your subconscious feeds you thoughts, memories, and associations automatically — but the choice of _whether_ to think at all. Whether to engage your conscious mind with reality, or passively float on whatever impulses and associations bubble up.
+Most of the time, if we're being honest, we didn't misjudge the problem. We know it's doable. We know it matters. We're just not doing it, and the usual diagnosis for that state is low agency, as if the focus machinery failed to switch on. Here's the thing though: your attention is not off. You are focused on something. So the real question isn't why you couldn't focus, it's what you were focused on instead. Dig into your own procrastination and there's always an underlying emotion blocking you from doing. We don't avoid the task, we avoid a feeling the task points at: the fear of trying properly and finding out our best wasn't enough, the quiet verdict that we don't actually care about this and don't want to admit it, the dread of embarrassing ourselves in front of our peers, the anticipated comfort of the easier thing (indulging in a bad habit like scrolling reels). Procrastination is just the costume. Underneath, attention is doing exactly what we aimed it at, which is the fear instead of the work. That's not inability. That's evasion, and we are all guilty of it. You always had the agency. You were spending it looking away.
 
-Its like managing a team, your subconscious sends material up to you constantly. Your fundamental act of agency is deciding what to accept, discard, or file — choosing to be _in focus_ rather than surrendering to autopilot.
+Now, "you're evading" sounds like an accusation. It's the opposite. Stay with the alternative for a second: if low agency were an inability, a missing trait, you'd be stuck with it the way you're stuck with your height. Nothing to do but cope. But a choice can be made differently, and not someday, *now*, in this exact moment, which is the only place the choice ever lives. And yes, that stays true on the bad days. A long, draining week can dim your attention down to a flicker, but a dim spotlight is still yours to aim, and the aiming is the act. Accept that the steering was yours all along, and a surprising number of your ceilings turn out to be self-imposed, which is another way of saying removable.
 
-## Agency Within Constraints
+Here's what the dim spotlight buys you, and it's more than it seems. Aim it at one small thing and finish it. Not a heroic thing, the smallest real one: the email you've been circling for a week, the first ugly version of the thing you keep planning instead of starting. What you get back isn't just the result. It's evidence. Your own mind registers that aiming worked. And evidence is the one thing that actually grows capacity, because the choice to focus gets easier every time you've watched it pay off. Small action, slightly more capability, stronger evidence, slightly bigger spotlight, slightly bigger action. That's the virtuous spiral, and it's the same loop that can run downward when you evade: every dodge files away it's own proof that you're not a doer and it eats at your self-esteem. The loop is running either way. You get to pick the direction. This is also why failure doesn't break it. A failed attempt is data about what to try next, and treating it that way is itself an act of aiming, attention held on the problem instead of fleeing to the verdict. None of this is wishful thinking, and that matters. The world has more levers than the low-agency story admits, and it reliably gives ground to sustained, directed effort. The spiral works because reality cooperates with people who keep looking at it.
 
-This doesn't mean you can do anything. Agency operates within a context determined by your nature, your knowledge, and your circumstances. You can't choose to jump to the moon. You face a finite set of alternatives at any moment.
+Your self-esteem is not a mood you manufacture with affirmations, and it's not your ranking against other people. It's a gauge, and what it measures is how well you've been using your own agency. It cannot be outsourced. Nobody else knows the spotlight you had to work with this week, your full context, so nobody else can fully judge your action. Comparing your output to someone else's is like reading a stranger's gauge and panicking about your own engine. The needle only responds to two things: did you aim at what you knew mattered, and were you honest with yourself about it. Which is why the wins have to be claimed. Shrugging off your own progress gets taught as humility, it isn't. It's sabotage with good manners. Let's look back at the loop: a real win is evidence and earned confidence, and waving it away is moving the spotlight off something you know is true because sitting with it feels uncomfortable. Underclaiming a win is evasion, just pointed at good news, and it starves the spiral of the fuel it runs on. Claiming a win you didn't earn is evasion in the other direction. You can't lie your way to self-esteem. It has to be earned, which is exactly what makes it worth anything.
 
-But this isn't determinism either. The identity of a volitional consciousness is precisely _to have the capacity for divergent choice within definite constraints_. A mind that can focus or drift is not "uncaused" — it is acting according to its nature, just as fire acts according to its nature when it burns. The difference is that a conscious being's nature includes the power of self-regulation: the ability to manually direct one's own cognitive system.
+One powerful thing the virtuous spiral responds to: who and what you put around it. Agency is contagious. Watching someone treat a hard problem as solvable, and then watching it actually yield, is evidence, the same currency the spiral runs on, except now you're collecting it from other people's actions too. Spend time around people like that and your universe for what is possible to achieve expands quickly. The inverse is also true. Other people want your spotlight, and not all of them mean you well. Some will hand you their ceilings, telling you what's realistic, passing on limitations they imposed on themselves. Others are simply competing for your attention, because attention is the scarcest thing you have and whoever aims it can collect what it produces. So choose your people deliberately, and be expensive to distract.
 
-This distinction matters. Consider three categories of tasks:
-
-1. **Easy tasks** — walking, drinking water. These require no special effort of focus.
-2. **Impossible tasks** — the laws of physics prevent you from building a perpetual motion machine. No amount of focus changes this.
-3. **Hard tasks** — you won't succeed immediately, but you can with sustained, directed effort.
-
-People with low agency don't lack ability. They lack the _habit_ of focusing — of engaging their conscious mind with hard problems rather than drifting away from them. They mistake category 3 for category 2.
-
-## Why This Matters
-
-Because you are the initiator of your own mental focus, you are genuinely responsible for what follows from that choice — your reasoning, your character, your values, your actions. Agency is what makes morality possible. If your thoughts and actions were fully determined by genes, society, or upbringing, then praise and blame would be meaningless.
-
-You can check your premises. You can correct your errors. You can redirect your life. The choice to focus is always available to you.
-
-## Developing Agency
-
-If agency is the choice to focus, then developing it means _strengthening that choice_. Not through willpower alone, but through evidence that focusing works:
-
-Learn how to succeed at specific things. Practice, and register your victories (don't let them slide past unacknowledged). Watch others in similar circumstances succeed through effort. When you fail, treat it as data about what to try differently, not evidence that you belong in category 2.
-
-Each of these builds the conviction that hard problems yield to sustained focus. That conviction isn't hope in the passive sense, it's _earned confidence_ in a capacity you can observe directly in yourself every time you choose to engage rather than drift. This builds self-esteem and helps sustain momentum in your goals and life.
-
-## The Contagion
-
-Agency is contagious: not because optimism is infectious, but because watching someone exercise genuine cognitive self-direction is powerful evidence that _you can too_. Seek out people who treat hard problems as solvable. Their example makes your own choice to focus easier to sustain.
-
----
-
-> Further reading:
-> - At the end of this [interview](https://www.youtube.com/watch?v=6COwtRiEZ3k&ab_channel=InfiniteLoops)
+Which brings it back to why any of this matters. Your attention isn't a productivity resource. It is, minute by minute, the material your life is actually made of: whatever it gets spent on is what your life ends up being. And the choice over it never lives in the future, in some version of you who finally became a high-agency person. There's no issuing authority for that. The choice only ever lives now, and now is the one thing that doesn't compound, roll over, or come back. The trade on offer is absurdly good: the entry fee is one small act of aiming you could do today, and the rewards, run through the spiral long enough, end up in places you'd once filed as impossible. So don't wait. You'll be three videos deep tonight, or circling that email again next week, and you'll feel a flicker of the thing this essay is about: your hands left the wheel, and they're still right there. Take it back. It's your life. You're the one driving.
