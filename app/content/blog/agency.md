@@ -3,6 +3,8 @@ title: "Agency: Eyes on the road"
 date: "2024-08-05"
 category: "Misc"
 ---
+![Agency](/blog/agency.png)
+
 It's basically a rite of passage at this point: every blog gets an agency post. This is mine.
 
 I'm writing it anyway because I think they are missing something important. Implicit in many essays I've read is that agency is something you have: a trait, like height, that some people get more of. Find the high-agency people, hire the high-agency people, why can't I be more like those high-agency people? The moment you believe agency is something people have, you've quietly answered the question of whether you have it and most people, on most days, answer no. That answer is the actual problem. Not your wiring. The belief.
