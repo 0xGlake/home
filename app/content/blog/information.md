@@ -3,6 +3,8 @@ title: "Information"
 date: "2024-08-07"
 category: "Misc"
 ---
+![Information](/blog/information.png)
+
 # Information: Looking at the road and staying in your lane
 
 *This is part two of a series on attention. It stands alone, but it builds on [part one, about agency](/blog/agency), which I'd recommend reading first.*
