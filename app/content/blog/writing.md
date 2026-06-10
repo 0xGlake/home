@@ -1,6 +1,6 @@
 ---
 title: "What Writing Is"
-date: "2024-08-05"
+date: "2026-06-10"
 category: "Misc"
 ---
 ![Writing](/blog/writing.png)
