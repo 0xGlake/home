@@ -1,75 +1,55 @@
 ---
 title: "What is Wealth and What is Money?"
-date: "2026-04-30"
+date: "2026-05-30"
 category: "Misc"
 ---
 # What is Wealth and What is Money?
 
-Almost every economic confusion of the modern age — inflation, fiat currency, "stimulus," the worship of consumption, the contempt for finance — traces back to a single failure to distinguish two concepts: **wealth** and **money**. They are not the same thing. One is the cause; the other is the symbol. When people confuse the symbol for the thing it represents, they end up believing that governments can create prosperity by printing paper, that bankers "just move numbers around," and that consumption rather than production is the engine of progress. Each of these errors is the same error, viewed from a different angle.
+We all feel that printing money is generally bad. But why is that?
 
-## I. Wealth: The Product of Mind Applied to Nature
+Every child eventually ends up asking the question: why don't we just give everyone a million dollars? Once we understand some basics of cause and effect, we see that this achieves nothing productive and just increases the price of everything (unless you are a Marxist, then you see no problem with this). But it's hard to say why it's bad at the roots.
 
-Wealth is not money. Wealth is the sum of material values that sustain human life — food, shelter, tools, machines, medicine, books, paintings, the lights overhead, the chair you are sitting in. Nature does not provide these. Nature provides only raw matter, indifferent and inert. Every value that distinguishes a human life from that of an animal in a cave is the product of a mind reshaping that raw matter to serve life.
+The full answer lies in understanding two words we think about every day and almost never define: wealth, and money.
 
-The principle is best stated as: *wealth is thought*. Every form of material asset beyond an animal's level — every tool, every machine, every product — is made possible by the human cognitive faculty: by intelligence, imagination, ingenuity. The Industrial Revolution is the most dramatic proof. Natural resources had existed forever; physical labor had existed forever; what was new in the seventeenth and eighteenth centuries was *liberated human thought* — reason and the political recognition of individual rights. Only that "drive" was new, and only that power qualifies as the fundamental creator of wealth.
+## So what is wealth?
 
-This is why the phrase **"to make money"** is so revealing. Earlier civilizations thought of wealth as a static quantity — to be seized, inherited, looted, begged, or rationed. The phrase "to make money" assumes the opposite: wealth must be *created*. It contains an entire ethics — that the standard of value is the productive mind, and that prosperity is not a zero-sum cake to be sliced but a structure to be built.
+Nature provides only raw matter and the laws of physics: not houses, not penicillin, not your medium rare steak. What turns inanimate matter into any of those is reason. Muscle moves things around, but only knowledge of what matter is, and what it can become, improves it. Every asset above an animal's level traces back to a mind. Wealth, then, is the sum of material values: matter reshaped by reason to sustain and further human life.
 
-The corollary is that wealth cannot be conjured. It cannot be willed into existence by legislative decree, multiplied by a printing press, or stimulated into being by handing out paper. Savings, not spending, is what creates wealth. "We're a consumer-driven economy" is a contradiction in terms — no economy is consumer-driven, because consumption *destroys* wealth. Wealth is created by deferring consumption, accumulating capital, and investing it in still-greater future production.
+Wealth is matter, and matter obeys causality, not decree. It cannot be conjured by printing, stimulus or legislation; it has to be produced by someone. Symbols and claims can be multiplied at will. Substance (wealth), only by productive work.
 
-## II. Money: A Symbol of Wealth, Reliably Accepted
+## What is Money?
 
-If wealth is the thing, money is the symbol — a tool that allows wealth to be exchanged.
+Money is the most reliable kind of claim there is. Put simply: money is **property** that is **reliably** accepted in **exchange** for other property or labour.
 
-The cleanest definition: *money is a form of property that reliably can be exchanged for other property or labor.* Three terms in that sentence carry the weight:
+- **Property** — an enforceable claim in a thing, not the thing itself; you can exclude others by the legitimate use of force, and it is the claim, not the thing, that changes hands in a trade. Take a land title: you hold a defensible right to use it and keep others off, and when you sell, it is the title that moves.
+- **Reliability** — you can count on the next person accepting it, and the person after them. This is what separates money from any other claim you could hold. Land titles are valuable property, but not money: you cannot buy groceries with it, because the grocer won't reliably take it.
+- **Exchange** — it only means anything among people who produce and trade, value for value. A banknote alone on a desert island is just paper; surrounded by producers, it has a shared exchangeable value.
 
-- **Property** — Money is not the *paper*; money is the *legal claim* you hold over the paper. Property is a claim on the use of force by the government to exclude others from controlling that in which you hold property. Land is not property; you hold property *in* land. A $10 bill is not property; you hold ownership *of* the bill.
-- **Reliability** — What separates money from any other form of property is that people will *reliably* accept it in trade. Your IOU is property too — but no corner store will take it, because no one knows you. A bank's IOU (your bank balance) is widely accepted, because everyone trusts the bank to honor it. Once everyone believes that a certain kind of property will be accepted by others, it is money.
-- **Exchange** — Money exists only because of the trader principle: voluntary value-for-value exchange among free people. Money is a tool of exchange that cannot exist unless there are goods produced and people able to produce them. It presupposes a society in which men deal with each other by trade rather than by force.
+Being money, then, is a status a claim holds and can lose, not a substance it is made of. Gold held it for millennia; today it does not (try buying a house with a bag of coins).
 
-Those three terms describe what money *is*. The functional test — what money must *do* — has three parts, all of which are dimensions of that third term, *exchange*:
+There are also things money must do, each a dimension of exchange:
 
-- **Medium of exchange** — exchange across transactions (this for that, in the moment).
-- **Unit of economic calculation** — exchange across goods (pricing, comparing, accounting).
-- **Store of value** — exchange across time (selling now, buying later).
+1. **Medium of exchange** — exchange across transactions. Everyone accepts dollars but no one will honour a random IOU note or your chickens for their shoes, the shoemaker can't verify your IOU note (debt) and probably doesn't want chickens.
+2. **Unit of economic calculation** — exchange across goods. One shared unit lets you weigh a house against a car against an hour of your time, and lets a business tell profit from loss.
+3. **Store of value** — exchange across time (selling now, buying later). Defer your consumption so you can hold money and its value is reliable, this allows you to make plans into the future.
 
-The third is the most important and the most often overlooked. A medium of exchange that is not also a store of value is a hot potato — useful only if you can offload it before it decays. A store of value requires that the money be *objectively* valuable: a thing in reality, finite, not arbitrarily replicable. Historically, the best candidate has been gold — not because of any mystical property of the metal, but because it is durable, divisible, recognizable, and (critically) cannot be inflated by fiat.
+The first two come almost for free once a claim is reliably accepted. The third is much harder to achieve, and it puts a requirement on the money itself: its supply cannot be expandable at the whim of people. Gold qualified not because mining is hard work but because nobody, state or crowd, can simply conjure more of it. 
 
-In modern industrialized economies, only two forms of property currently qualify as money: **central bank currency** (the notes and coins issued by the Federal Reserve, Bank of England, etc.) and **bank credit** (the IOUs that constitute your bank balance). When you write a check, you are not transferring cash; you are transferring *debt* — instructing the bank to lower one balance and raise another. A bank loan, similarly, is not a transfer of currency; it is a *trade of debts*: you exchange your untrusted IOU for the bank's trusted IOU, and pay interest as the price of renting the bank's credibility.
+It is worth saying why gold specifically. Durable, so value keeps across time; uniform and divisible, so one ounce equals any other and can act as the unit; dense and rare, so a fortune is portable and the supply only ever creeps. Above all its quantity is fixed by chemistry, not by anyone's decision, so no issuer can dilute what you already hold. And no one can invent a replacement either: the list of elements is closed, and almost none of them come close to gold's mix of properties. Gold is the hardest store of value the periodic table makes available, its worth anchored in matter rather than in anyone's promise or continued coordination, and that grounding, not consensus, is what makes it trustworthy as money.
 
-## III. The Relationship: What are capital allocators actually doing?
+A money like that is really a measuring instrument laid over production, and the readings mean something only while the unit holds still. Printing money no more creates houses than redefining the metre creates distance: not one extra house, heart pacemaker or cheese burger comes into being. The only thing that changes is who holds the claims to what already exists.
 
-Once you grasp that wealth is the thing and money is the symbol, you can see why the standard contempt for bankers is not merely wrong but inverted. The accusation that "bankers don't create anything — they just move numbers around" misses the entire point of what banking is.
+Now let's watch what plays out when a centralised institution defines and issues the money.
+## Is Fiat Money?
 
-Savers deposit wealth they have already created. Bankers — through an act of high-level abstract integration across entire industries — direct that capital toward the ventures most likely to produce *more* wealth. The borrower gets to start a productive enterprise; the bank earns interest on the loan; the saver earns a share of that interest. Three parties, three winners. This is the trader principle made systematic. Bankers do, with extraordinary skill and at enormous scale, exactly what central planners claim only the state can do — and they do it well precisely because they are motivated by self-interest, which forces capital toward what people actually value rather than toward what officials prefer.
+Fiat currency is money whose supply can be expanded at whim. It is reliably accepted everywhere, but it fails the store of value by construction: an ounce of gold costs nearly an ounce of real inputs to dig up, while a unit of fiat costs nothing to issue. The instrument the whole economy measures with now has an owner who can redefine the unit for free.
 
-The hatred of bankers is, at root, the hatred of abstraction. People can see the worker turning a crank or the farmer planting potatoes; they cannot see the integration that links a saver's deposit, an entrepreneur's vision, and a new factory floor. The integration is invisible, and so — to those unwilling or unable to think in principle — it appears to be nothing.
+This answers the question we began with: why does almost everything keep getting more expensive? Not because the stuff is getting scarcer. The world makes more of it every year, and under honest money that shows up as falling prices. Prices rising across the board can therefore mean only one thing: the claims are multiplying faster than the wealth behind them. The denominator is becoming useless.
 
-## IV. The Fatal Confusion: Fiat Currency
+Notice that new money does not fall like snow, evenly on everyone at once. It enters at a point, a bond purchase, a bailout, a government contract for a product that would not exist in a free market, bribing a government-reliant underclass through welfare for votes. And whoever stands nearest spends it at yesterday's prices, before they move. The ledger runs from those furthest from the tap to those closest to it (for more google the Cantillon effect): from savers to the issuer and the borrowers beside him. In a free market wealth moves toward whoever produces what others want; today's fiat reverses this process; it steals from the productive to give to and incentivise the unproductive.
 
-Now consider what happens when people forget that money is a *symbol* and treat it as the wealth itself.
+Another clear tell is having an interest rate below inflation. Under honest money it cannot happen, because no one hands over an ounce of gold to be repaid the value of half an ounce; it is possible only when the lender can print what he lends. And interest is no ordinary price, it is the price of time, the number every plan in the economy is set against. Hold it below inflation and borrowing becomes free in real terms: leverage looks safe and necessary, ventures no real saving would ever have funded get funded (I love NFTs and memecoins), and the overflow goes hunting for assets to inflate, wherever policy happens to steer it (housing market circa 2008). You watched it run live, money poured out in 2020, rates pinned at zero, every asset repricing at once. We were all participants in the Keynesian beauty contest.
 
-If a government can print more currency, and currency is wealth, then a government can print prosperity. This is the premise underlying every fiat regime in history — and it is a flat contradiction. *You do not increase the wealth of society by changing the number of dollars. All that can change the wealth of society is productivity.* Inflation is the production of more *denominations* of wealth without any corresponding production of the underlying wealth. The result is theft — covert, systematic, and (because it is invisible) almost impossible to prosecute. Each new dollar dilutes every existing dollar; the counterfeiter, whether private or governmental, captures purchasing power that should have accrued to savers.
+It is also why saving quietly stopped working. The savings account still exists, but its rate is set by the issuer and sits below the rate of dilution, so it can no longer do its one job, holding the value you put in. Everyone already senses this and acts on it without quite being able to explain why: the rush into index funds, treating houses as the family vault, the nihilism of spending what you earn the moment it lands, the rush back into gold, the common knowledge that holding cash is foolish, which is really an admission that the thing built to store value can't.
 
-A useful analogy: fiat currency is like adding random noises to the dictionary and announcing that knowledge has expanded. Look at all these new words! But the words mean nothing if they do not refer to anything real. Concepts must refer to percepts; dollars must refer to wealth. Sever the symbol from the referent and you do not enrich the symbol — you destroy it.
-
-## V. Bitcoin Is Not Money
-
-The natural response to government inflation has been cryptocurrency: an alternative medium of exchange that no central authority can debase. The instinct is correct — the solution is not. Bitcoin escapes *centralized* fiat only to substitute *decentralized* fiat. Each individual cryptocurrency may be finite, but cryptocurrencies as a class are unboundedly proliferable: anyone can launch another one. Their value rests not on a commodity that is objectively valuable in reality, but on subjective agreement among holders. This is the *democratization* of fiat currency, not its abolition. The proper alternative to a state-controlled money supply is not a crowd-controlled money supply but an *objectively grounded* one: a commodity currency, anchored in something real - like precious metals.
-
-To say Bitcoin is not money is not to say Bitcoin is worthless. A protocol that coordinates millions of strangers to converge on the same ledger, settle transactions without a central authority, and coordinate value across borders is a genuine human achievement. The value lies in the social organization — the narratives, the network, the trust mechanism, the Schelling point — not in any commodity grounding. Narratives, coordination, and even speculation are legitimate sources of value. They are simply different sources than the one that makes a thing money.
-
-## VI. Conclusion: The Tool of Free Men
-
-The relation of wealth to money is the relation of substance to symbol, of cause to representation. Wealth is what reason produces by reshaping nature for human life. Money is the symbol by which wealth is traded among free people. Neither concept can survive the loss of the other: wealth without money collapses into barter and stagnation; money without wealth collapses into fraud.
-
-The principle, fully stated:
-
-> When money ceases to be the tool by which men deal with one another, then men become the tools of men. Blood, whips and guns — or dollars. Take your choice — there is no other — and your time is running out.
-
-Money is not the root of evil. It is the visible sign that people are dealing with each other by reason, by trade, and by mutual consent — that they have chosen the methods of producers over the methods of looters. The defense of sound money is the defense of every value that money was invented to carry: production, property, voluntary exchange, and the free human mind that makes wealth possible in the first place.
-
-> Further reading:
-> - Paul McKeever, [Understanding Money & Banking Pt. 1: What is Money?](https://www.youtube.com/watch?v=zWHoo3Tkv38)
-> - Charles Tew, [How to Avoid Being an Idiot Who Thinks Bankers Just Move Numbers Around](https://www.youtube.com/watch?v=T2FhqUKc-gk) (Functional Philosophy #12), [The Status of Cryptocurrencies Like Bitcoin](https://www.youtube.com/watch?v=VldcMijnGjY) (Functional Philosophy #36), [Marxism, Abstraction, and Alienation](https://www.youtube.com/watch?v=Tg3czMmieRk) (Functional Philosophy #35)
-> - Leonard Peikoff, *Objectivism: The Philosophy of Ayn Rand*, chs. 8 (Virtue) & 11 (Capitalism)
+One last thing. There are only two ways to get what others have made: trade or force, and honest money is the residue of the first, proof that value was given for value by consent. Corrupting it is no mere economic nuisance: change what the symbol means and you nudge a society off the first path toward the second. Wealth is made by reshaping nature and cannot be printed; money only measures it; a claim that costs nothing to issue will be issued, at the expense of whoever is slowest to the tap. Next time anyone, a central bank, a politician, a protocol (remember Terra Luna?), promises prosperity by adjusting the symbol, you will know what is wrong.
