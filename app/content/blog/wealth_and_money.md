@@ -1,6 +1,6 @@
 ---
 title: "What is Wealth and What is Money?"
-date: "2026-05-30"
+date: "2026-06-12"
 category: "Misc"
 ---
 # What is Wealth and What is Money?
