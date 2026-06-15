@@ -183,8 +183,8 @@ export default function Home() {
               Thanks for dropping by
               <br />
               <br />
-              My current interests are: defi, full stack development,
-              communities, emergence, philosophy, humour and more
+              My current interests are: DeFi, Software, Communities, Emergence,
+              Philosophy, Humour and more
               <br />
               <br />
               Please feel free to reach out to me on twitter
