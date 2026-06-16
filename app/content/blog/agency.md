@@ -9,31 +9,30 @@ category: "Misc"
 
 It's basically a rite of passage at this point: every blog gets an agency post. This is mine.
 
-I'm writing it anyway because I think they are missing something important. Implicit in many essays I've read is that agency is something you _have_: a trait, like height, that some people get more of. Find the high-agency people, hire the high-agency people, why can't I be more like those high-agency people? The moment you believe agency is something people have, you've quietly answered the question of whether you have it and most people, on most days, answer no. **That answer is the actual problem. Not your wiring. The belief.**
+I'm writing it anyway because I think they are missing something important. Implicit in some peoples views of agency it is something you _have_: a trait, like height, that some people get more of. Why can't I be more like those high-agency people? The moment you believe agency is something people have, you've quietly answered the question of whether you have it and most people, on most days, answer no. **That answer is the actual problem: The incorrect belief.**
 
 ---
-
-## A choice, not a trait
+## Agency Is A Choice
 
 Agency isn't a thing you have. It's a choice you make in every waking moment, one specific choice, over and over: whether to engage your mind with what's important or let it idle. Different from the choice of _what_ to think. Thoughts, memories, associations can bubble up on their own, you don't necessarily summon them. The choice is whether to do anything with them. It's like managing a team: your subconscious sends material up constantly, and your actual job is deciding what to accept, discard, or file.
 
-You can verify this without taking my word for it. Notice what your attention is doing right now, reading this. Then notice that you just chose to check. To be clear, the checking isn't the point. It's just the cheapest demonstration that your attention has a steering wheel and your hands can be on it. The real act is what you do next: aiming your mind at what matters (like finishing this blog) instead of whatever happens to be passing through. That aiming, that's the locus of the whole thing. Everything anyone admires as "high agency" is downstream of doing it more often.
+You can verify this without taking my word for it. Notice what your attention is doing right now, reading this. Then notice that you just chose to check. To be clear, the checking isn't the point. It's just the cheapest demonstration that your attention has a steering wheel and your hands can be on it. The real act is what you do next: aiming your mind at focusing on what matters (like finishing this post) instead of whatever happens to be passing through like an itch to go on youtube or get food from the pantry. That aiming, that's the locus of the whole thing. Everything anyone admires as "high agency" is downstream of doing it more often.
 
 ## Easy, hard, impossible
 
-This isn't without constraints. The choice operates within your circumstances, your knowledge, what you're actually working with. At any moment you face a real but finite set of options, and wishing doesn't add to them. But finite doesn't mean fixed. Roughly every problem you'll ever face sorts into three categories of tasks:
+This isn't without constraints. The choice operates within your circumstances, your knowledge, what you're actually working with. At any moment you face a real but finite set of options, and wishing doesn't add to them. But finite doesn't mean fixed. Every problem you'll ever face sorts into three categories of tasks:
 
-1. **Easy** (walk to the kitchen, drink water, open instagram, little focus required)
-2. **Hard** (won't yield today, will yield to sustained, directed effort). Almost everything that matters lives in this category.
+1. **Easy** (walk to the kitchen, drink water, open instagram, a habit. Little focus required)
+2. **Hard** (won't yield today, but will yield to sustained, directed effort). Almost everything that matters lives in this category.
 3. **Impossible** (build a perpetual motion machine, physics says no)
 
-Much of the low-agency experience boils down to a filing error mistaking something that is hard for something that is easy or impossible. You know your context best so it's up to you to determine which categories your tasks fit in, for example the ship has probably sailed on me becoming a professional tennis player, and finding a wife won't be easy but I like to think that's possible.
+Much of the low-agency experience boils down to a filing error mistaking something that is hard for something that is easy or impossible. You know your context best so it's up to you to determine which categories your tasks fit in, for example the ship has probably sailed on me becoming a professional tennis player, but finding a wife won't be easy but I like to think it's possible.
 
-## What you were focused on instead
+## Why we choose to look away
 
 Most of the time, if we're being honest, we didn't misjudge the problem. We know it's doable. We know it matters. We're just not doing it, and the usual diagnosis for that state is low agency, as if the focus machinery failed to switch on. Here's the thing though: your attention is not off. You are focused on _something_. So the real question isn't why you couldn't focus, it's what you were focused on instead.
 
-Dig into your own procrastination and there's always an underlying emotion blocking you from doing. We don't avoid the task, we avoid a feeling the task points at: the fear of trying properly and finding out our best wasn't enough, the quiet verdict that we don't actually care about this and don't want to admit it, the dread of embarrassing ourselves in front of our peers, the anticipated comfort of the easier thing (indulging in a bad habit like scrolling reels). **Procrastination is just the costume.** Underneath, attention is doing exactly what we aimed it at, which is the fear instead of the work. That's not inability. That's evasion, and we are all guilty of it. You always had the agency. You were spending it looking away.
+Dig into your own procrastination and there's always an underlying emotion blocking you from doing. We don't avoid the task, we avoid a feeling the task points at: the fear of trying properly and finding out our best wasn't enough, the quiet verdict that we don't actually care about this and don't want to admit it, the dread of embarrassing ourselves in front of our peers, the anticipated comfort of the easier thing (indulging in a bad habit). **Procrastination is just the costume.** Underneath, attention is doing exactly what we aimed it at, which is the fear instead of the work. That's not inability. That's evasion, and we are all guilty of it. You always had the agency. You were spending it looking away.
 
 ## The good news
 
@@ -43,8 +42,9 @@ Now, "you're evading" sounds like an accusation. It's the opposite. Stay with th
 
 Here's what the dim spotlight buys you, and it's more than it seems. Aim it at one small thing and finish it. Not a heroic thing, the smallest real one: the email you've been circling for a week, the first ugly version of the thing you keep planning instead of starting. What you get back isn't just the result. **It's evidence.** Your own mind registers that aiming worked. And evidence is the one thing that actually grows capacity, because the choice to focus gets easier every time you've watched it pay off.
 
-Small action, slightly more capability, stronger evidence, slightly bigger spotlight, slightly bigger action. That's the virtuous spiral, and it's the same loop that can run downward when you evade: every dodge files away it's own proof that you're not a doer and it eats at your self-esteem. The loop is running either way. You get to pick the direction. This is also why failure doesn't break it. A failed attempt is data about what to try next, and treating it that way is itself an act of aiming, attention held on the problem instead of fleeing to the verdict. None of this is wishful thinking, and that matters. The world has more levers than the low-agency story admits, and it reliably gives ground to sustained, directed effort. The spiral works because reality cooperates with people who keep looking at it.
+Small action, slightly more capability, stronger evidence, slightly bigger spotlight, slightly bigger action. That's the virtuous spiral, and it's the same loop that can run downward when you evade: every dodge files away it's own proof that you're not a doer and it eats at your self-esteem. The loop is running either way. You get to pick the direction. This is also why failure doesn't break it. A failed attempt is data about what to try next, and treating it that way is itself an act of aiming, attention held on the problem instead of fleeing because of resistance. None of this is wishful thinking, and that matters. The world has more levers than the low-agency story admits, and it reliably gives ground to sustained, directed effort. The spiral works because reality cooperates with people who keep looking at it.
 
+-> problems that were once hard become easy and you start building positive habits of productivity
 ## The gauge
 
 Your self-esteem is not a mood you manufacture with affirmations, and it's not your ranking against other people. It's a gauge, and what it measures is how well you've been using your own agency. It cannot be outsourced. Nobody else knows the spotlight you had to work with this week, your full context, so nobody else can fully judge your action. Comparing your output to someone else's is like reading a stranger's gauge and panicking about your own engine. The needle only responds to two things: did you aim at what you knew mattered, and were you honest with yourself about it.
