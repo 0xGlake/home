@@ -9,9 +9,9 @@ import { customRenderers } from '../../lib/CustomRenderers';
 import CanvasPost from './CanvasPost';
 
 interface BlogPostProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 const CANVAS_SLUG_PREFIX = 'canvas-';
@@ -52,8 +52,9 @@ export async function generateStaticParams() {
   return params;
 }
 
-export default function BlogPost({ params }: BlogPostProps) {
-  const post = resolvePost(params.slug);
+export default async function BlogPost({ params }: BlogPostProps) {
+  const { slug } = await params;
+  const post = resolvePost(slug);
 
   if (post.type === "canvas") {
     return (
