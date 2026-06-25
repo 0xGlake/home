@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import ImageSlideshow from "./ImageSlideshow";
 
 // Project data ordered from newest to oldest
 const projects = [
@@ -10,7 +10,7 @@ const projects = [
     description:
       "Self improvement tool which allows the LLM to write to a database which can then be visualised in a mermaid diagram.",
     type: "screenshot",
-    imageUrl: "/eudaimonai.png",
+    imageUrls: ["/eudaimonai.png"],
     tech: ["Next.js", "LLM Chat", "postgres"],
     demoUrl: "https://eudaimonai.vercel.app/",
   },
@@ -20,7 +20,7 @@ const projects = [
     description:
       "A comprehensive comparison tool for perpetual trading decentralized exchanges, analyzing funding rates, orderbook depth, and open interest distributions across multiple platforms.",
     type: "screenshot",
-    imageUrl: "/perp-dex-preview.png",
+    imageUrls: ["/perp-dex-preview.png"],
     tech: ["React", "Next.js", "DeFi", "Real-time Data"],
     demoUrl: "https://parallax-one-flame.vercel.app/",
   },
@@ -30,7 +30,7 @@ const projects = [
     description:
       "A procedurally generated isometric city simulation on a floating island. Watch as cities grow, roads connect, and artificial islands emerge from the water.",
     type: "sketch",
-    imageUrl: "/island-preview.png",
+    imageUrls: ["/island-preview.png"],
     tech: ["p5.js", "Procedural Generation", "Isometric"],
     slug: "island",
   },
@@ -92,14 +92,10 @@ export default function ProjectPage() {
                 <div className="aspect-video w-full relative mb-4">
                   {project.type === "sketch" ||
                   project.type === "screenshot" ? (
-                    <div className="w-full h-full flex items-center justify-center bg-black rounded overflow-hidden relative">
-                      <Image
-                        src={project.imageUrl}
-                        alt={project.title}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                    <ImageSlideshow
+                      images={project.imageUrls}
+                      alt={project.title}
+                    />
                   ) : (
                     <iframe
                       src={`https://player.vimeo.com/video/${project.vimeoId}`}
