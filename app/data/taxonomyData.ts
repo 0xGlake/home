@@ -104,6 +104,7 @@ export const taxonomy: Group[] = [
                 items: [
                   { name: "Pear Protocol", url: "https://x.com/pear_protocol" },
                   { name: "Tread", url: "https://x.com/tread_fi" },
+                  { name: "LorisTools", url: "https://x.com/LorisTools", isNew: true },
                 ],
               },
               {
@@ -122,6 +123,7 @@ export const taxonomy: Group[] = [
               { name: "Dune Analytics", url: "https://x.com/Dune" },
               { name: "Nansen", url: "https://x.com/nansen_ai" },
               { name: "Arkham", url: "https://x.com/Arkham" },
+              { name: "Artemis", url: "https://x.com/artemis", isNew: true },
             ],
           },
           {
@@ -196,7 +198,6 @@ export const taxonomy: Group[] = [
               {
                 title: "NFT",
                 accent: "pink",
-                caption: "milady",
                 items: [{ name: "Milady", url: "https://x.com/miladymaker" }],
                 children: [
                   {
@@ -209,8 +210,17 @@ export const taxonomy: Group[] = [
                 title: "RWA",
                 caption: "legal claims to off-chain assets, 1:1",
                 children: [
-                  { title: "Fiat backed stables", items: ["USDC", "USDT"] },
-                  { title: "Commodity backed stables", items: ["PAXG"] },
+                  {
+                    title: "Fiat backed stables",
+                    items: [
+                      { name: "USDC", url: "https://x.com/USDC" },
+                      { name: "USDT", url: "https://x.com/USDT0_to" },
+                    ],
+                  },
+                  {
+                    title: "Commodity backed stables",
+                    items: [{ name: "PAXG", url: "https://x.com/Paxos" }],
+                  },
                   {
                     title: "Physical Asset",
                     caption: "real estate, wrapped bonds/shares, cards, skins",
@@ -218,6 +228,12 @@ export const taxonomy: Group[] = [
                       {
                         name: "Superstate",
                         url: "https://x.com/SuperstateInc",
+                        isNew: true,
+                        description: "tokenized equities w/ full shareholder rights",
+                      },
+                      {
+                        name: "Collector Crypt",
+                        url: "https://x.com/Collector_Crypt",
                         isNew: true,
                       },
                     ],
@@ -249,9 +265,9 @@ export const taxonomy: Group[] = [
                   },
                   {
                     title: "Yield-Bearing Stablecoins",
-                    items: ["sDAI", "sUSDe", "aUSDC"],
+                    caption: "sDAI, sUSDe, aUSDC",
                   },
-                  { title: "Bridged Assets", items: ["bridged BTC"] },
+                  { title: "Bridged Assets", caption: "bridged BTC" },
                 ],
               },
             ],
@@ -331,7 +347,10 @@ export const taxonomy: Group[] = [
               },
               {
                 title: "RFQ",
-                items: ["UniswapX", { name: "CoW", url: "https://x.com/CoWSwap" }],
+                items: [
+                  { name: "UniswapX", url: "https://x.com/Uniswap" },
+                  { name: "CoW", url: "https://x.com/CoWSwap" },
+                ],
               },
               {
                 title: "Dark Pool",
@@ -366,8 +385,7 @@ export const taxonomy: Group[] = [
                 title: "Perpetuals",
                 children: [
                   {
-                    title: "Dark AMM/Prop AMM",
-                    caption: "Velocity adding",
+                    title: "Prop AMM",
                     items: [
                       {
                         name: "Phoenix Perps",
@@ -380,11 +398,10 @@ export const taxonomy: Group[] = [
                   {
                     title: "CLOB",
                     items: [
-                      { name: "Hyperliquid", url: "https://x.com/HyperliquidX" },
                       { name: "DyDx", url: "https://x.com/dYdX" },
                       { name: "Aster", url: "https://x.com/Aster_DEX" },
-                      "Extended",
-                      "Bullet",
+                      { name: "Extended", url: "https://x.com/extendedapp" },
+                      { name: "Bullet", url: "https://x.com/Bulletxyz" },
                       { name: "Bulk Trade", url: "https://x.com/BulkTrade", isNew: true },
                       {
                         name: "Meridian",
@@ -402,7 +419,7 @@ export const taxonomy: Group[] = [
                     children: [
                       {
                         title: "Cross-Margin / Multi-Asset",
-                        caption: "tentative — margin-engine axis",
+                        caption: "margin-engine evolution — still deciding placement",
                         isNew: true,
                         items: [
                           { name: "Hyperliquid", url: "https://x.com/HyperliquidX" },
@@ -420,7 +437,6 @@ export const taxonomy: Group[] = [
                   },
                   {
                     title: "Martingale LP Pool",
-                    caption: "unique matching engine",
                     isNew: true,
                     items: [
                       { name: "Papertrade", url: "https://x.com/papertrade_xyz" },
@@ -436,14 +452,6 @@ export const taxonomy: Group[] = [
                   {
                     title: "Dark Pool",
                     caption: "in development",
-                    items: ["Defx"],
-                  },
-                  {
-                    title: "Hybrid",
-                    caption: "DLOB + dAMM + JIT/RFQ (formerly Drift)",
-                    items: [
-                      { name: "Velocity", url: "https://x.com/DriftProtocol" },
-                    ],
                   },
                 ],
               },
@@ -451,9 +459,14 @@ export const taxonomy: Group[] = [
           },
           {
             title: "Multiverse Markets",
-            caption: "perp x prediction hybrid — new primitive",
             isNew: true,
-            items: [{ name: "ProofMarkets", url: "https://x.com/ProofMarkets" }],
+            items: [
+              {
+                name: "ProofMarkets",
+                url: "https://x.com/ProofMarkets",
+                description: "perp x prediction hybrid — new primitive",
+              },
+            ],
           },
           {
             title: "Insurance",
@@ -471,22 +484,30 @@ export const taxonomy: Group[] = [
             children: [
               {
                 title: "Parlays",
-                caption: "collateral engine for combined outcomes",
                 isNew: true,
-                items: [{ name: "ParlayIt", url: "https://x.com/ParlayItGG" }],
+                items: [
+                  {
+                    name: "ParlayIt",
+                    url: "https://x.com/ParlayItGG",
+                    description: "collateral engine for combined outcomes",
+                  },
+                ],
               },
               {
                 title: "Supporting Infra",
-                caption: "margin for prediction markets",
                 isNew: true,
                 items: [
-                  { name: "Lattica Finance", url: "https://x.com/LatticaFinance" },
+                  {
+                    name: "Lattica Finance",
+                    url: "https://x.com/LatticaFinance",
+                    description: "margin/leverage for prediction markets",
+                  },
                 ],
               },
             ],
           },
           {
-            title: "Gamified Trading / Degen Gambling",
+            title: "Gamified Trading",
             isNew: true,
             children: [
               {
@@ -509,7 +530,7 @@ export const taxonomy: Group[] = [
             title: "Yield Trading / Rate Swaps",
             items: [
               { name: "Pendle", url: "https://x.com/pendle_fi" },
-              { name: "RateX", isNew: true },
+              { name: "RateX", url: "https://x.com/RateX_Dex", isNew: true },
               { name: "Exponent", url: "https://x.com/ExponentFinance", isNew: true },
             ],
           },
@@ -533,13 +554,18 @@ export const taxonomy: Group[] = [
           },
           {
             title: "Indexes",
-            caption: "Spot/Deriv Index",
             items: [
-              { name: "alt.fun", url: "https://x.com/altdotfun", isNew: true },
+              {
+                name: "alt.fun",
+                url: "https://x.com/altdotfun",
+                isNew: true,
+                description: "perp positions",
+              },
               {
                 name: "Cleopetra",
                 url: "https://x.com/cleopetrafun",
                 isNew: true,
+                description: "prediction outcomes",
               },
             ],
           },
@@ -555,8 +581,13 @@ export const taxonomy: Group[] = [
             children: [
               {
                 title: "Voting and Tooling",
-                caption: "Futarchy",
-                items: [{ name: "Metadao", url: "https://x.com/MetaDAOProject" }],
+                items: [
+                  {
+                    name: "Metadao",
+                    url: "https://x.com/MetaDAOProject",
+                    description: "Futarchy",
+                  },
+                ],
               },
             ],
           },
@@ -582,7 +613,7 @@ export const taxonomy: Group[] = [
           {
             title: "Prime Brokerage / Unified Margin",
             isNew: true,
-            items: ["Project 0"],
+            items: [{ name: "Project 0", url: "https://x.com/project0" }],
           },
           {
             title: "Prop Trading Firms",
@@ -603,14 +634,7 @@ export const taxonomy: Group[] = [
           {
             title: "Collateralised Lending",
             caption: "Margin Trading — user custody",
-            items: [
-              { name: "Aave", url: "https://x.com/aave" },
-              {
-                name: "Blend (NFT)",
-                url: "https://x.com/blend_fi",
-                description: "Defunct",
-              },
-            ],
+            items: [{ name: "Aave", url: "https://x.com/aave" }],
             children: [
               {
                 title: "Composable Leverage",
@@ -624,7 +648,6 @@ export const taxonomy: Group[] = [
             items: [
               { name: "Lido", url: "https://x.com/LidoFinance" },
               { name: "Jito", url: "https://x.com/jito_sol" },
-              "LSD",
             ],
           },
           {
@@ -635,14 +658,24 @@ export const taxonomy: Group[] = [
             title: "Credit/Undercollateralized Lending",
             items: [
               { name: "Maple", url: "https://x.com/maplefinance" },
-              { name: "APYX", url: "https://x.com/apyx_fi", isNew: true },
+              {
+                name: "APYX",
+                url: "https://x.com/apyx_fi",
+                isNew: true,
+                description: "Digital Credit Yield",
+              },
             ],
           },
           {
             title: "Fixed Rate",
             items: [
               { name: "Notional Finance", url: "https://x.com/NotionalFinance" },
-              { name: "Morpho", url: "https://x.com/Morpho", isNew: true },
+              {
+                name: "Morpho",
+                url: "https://x.com/Morpho",
+                isNew: true,
+                description: "also collateralised lending",
+              },
             ],
           },
           {
@@ -688,8 +721,12 @@ export const taxonomy: Group[] = [
           },
           {
             title: "L1",
-            caption: "best-guess placement — move as needed",
-            items: [{ name: "Plasma", url: "https://x.com/Plasma", isNew: true }],
+            items: [
+              { name: "Bitcoin", url: "https://x.com/Bitcoin" },
+              { name: "Ethereum", url: "https://x.com/ethereum" },
+              { name: "Solana", url: "https://x.com/solana" },
+              { name: "Plasma", url: "https://x.com/Plasma", isNew: true },
+            ],
           },
           {
             title: "L2/Rollups",
