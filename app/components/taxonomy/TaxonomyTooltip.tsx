@@ -85,37 +85,22 @@ export default function TaxonomyTooltip({
     [hide],
   );
 
-  // Cache viewport size; also collapse to a single column while actively
-  // resizing (balanced nested multi-column is ~10x costlier to reflow per
-  // frame), restoring the masonry shortly after resizing settles.
-  const [resizing, setResizing] = useState(false);
+  // Cache viewport size for tooltip placement; hide the tooltip while resizing.
   useEffect(() => {
     const readViewport = () => {
       viewport.current = { w: window.innerWidth, h: window.innerHeight };
     };
     readViewport();
-    let timer: ReturnType<typeof setTimeout> | undefined;
     const onResize = () => {
       readViewport();
       hide();
-      setResizing(true);
-      clearTimeout(timer);
-      timer = setTimeout(() => setResizing(false), 200);
     };
     window.addEventListener("resize", onResize);
-    return () => {
-      window.removeEventListener("resize", onResize);
-      clearTimeout(timer);
-    };
+    return () => window.removeEventListener("resize", onResize);
   }, [hide]);
 
   return (
-    <div
-      className={resizing ? styles.resizing : undefined}
-      onMouseMove={handleMove}
-      onMouseLeave={clear}
-      onClick={handleClick}
-    >
+    <div onMouseMove={handleMove} onMouseLeave={clear} onClick={handleClick}>
       {children}
       <div ref={tipRef} className={styles.tooltip} style={{ display: "none" }}>
         <div className={styles.tooltipPath}>{content?.path}</div>

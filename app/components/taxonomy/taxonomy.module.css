@@ -77,6 +77,9 @@
   font-weight: 600;
   line-height: 1.25;
   color: var(--accent);
+  /* break very long words (e.g. "Undercollateralized") so titles never clip out
+     of a narrow column */
+  overflow-wrap: break-word;
 }
 
 .caption {
@@ -87,25 +90,36 @@
   color: #8a8a8a;
 }
 
-/* Masonry container for nested boxes. The per-container column-width is set
-   inline by GroupBox from the subtree's content weight (heavier children get
-   wider columns); this just supplies the gap and balancing. */
+/* Masonry container for nested boxes. The layout engine packs children into one or
+   more full-width bands stacked vertically; each band is a row of variable-width
+   columns, and each column a plain flex stack — so there is no expensive CSS
+   multi-column reflow. */
 .children {
-  column-gap: 8px;
-  column-fill: balance;
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* must match ROW_GAP in taxonomyLayout.ts (between stacked bands) */
 }
 
-.children > .box {
+.band {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px; /* must match COL_GAP in taxonomyLayout.ts */
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  /* flex-grow is set inline per column (∝ its content width); basis 0 so widths
+     are purely proportional to that weight. */
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  min-width: 0;
+  gap: 5px; /* must match ROW_GAP in taxonomyLayout.ts */
+}
+
+.col > .box {
   width: 100%;
-  margin: 0 0 5px;
-}
-
-/* While the window is actively resizing, collapse every container to a single
-   column. column-count caps the multi-column count to 1 regardless of the inline
-   column-width, making each reflow ~10x cheaper; the masonry is restored once
-   resizing settles (see TaxonomyTooltip). */
-.resizing .children {
-  column-count: 1;
 }
 
 /* Labelled protocol circles. Fixed cell width gives even, grid-like horizontal
@@ -210,9 +224,8 @@
     padding: 7px 9px;
   }
 
-  /* single column on phones */
-  .children {
-    column-width: auto;
-    column-count: 1;
+  /* stack columns on phones */
+  .band {
+    flex-direction: column;
   }
 }

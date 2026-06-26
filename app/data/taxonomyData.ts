@@ -96,6 +96,7 @@ export const taxonomy: Group[] = [
                   { name: "GMGN", url: "https://x.com/gmgnai" },
                   { name: "FOMO", url: "https://x.com/fomo" },
                   { name: "PvP", url: "https://x.com/pvpterminal" },
+                  { name: "JTX", url: "https://x.com/jtx_trade", isNew: true },
                 ],
               },
               {
@@ -111,6 +112,22 @@ export const taxonomy: Group[] = [
                 title: "Prediction",
                 isNew: true,
                 items: [{ name: "Hunch", url: "https://x.com/tradeonhunch" }],
+              },
+              {
+                title: "Gamified Trading",
+                isNew: true,
+                children: [
+                  {
+                    title: "Options",
+                    isNew: true,
+                    items: [{ name: "Euphoria", url: "https://x.com/Euphoria_fi" }],
+                  },
+                  {
+                    title: "Perps",
+                    isNew: true,
+                    items: [{ name: "hit.one", url: "https://x.com/hitdotone" }],
+                  },
+                ],
               },
             ],
           },
@@ -193,7 +210,10 @@ export const taxonomy: Group[] = [
                 caption: "cult communities, hyper-financialised narrative",
               },
               { title: "Revenue Sharing", caption: "securities" },
-              { title: "Governance", caption: "all DeFi tokens" },
+              {
+                title: "Governance",
+                caption: "Token rights for holders to control protocol",
+              },
               { title: "DATs", caption: "Digital Asset Treasury" },
               {
                 title: "NFT",
@@ -257,7 +277,6 @@ export const taxonomy: Group[] = [
                   },
                   {
                     title: "Algo Stables",
-                    caption: "FRAX historically, Terra UST",
                     items: [
                       { name: "Frax", url: "https://x.com/fraxfinance" },
                       { name: "Terra", url: "https://x.com/terra_money" },
@@ -392,7 +411,6 @@ export const taxonomy: Group[] = [
                         url: "https://x.com/PhoenixTrade",
                         isNew: true,
                       },
-                      { name: "JTX", url: "https://x.com/jtx_trade", isNew: true },
                     ],
                   },
                   {
@@ -419,7 +437,6 @@ export const taxonomy: Group[] = [
                     children: [
                       {
                         title: "Cross-Margin / Multi-Asset",
-                        caption: "margin-engine evolution — still deciding placement",
                         isNew: true,
                         items: [
                           { name: "Hyperliquid", url: "https://x.com/HyperliquidX" },
@@ -455,16 +472,16 @@ export const taxonomy: Group[] = [
                   },
                 ],
               },
-            ],
-          },
-          {
-            title: "Multiverse Markets",
-            isNew: true,
-            items: [
               {
-                name: "ProofMarkets",
-                url: "https://x.com/ProofMarkets",
-                description: "perp x prediction hybrid — new primitive",
+                title: "Multiverse Markets",
+                isNew: true,
+                items: [
+                  {
+                    name: "ProofMarkets",
+                    url: "https://x.com/ProofMarkets",
+                    description: "perp x prediction hybrid — new primitive",
+                  },
+                ],
               },
             ],
           },
@@ -503,22 +520,6 @@ export const taxonomy: Group[] = [
                     description: "margin/leverage for prediction markets",
                   },
                 ],
-              },
-            ],
-          },
-          {
-            title: "Gamified Trading",
-            isNew: true,
-            children: [
-              {
-                title: "Options",
-                isNew: true,
-                items: [{ name: "Euphoria", url: "https://x.com/Euphoria_fi" }],
-              },
-              {
-                title: "Perps",
-                isNew: true,
-                items: [{ name: "hit.one", url: "https://x.com/hitdotone" }],
               },
             ],
           },
@@ -655,7 +656,7 @@ export const taxonomy: Group[] = [
             items: [{ name: "Aave", url: "https://x.com/aave" }],
           },
           {
-            title: "Credit/Undercollateralized Lending",
+            title: "Credit / Undercollateralized Lending",
             items: [
               { name: "Maple", url: "https://x.com/maplefinance" },
               {
@@ -686,6 +687,17 @@ export const taxonomy: Group[] = [
       },
 
       {
+        title: "L1",
+        accent: "teal",
+        items: [
+          { name: "Bitcoin", url: "https://x.com/Bitcoin" },
+          { name: "Ethereum", url: "https://x.com/ethereum" },
+          { name: "Solana", url: "https://x.com/solana" },
+          { name: "Plasma", url: "https://x.com/Plasma", isNew: true },
+        ],
+      },
+
+      {
         title: "Alternate Network Types",
         accent: "teal",
         children: [
@@ -706,7 +718,6 @@ export const taxonomy: Group[] = [
           },
           {
             title: "Networking",
-            caption: "Helium (internet), DoubleZero (HPC)",
             items: [
               { name: "Helium", url: "https://x.com/helium" },
               { name: "DoubleZero", url: "https://x.com/doublezero" },
@@ -717,15 +728,6 @@ export const taxonomy: Group[] = [
             items: [
               { name: "Urbit", url: "https://x.com/urbit" },
               { name: "Farcaster", url: "https://x.com/farcaster_xyz" },
-            ],
-          },
-          {
-            title: "L1",
-            items: [
-              { name: "Bitcoin", url: "https://x.com/Bitcoin" },
-              { name: "Ethereum", url: "https://x.com/ethereum" },
-              { name: "Solana", url: "https://x.com/solana" },
-              { name: "Plasma", url: "https://x.com/Plasma", isNew: true },
             ],
           },
           {
