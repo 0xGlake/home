@@ -17,9 +17,11 @@ export default function TaxonomyTooltip({
 }: {
   children: React.ReactNode;
 }) {
-  const [content, setContent] = useState<{ path: string; desc: string | null } | null>(
-    null,
-  );
+  const [content, setContent] = useState<{
+    path: string;
+    desc: string | null;
+    ticker: string | null;
+  } | null>(null);
 
   const tipRef = useRef<HTMLDivElement>(null);
   const enabledRef = useRef(true);
@@ -60,7 +62,11 @@ export default function TaxonomyTooltip({
         const key = el.dataset.path || "";
         if (key !== lastKey.current) {
           lastKey.current = key;
-          setContent({ path: key, desc: el.dataset.desc ?? null });
+          setContent({
+            path: key,
+            desc: el.dataset.desc ?? null,
+            ticker: el.dataset.ticker ?? null,
+          });
         }
       });
     },
@@ -103,7 +109,12 @@ export default function TaxonomyTooltip({
     <div onMouseMove={handleMove} onMouseLeave={clear} onClick={handleClick}>
       {children}
       <div ref={tipRef} className={styles.tooltip} style={{ display: "none" }}>
-        <div className={styles.tooltipPath}>{content?.path}</div>
+        <div className={styles.tooltipPath}>
+          {content?.path}
+          {content?.ticker && (
+            <span className={styles.tooltipTicker}>${content.ticker}</span>
+          )}
+        </div>
         {content?.desc && <div className={styles.tooltipDesc}>{content.desc}</div>}
       </div>
     </div>

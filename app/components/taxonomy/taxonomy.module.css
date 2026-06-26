@@ -145,6 +145,20 @@
   text-align: center;
   text-decoration: none;
   color: #c7c7c7;
+  /* highlight-toggle background sits behind the whole cell */
+  padding: 3px 2px;
+  border-radius: 7px;
+  transition: background 0.12s ease;
+}
+
+/* The interactive variant is a <button>; strip its native chrome so it matches
+   the old <a>/<span> circles exactly. */
+.circleButton {
+  appearance: none;
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .circleName {
@@ -191,6 +205,16 @@
   border-color: var(--accent);
 }
 
+/* Token highlight toggle: background every protocol that carries a token. */
+.highlightTokens [data-token] {
+  background: rgba(120, 200, 130, 0.16);
+  box-shadow: 0 0 0 1px rgba(120, 200, 130, 0.4);
+}
+
+.highlightTokens [data-token]:hover {
+  background: rgba(120, 200, 130, 0.24);
+}
+
 /* Cursor-following hover tooltip (single instance, see TaxonomyTooltip). */
 .tooltip {
   position: fixed;
@@ -215,6 +239,72 @@
   margin-top: 3px;
   color: #9aa0a6;
   font-style: italic;
+}
+
+/* Ticker chip shown beside the breadcrumb in the hover tooltip. */
+.tooltipTicker {
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: rgba(120, 200, 130, 0.18);
+  color: #8fe0a0;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+/* Cursor-anchored action popover (single instance, see TaxonomyPopover). */
+.popover {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 132px;
+  padding: 8px;
+  border-radius: 9px;
+  background: rgba(12, 12, 14, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+}
+
+.popoverName {
+  padding: 0 2px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e6e6e6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popoverAction {
+  display: block;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d6d6d6;
+  font-size: 11px;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.popoverAction:hover {
+  background: rgba(110, 168, 255, 0.18);
+  border-color: rgba(110, 168, 255, 0.5);
+  color: #eaf1ff;
+}
+
+.popoverNote {
+  margin-top: 1px;
+  max-width: 150px;
+  color: #7e8489;
+  font-size: 9px;
+  font-style: italic;
+  line-height: 1.3;
 }
 
 /* Dismissible caution overlay shown on load (see TaxonomyIntro). */

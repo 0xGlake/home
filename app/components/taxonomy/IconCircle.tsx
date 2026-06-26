@@ -35,7 +35,8 @@ export default function IconCircle({
   item: Item;
   path?: string[];
 }) {
-  const { name, url, img, description } = normalizeItem(item);
+  const { name, url, img, description, coingeckoId, ticker } =
+    normalizeItem(item);
   const handle = xHandle(url);
   const cached = handle ? manifest[handle.toLowerCase()] : undefined;
 
@@ -84,20 +85,40 @@ export default function IconCircle({
     </>
   );
 
+  // Anything with a destination (X link and/or token page) opens the
+  // cursor-anchored action popover handled by TaxonomyPopover, which reads these
+  // data-* attributes off the nearest [data-protocol]. Items with no destination
+  // are inert spans that still surface their breadcrumb on hover.
+  const interactive = Boolean(url || coingeckoId);
+
   const shared = {
-    className: styles.circleLink,
+    "data-protocol": "",
     "aria-label": name,
+    "data-name": name,
     "data-path": fullPath,
     ...(description ? { "data-desc": description } : {}),
-  };
+    ...(ticker ? { "data-ticker": ticker } : {}),
+    ...(url ? { "data-twitter": url } : {}),
+    ...(coingeckoId ? { "data-coingecko": coingeckoId } : {}),
+    // Drives the highlight toggle's background (see HighlightToggle / CSS).
+    ...(coingeckoId ? { "data-token": "" } : {}),
+  } as const;
 
-  if (url) {
+  if (interactive) {
     return (
-      <a href={url} target="_blank" rel="noopener noreferrer" {...shared}>
+      <button
+        type="button"
+        className={`${styles.circleLink} ${styles.circleButton}`}
+        {...shared}
+      >
         {content}
-      </a>
+      </button>
     );
   }
 
-  return <span {...shared}>{content}</span>;
+  return (
+    <span className={styles.circleLink} {...shared}>
+      {content}
+    </span>
+  );
 }

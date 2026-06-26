@@ -15,9 +15,10 @@ export type Item =
   | {
       name: string;
       url?: string;
-      isNew?: boolean;
       img?: string;
       description?: string; // optional blurb shown in the hover tooltip
+      coingeckoId?: string; // CoinGecko coin id → /en/coins/<id>
+      ticker?: string; // token symbol, e.g. "LINK"
     };
 
 export interface Group {
@@ -25,7 +26,6 @@ export interface Group {
   caption?: string; // small italic note under the title
   accent?: Accent; // title colour key; default "sky"
   dashed?: boolean; // dashed border style
-  isNew?: boolean; // private diff marker — never rendered
   items?: Item[]; // leaf protocols → circles
   children?: Group[]; // nested boxes
 }
@@ -33,9 +33,10 @@ export interface Group {
 export interface NormalizedItem {
   name: string;
   url?: string;
-  isNew?: boolean;
   img?: string;
   description?: string;
+  coingeckoId?: string;
+  ticker?: string;
 }
 
 // Turns a bare string item into the object form.

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Group } from "@/app/data/types";
+import { useHighlight } from "./HighlightContext";
 import GroupBox from "./GroupBox";
 import {
   createLayoutEngine,
@@ -66,8 +67,13 @@ export default function TaxonomyMasonry({ groups }: { groups: Group[] }) {
     [nodes],
   );
 
+  const { highlight } = useHighlight();
+
   return (
-    <div ref={mapRef} className={styles.map}>
+    <div
+      ref={mapRef}
+      className={`${styles.map}${highlight ? ` ${styles.highlightTokens}` : ""}`}
+    >
       {rendered}
     </div>
   );

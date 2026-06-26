@@ -9,6 +9,8 @@ import { customRenderers } from '../../lib/CustomRenderers';
 import { componentPosts, getComponentPost } from '../../lib/ComponentPosts';
 import CanvasPost from './CanvasPost';
 import TaxonomyMap from '../../components/taxonomy/TaxonomyMap';
+import { HighlightProvider } from '../../components/taxonomy/HighlightContext';
+import HighlightToggle from '../../components/taxonomy/HighlightToggle';
 
 interface BlogPostProps {
   params: Promise<{
@@ -90,24 +92,30 @@ export default async function BlogPost({ params }: BlogPostProps) {
   }
 
   if (post.type === "component") {
+    const isTaxonomy = post.slug === "crypto-taxonomy";
     return (
-      <div style={{ background: "rgb(16, 16, 16)", minHeight: "100vh" }}>
-        <div className="px-4 py-3 flex items-center gap-4">
-          <Link href="/blog" className="text-lg font-mono font-bold text-violet-400 hover:text-violet-300">
-            &lt; Blog
-          </Link>
-          <span className="text-gray-400 font-mono text-sm">{post.title}</span>
-          <a
-            href="https://x.com/0xGlake"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto rounded-md border border-violet-500/40 bg-violet-500/10 px-3 py-1 font-mono text-sm text-violet-300 hover:bg-violet-500/20 hover:text-violet-200"
-          >
-            Submit a protocol
-          </a>
+      <HighlightProvider>
+        <div style={{ background: "rgb(16, 16, 16)", minHeight: "100vh" }}>
+          <div className="px-4 py-3 flex items-center gap-4">
+            <Link href="/blog" className="text-lg font-mono font-bold text-violet-400 hover:text-violet-300">
+              &lt; Blog
+            </Link>
+            <span className="text-gray-400 font-mono text-sm">{post.title}</span>
+            <div className="ml-auto flex items-center gap-3">
+              {isTaxonomy && <HighlightToggle />}
+              <a
+                href="https://x.com/0xGlake"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-md border border-violet-500/40 bg-violet-500/10 px-3 py-1 font-mono text-sm text-violet-300 hover:bg-violet-500/20 hover:text-violet-200"
+              >
+                Submit a protocol
+              </a>
+            </div>
+          </div>
+          {isTaxonomy && <TaxonomyMap />}
         </div>
-        {post.slug === "crypto-taxonomy" && <TaxonomyMap />}
-      </div>
+      </HighlightProvider>
     );
   }
 
