@@ -3,66 +3,101 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./taxonomy.module.css";
 
-type Tip = { path: string; desc: string | null; x: number; y: number };
-
 // Single delegated tooltip for the whole tree. Boxes carry `data-path`
 // (breadcrumb of ancestor categories) and circles carry the full chain plus an
 // optional `data-desc`. On hover we walk up from the event target to the nearest
-// element with a `data-path` and render a tooltip that follows the cursor — so
-// the server-rendered tree stays static and only this wrapper is a client
-// component.
+// element with a `data-path`.
+//
+// Performance: the tooltip follows the cursor by writing styles directly to its
+// DOM node (no React render per pixel); React state only updates when the hovered
+// node actually changes (new breadcrumb). A click anywhere that isn't a protocol
+// link toggles the tooltip off/on.
 export default function TaxonomyTooltip({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [tip, setTip] = useState<Tip | null>(null);
-  // Tooltips are on by default; a click anywhere that isn't a protocol link
-  // toggles them off/on.
-  const [enabled, setEnabled] = useState(true);
+  const [content, setContent] = useState<{ path: string; desc: string | null } | null>(
+    null,
+  );
+
+  const tipRef = useRef<HTMLDivElement>(null);
   const enabledRef = useRef(true);
+  const lastKey = useRef<string | null>(null);
   const raf = useRef<number | null>(null);
+  const viewport = useRef({ w: 1920, h: 1080 });
 
-  const handleMove = useCallback((e: React.MouseEvent) => {
-    if (!enabledRef.current) return;
-    const x = e.clientX;
-    const y = e.clientY;
-    const el = (e.target as HTMLElement).closest<HTMLElement>("[data-path]");
-    if (raf.current) cancelAnimationFrame(raf.current);
-    raf.current = requestAnimationFrame(() => {
-      if (!el) {
-        setTip(null);
-        return;
-      }
-      setTip({ path: el.dataset.path || "", desc: el.dataset.desc ?? null, x, y });
-    });
+  const hide = useCallback(() => {
+    if (tipRef.current) tipRef.current.style.display = "none";
+    lastKey.current = null;
   }, []);
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    // Let protocol links navigate without toggling.
-    if ((e.target as HTMLElement).closest("a")) return;
-    const next = !enabledRef.current;
-    enabledRef.current = next;
-    setEnabled(next);
-    if (!next) {
+  const place = useCallback((x: number, y: number) => {
+    const el = tipRef.current;
+    if (!el) return;
+    const { w, h } = viewport.current;
+    const nearRight = x > w - 340;
+    const nearBottom = y > h - 140;
+    el.style.left = `${x + (nearRight ? -14 : 14)}px`;
+    el.style.top = `${y + (nearBottom ? -16 : 16)}px`;
+    el.style.transform = `translate(${nearRight ? "-100%" : "0"}, ${nearBottom ? "-100%" : "0"})`;
+  }, []);
+
+  const handleMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!enabledRef.current) return;
+      const x = e.clientX;
+      const y = e.clientY;
+      const el = (e.target as HTMLElement).closest<HTMLElement>("[data-path]");
       if (raf.current) cancelAnimationFrame(raf.current);
-      setTip(null);
-    }
-  }, []);
+      raf.current = requestAnimationFrame(() => {
+        if (!el) {
+          hide();
+          return;
+        }
+        if (tipRef.current) tipRef.current.style.display = "block";
+        place(x, y); // imperative: no React render
+        const key = el.dataset.path || "";
+        if (key !== lastKey.current) {
+          lastKey.current = key;
+          setContent({ path: key, desc: el.dataset.desc ?? null });
+        }
+      });
+    },
+    [hide, place],
+  );
 
   const clear = useCallback(() => {
     if (raf.current) cancelAnimationFrame(raf.current);
-    setTip(null);
-  }, []);
+    hide();
+  }, [hide]);
 
-  // Balanced nested multi-column is ~10x more expensive to lay out than a single
-  // column. Resizing reflows it every frame → unusable lag. So while the window
-  // is actively resizing we collapse to a single column (cheap), then restore
-  // the masonry shortly after the user stops.
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Let protocol links navigate without toggling.
+      if ((e.target as HTMLElement).closest("a")) return;
+      enabledRef.current = !enabledRef.current;
+      if (!enabledRef.current) {
+        if (raf.current) cancelAnimationFrame(raf.current);
+        hide();
+      }
+    },
+    [hide],
+  );
+
+  // Cache viewport size; also collapse to a single column while actively
+  // resizing (balanced nested multi-column is ~10x costlier to reflow per
+  // frame), restoring the masonry shortly after resizing settles.
   const [resizing, setResizing] = useState(false);
   useEffect(() => {
+    const readViewport = () => {
+      viewport.current = { w: window.innerWidth, h: window.innerHeight };
+    };
+    readViewport();
     let timer: ReturnType<typeof setTimeout> | undefined;
     const onResize = () => {
+      readViewport();
+      hide();
       setResizing(true);
       clearTimeout(timer);
       timer = setTimeout(() => setResizing(false), 200);
@@ -72,24 +107,7 @@ export default function TaxonomyTooltip({
       window.removeEventListener("resize", onResize);
       clearTimeout(timer);
     };
-  }, []);
-
-  // Keep the tooltip on-screen: nudge left of the cursor near the right edge,
-  // and above it near the bottom edge.
-  let style: React.CSSProperties | undefined;
-  if (tip) {
-    const vw = typeof window !== "undefined" ? window.innerWidth : 1920;
-    const vh = typeof window !== "undefined" ? window.innerHeight : 1080;
-    const nearRight = tip.x > vw - 340;
-    const nearBottom = tip.y > vh - 140;
-    style = {
-      left: tip.x + (nearRight ? -14 : 14),
-      top: tip.y + (nearBottom ? -16 : 16),
-      transform: `translate(${nearRight ? "-100%" : "0"}, ${
-        nearBottom ? "-100%" : "0"
-      })`,
-    };
-  }
+  }, [hide]);
 
   return (
     <div
@@ -99,12 +117,10 @@ export default function TaxonomyTooltip({
       onClick={handleClick}
     >
       {children}
-      {tip && (
-        <div className={styles.tooltip} style={style}>
-          <div className={styles.tooltipPath}>{tip.path}</div>
-          {tip.desc && <div className={styles.tooltipDesc}>{tip.desc}</div>}
-        </div>
-      )}
+      <div ref={tipRef} className={styles.tooltip} style={{ display: "none" }}>
+        <div className={styles.tooltipPath}>{content?.path}</div>
+        {content?.desc && <div className={styles.tooltipDesc}>{content.desc}</div>}
+      </div>
     </div>
   );
 }
