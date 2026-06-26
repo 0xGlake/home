@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./taxonomy.module.css";
 
 type Tip = { path: string; desc: string | null; x: number; y: number };
@@ -55,6 +55,25 @@ export default function TaxonomyTooltip({
     setTip(null);
   }, []);
 
+  // Balanced nested multi-column is ~10x more expensive to lay out than a single
+  // column. Resizing reflows it every frame → unusable lag. So while the window
+  // is actively resizing we collapse to a single column (cheap), then restore
+  // the masonry shortly after the user stops.
+  const [resizing, setResizing] = useState(false);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onResize = () => {
+      setResizing(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setResizing(false), 200);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      clearTimeout(timer);
+    };
+  }, []);
+
   // Keep the tooltip on-screen: nudge left of the cursor near the right edge,
   // and above it near the bottom edge.
   let style: React.CSSProperties | undefined;
@@ -73,7 +92,12 @@ export default function TaxonomyTooltip({
   }
 
   return (
-    <div onMouseMove={handleMove} onMouseLeave={clear} onClick={handleClick}>
+    <div
+      className={resizing ? styles.resizing : undefined}
+      onMouseMove={handleMove}
+      onMouseLeave={clear}
+      onClick={handleClick}
+    >
       {children}
       {tip && (
         <div className={styles.tooltip} style={style}>

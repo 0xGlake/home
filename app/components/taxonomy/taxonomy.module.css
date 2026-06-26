@@ -100,6 +100,14 @@
   margin: 0 0 5px;
 }
 
+/* While the window is actively resizing, collapse every container to a single
+   column. column-count caps the multi-column count to 1 regardless of the inline
+   column-width, making each reflow ~10x cheaper; the masonry is restored once
+   resizing settles (see TaxonomyTooltip). */
+.resizing .children {
+  column-count: 1;
+}
+
 /* Labelled protocol circles. Fixed cell width gives even, grid-like horizontal
    spacing (independent of name length). The cell is wide enough that single
    words like "Hivemapper" stay on one line; longer names wrap and clamp to two
