@@ -107,9 +107,12 @@ export default async function BlogPost({ params }: BlogPostProps) {
                 href="https://x.com/0xGlake"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-violet-500/40 bg-violet-500/10 px-3 py-1 font-mono text-sm text-violet-300 hover:bg-violet-500/20 hover:text-violet-200"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3.5 py-1.5 font-mono text-sm font-medium text-violet-300 shadow-sm shadow-violet-500/10 transition-all duration-150 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-violet-100 active:scale-[0.97]"
               >
                 Submit a protocol
+                <span aria-hidden className="text-violet-400/70">
+                  ↗
+                </span>
               </a>
             </div>
           </div>

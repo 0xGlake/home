@@ -24,7 +24,7 @@ export const taxonomy: Group[] = [
         caption: "blockchain <> blockchain",
         items: [
           { name: "Wormhole", coingeckoId: "wormhole", ticker: "W", url: "https://x.com/wormhole" },
-          { name: "GardenFinance", url: "https://x.com/gardenfi" },
+          { name: "GardenFinance", coingeckoId: "garden-finance", ticker: "SEED", url: "https://x.com/gardenfi" },
         ],
       },
       {
