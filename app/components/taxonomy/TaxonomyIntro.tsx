@@ -15,8 +15,12 @@ export default function TaxonomyIntro() {
       <div className={styles.introCard} onClick={(e) => e.stopPropagation()}>
         <h2 className={styles.introHeading}>Before you explore</h2>
         <p className={styles.introText}>
-          The X / Twitter handles behind each logo are matched by hand and may be
-          attributed incorrectly — please double-check before relying on them.
+          Click on an asset for additional information.
+        </p>
+        <p className={styles.introText}>
+          The X / Twitter handles behind each logo and coingecko links are
+          matched by hand and may be attributed incorrectly — please
+          double-check before relying on them.
         </p>
         <p className={styles.introText}>
           Hover a protocol for its breadcrumb. Click anywhere to dismiss the
