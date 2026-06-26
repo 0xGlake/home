@@ -1,0 +1,210 @@
+/* Nested taxonomy map.
+   Children are packed with CSS multi-column "masonry": boxes flow into
+   independent columns with no per-row height reservation, and the browser
+   balances column heights (column-fill: balance) so short boxes stack
+   together instead of leaving the dead space a flex row would. */
+
+.map {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 7px;
+  background: rgb(16, 16, 16);
+  color: #e6e6e6;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.02);
+  /* default accent; overridden per data-accent below */
+  --accent: #6ea8ff;
+  /* keep a box intact when it sits inside a masonry column */
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+
+/* Nested boxes are slightly lighter than their parent. */
+.box .box {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.dashed {
+  border-style: dashed;
+}
+
+/* Accent palette — resolved from the data-accent attribute. */
+.box[data-accent="sky"] {
+  --accent: #6ea8ff;
+}
+.box[data-accent="blue"] {
+  --accent: #5b9cff;
+}
+.box[data-accent="teal"] {
+  --accent: #4cc2c4;
+}
+.box[data-accent="purple"] {
+  --accent: #b394ff;
+}
+.box[data-accent="pink"] {
+  --accent: #e879b9;
+}
+.box[data-accent="amber"] {
+  --accent: #f0b429;
+}
+.box[data-accent="green"] {
+  --accent: #7bc96f;
+}
+.box[data-accent="coral"] {
+  --accent: #f08a6c;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--accent);
+}
+
+.caption {
+  margin: 0;
+  font-style: italic;
+  font-size: 0.82em;
+  line-height: 1.2;
+  color: #8a8a8a;
+}
+
+/* Masonry container for nested boxes. The per-container column-width is set
+   inline by GroupBox from the subtree's content weight (heavier children get
+   wider columns); this just supplies the gap and balancing. */
+.children {
+  column-gap: 8px;
+  column-fill: balance;
+}
+
+.children > .box {
+  width: 100%;
+  margin: 0 0 5px;
+}
+
+/* Labelled protocol circles. Fixed cell width gives even, grid-like horizontal
+   spacing (independent of name length). The cell is wide enough that single
+   words like "Hivemapper" stay on one line; longer names wrap and clamp to two
+   lines, with the full name available in the hover tooltip. */
+.icons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 5px 6px;
+}
+
+.circleLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 56px;
+  text-align: center;
+  text-decoration: none;
+  color: #c7c7c7;
+}
+
+.circleName {
+  font-size: 9px;
+  line-height: 1.05;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.circleLink:hover .circleName {
+  color: var(--accent);
+}
+
+.circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.circleImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.circleLink:hover .circle {
+  transform: scale(1.1);
+  border-color: var(--accent);
+}
+
+/* Cursor-following hover tooltip (single instance, see TaxonomyTooltip). */
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  max-width: 320px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: rgba(10, 10, 12, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.tooltipPath {
+  color: #dcdcdc;
+  font-weight: 500;
+}
+
+.tooltipDesc {
+  margin-top: 3px;
+  color: #9aa0a6;
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .map {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .box {
+    padding: 7px 9px;
+  }
+
+  /* single column on phones */
+  .children {
+    column-width: auto;
+    column-count: 1;
+  }
+}

@@ -1,13 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { componentPosts } from './ComponentPosts';
 
 interface BlogPost {
   slug: string;
   title: string;
   date: string;
   category: string;
-  type: "markdown" | "canvas";
+  type: "markdown" | "canvas" | "component";
 }
 
 export function getBlogPosts(): BlogPost[] {
@@ -51,6 +52,17 @@ export function getBlogPosts(): BlogPost[] {
     }
   } catch {
     // canvas directory might not exist yet
+  }
+
+  // Component-backed posts (e.g. the taxonomy map)
+  for (const cp of componentPosts) {
+    posts.push({
+      slug: cp.slug,
+      title: cp.title,
+      date: cp.date,
+      category: cp.category,
+      type: "component",
+    });
   }
 
   return posts.sort((a, b) => (a.date > b.date ? -1 : 1));
