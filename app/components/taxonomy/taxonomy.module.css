@@ -217,6 +217,76 @@
   font-style: italic;
 }
 
+/* Dismissible caution overlay shown on load (see TaxonomyIntro). */
+.introOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.introCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+  padding: 28px;
+  border-radius: 12px;
+  background: rgba(20, 20, 22, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.introHeading {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #e9e9ec;
+}
+
+.introText {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #b6b6bd;
+}
+
+.introLink {
+  color: #8fb6ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.introLink:hover {
+  text-decoration: underline;
+}
+
+.introDismiss {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 8px 26px;
+  border-radius: 7px;
+  background: rgba(110, 168, 255, 0.16);
+  border: 1px solid rgba(110, 168, 255, 0.42);
+  color: #e9e9ec;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.introDismiss:hover {
+  background: rgba(110, 168, 255, 0.26);
+  border-color: rgba(110, 168, 255, 0.6);
+}
+
 @media (max-width: 640px) {
   .map {
     gap: 8px;
