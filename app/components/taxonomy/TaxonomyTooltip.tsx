@@ -1,0 +1,126 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import styles from "./taxonomy.module.css";
+
+// Single delegated tooltip for the whole tree. Boxes carry `data-path`
+// (breadcrumb of ancestor categories) and circles carry the full chain plus an
+// optional `data-desc`. On hover we walk up from the event target to the nearest
+// element with a `data-path`.
+//
+// Performance: the tooltip follows the cursor by writing styles directly to its
+// DOM node (no React render per pixel); React state only updates when the hovered
+// node actually changes (new breadcrumb). A click anywhere that isn't a protocol
+// link toggles the tooltip off/on.
+export default function TaxonomyTooltip({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [content, setContent] = useState<{ path: string; desc: string | null } | null>(
+    null,
+  );
+
+  const tipRef = useRef<HTMLDivElement>(null);
+  const enabledRef = useRef(true);
+  const lastKey = useRef<string | null>(null);
+  const raf = useRef<number | null>(null);
+  const viewport = useRef({ w: 1920, h: 1080 });
+
+  const hide = useCallback(() => {
+    if (tipRef.current) tipRef.current.style.display = "none";
+    lastKey.current = null;
+  }, []);
+
+  const place = useCallback((x: number, y: number) => {
+    const el = tipRef.current;
+    if (!el) return;
+    const { w, h } = viewport.current;
+    const nearRight = x > w - 340;
+    const nearBottom = y > h - 140;
+    el.style.left = `${x + (nearRight ? -14 : 14)}px`;
+    el.style.top = `${y + (nearBottom ? -16 : 16)}px`;
+    el.style.transform = `translate(${nearRight ? "-100%" : "0"}, ${nearBottom ? "-100%" : "0"})`;
+  }, []);
+
+  const handleMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!enabledRef.current) return;
+      const x = e.clientX;
+      const y = e.clientY;
+      const el = (e.target as HTMLElement).closest<HTMLElement>("[data-path]");
+      if (raf.current) cancelAnimationFrame(raf.current);
+      raf.current = requestAnimationFrame(() => {
+        if (!el) {
+          hide();
+          return;
+        }
+        if (tipRef.current) tipRef.current.style.display = "block";
+        place(x, y); // imperative: no React render
+        const key = el.dataset.path || "";
+        if (key !== lastKey.current) {
+          lastKey.current = key;
+          setContent({ path: key, desc: el.dataset.desc ?? null });
+        }
+      });
+    },
+    [hide, place],
+  );
+
+  const clear = useCallback(() => {
+    if (raf.current) cancelAnimationFrame(raf.current);
+    hide();
+  }, [hide]);
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Let protocol links navigate without toggling.
+      if ((e.target as HTMLElement).closest("a")) return;
+      enabledRef.current = !enabledRef.current;
+      if (!enabledRef.current) {
+        if (raf.current) cancelAnimationFrame(raf.current);
+        hide();
+      }
+    },
+    [hide],
+  );
+
+  // Cache viewport size; also collapse to a single column while actively
+  // resizing (balanced nested multi-column is ~10x costlier to reflow per
+  // frame), restoring the masonry shortly after resizing settles.
+  const [resizing, setResizing] = useState(false);
+  useEffect(() => {
+    const readViewport = () => {
+      viewport.current = { w: window.innerWidth, h: window.innerHeight };
+    };
+    readViewport();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onResize = () => {
+      readViewport();
+      hide();
+      setResizing(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => setResizing(false), 200);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      clearTimeout(timer);
+    };
+  }, [hide]);
+
+  return (
+    <div
+      className={resizing ? styles.resizing : undefined}
+      onMouseMove={handleMove}
+      onMouseLeave={clear}
+      onClick={handleClick}
+    >
+      {children}
+      <div ref={tipRef} className={styles.tooltip} style={{ display: "none" }}>
+        <div className={styles.tooltipPath}>{content?.path}</div>
+        {content?.desc && <div className={styles.tooltipDesc}>{content.desc}</div>}
+      </div>
+    </div>
+  );
+}

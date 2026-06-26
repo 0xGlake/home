@@ -6,7 +6,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { customRenderers } from '../../lib/CustomRenderers';
+import { componentPosts, getComponentPost } from '../../lib/ComponentPosts';
 import CanvasPost from './CanvasPost';
+import TaxonomyMap from '../../components/taxonomy/TaxonomyMap';
 
 interface BlogPostProps {
   params: Promise<{
@@ -16,7 +18,12 @@ interface BlogPostProps {
 
 const CANVAS_SLUG_PREFIX = 'canvas-';
 
-function resolvePost(slug: string): { type: "markdown"; slug: string } | { type: "canvas"; canvasFile: string; title?: string } {
+type ResolvedPost =
+  | { type: "markdown"; slug: string }
+  | { type: "canvas"; canvasFile: string; title?: string }
+  | { type: "component"; slug: string; title: string };
+
+function resolvePost(slug: string): ResolvedPost {
   if (slug.startsWith(CANVAS_SLUG_PREFIX)) {
     const canvasName = slug.slice(CANVAS_SLUG_PREFIX.length);
     const canvasPath = path.join(process.cwd(), 'public', 'canvas', `${canvasName}.canvas`);
@@ -25,6 +32,12 @@ function resolvePost(slug: string): { type: "markdown"; slug: string } | { type:
       return { type: "canvas", canvasFile: `${canvasName}.canvas`, title: data.title };
     }
   }
+
+  const component = getComponentPost(slug);
+  if (component) {
+    return { type: "component", slug, title: component.title };
+  }
+
   return { type: "markdown", slug };
 }
 
@@ -49,6 +62,10 @@ export async function generateStaticParams() {
     }
   } catch {}
 
+  for (const cp of componentPosts) {
+    params.push({ slug: cp.slug });
+  }
+
   return params;
 }
 
@@ -68,6 +85,28 @@ export default async function BlogPost({ params }: BlogPostProps) {
           )}
         </div>
         <CanvasPost canvasFile={post.canvasFile} />
+      </div>
+    );
+  }
+
+  if (post.type === "component") {
+    return (
+      <div style={{ background: "rgb(16, 16, 16)", minHeight: "100vh" }}>
+        <div className="px-4 py-3 flex items-center gap-4">
+          <Link href="/blog" className="text-lg font-mono font-bold text-violet-400 hover:text-violet-300">
+            &lt; Blog
+          </Link>
+          <span className="text-gray-400 font-mono text-sm">{post.title}</span>
+          <a
+            href="https://x.com/0xGlake"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto rounded-md border border-violet-500/40 bg-violet-500/10 px-3 py-1 font-mono text-sm text-violet-300 hover:bg-violet-500/20 hover:text-violet-200"
+          >
+            Submit a protocol
+          </a>
+        </div>
+        {post.slug === "crypto-taxonomy" && <TaxonomyMap />}
       </div>
     );
   }
