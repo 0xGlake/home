@@ -129,7 +129,10 @@
 .icons {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  /* bottom-align so every logo sits on a common baseline (the cell "footer");
+     one- vs two-line names grow upward instead of staggering the logos */
+  align-items: flex-end;
+  justify-content: center;
   gap: 5px 6px;
 }
 
