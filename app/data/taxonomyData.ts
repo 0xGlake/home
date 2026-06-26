@@ -218,7 +218,7 @@ export const taxonomy: Group[] = [
               {
                 title: "NFT",
                 accent: "pink",
-                items: [{ name: "Milady", url: "https://x.com/miladymaker" }],
+                items: [{ name: "Milady", url: "https://x.com/MiladyMaker333" }],
                 children: [
                   {
                     title: "Revenue Accruing",
