@@ -3,7 +3,14 @@
 import { useState } from "react";
 import type { Item } from "@/app/data/types";
 import { normalizeItem, PATH_SEP } from "@/app/data/types";
+import avatarManifest from "@/app/data/avatarManifest.json";
 import styles from "./taxonomy.module.css";
+
+const manifest = avatarManifest as Record<string, string>;
+
+function unavatar(handle: string): string {
+  return `https://unavatar.io/x/${handle}?fallback=false`;
+}
 
 // Pull the handle out of an x.com / twitter.com link.
 // Defensive: ignores non-X hosts, strips query strings and any trailing
@@ -30,16 +37,19 @@ export default function IconCircle({
 }) {
   const { name, url, img, description } = normalizeItem(item);
   const handle = xHandle(url);
+  const cached = handle ? manifest[handle.toLowerCase()] : undefined;
 
-  // Prefer a pinned image, then the X avatar via unavatar. `fallback=false`
-  // makes genuine misses 404 so onError can degrade to an empty circle.
-  const initialSrc = img
-    ? img
-    : handle
-      ? `https://unavatar.io/x/${handle}?fallback=false`
-      : null;
+  // Source priority: pinned image → build-time cached avatar → unavatar at
+  // runtime (covers handles not cached yet). onError walks this chain down,
+  // ending at an empty circle.
+  const initialSrc = img ?? cached ?? (handle ? unavatar(handle) : null);
 
   const [src, setSrc] = useState<string | null>(initialSrc);
+
+  const handleError = () => {
+    if (cached && src === cached && handle) setSrc(unavatar(handle));
+    else setSrc(null);
+  };
 
   // Full chain incl. the protocol itself, read by the tooltip on hover.
   const fullPath = [...path, name].join(PATH_SEP);
@@ -58,7 +68,7 @@ export default function IconCircle({
             height={20}
             loading="lazy"
             className={styles.circleImg}
-            onError={() => setSrc(null)}
+            onError={handleError}
           />
         )}
       </span>

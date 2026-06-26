@@ -510,6 +510,7 @@ export const taxonomy: Group[] = [
             items: [
               { name: "Pendle", url: "https://x.com/pendle_fi" },
               { name: "RateX", isNew: true },
+              { name: "Exponent", url: "https://x.com/ExponentFinance", isNew: true },
             ],
           },
           {
@@ -684,6 +685,11 @@ export const taxonomy: Group[] = [
               { name: "Urbit", url: "https://x.com/urbit" },
               { name: "Farcaster", url: "https://x.com/farcaster_xyz" },
             ],
+          },
+          {
+            title: "L1",
+            caption: "best-guess placement — move as needed",
+            items: [{ name: "Plasma", url: "https://x.com/Plasma", isNew: true }],
           },
           {
             title: "L2/Rollups",
