@@ -511,7 +511,7 @@ export const taxonomy: Group[] = [
                 ],
               },
               {
-                title: "Supporting Infra",
+                title: "Margin Trading",
                 isNew: true,
                 items: [
                   {
