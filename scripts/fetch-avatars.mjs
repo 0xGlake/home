@@ -112,7 +112,7 @@ async function main() {
 
   writeManifest(manifest);
   console.log(
-    `\nDone. handles:${handles.length} cached:${cached} skipped:${skipped} missing(404):${missing} failed:${failed} | manifest entries:${Object.keys(sorted).length}`,
+    `\nDone. handles:${handles.length} cached:${cached} skipped:${skipped} missing(404):${missing} failed:${failed} | manifest entries:${Object.keys(manifest).length}`,
   );
   if (failed > 0) {
     console.log(
