@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Item } from "@/app/data/types";
 import { normalizeItem, PATH_SEP } from "@/app/data/types";
 import avatarManifest from "@/app/data/avatarManifest.json";
@@ -45,6 +45,15 @@ export default function IconCircle({
   const initialSrc = img ?? cached ?? (handle ? unavatar(handle) : null);
 
   const [src, setSrc] = useState<string | null>(initialSrc);
+
+  // Re-seed from props if this instance is reused for a different item (the
+  // masonry reshuffles boxes on resize). Without this, the onError-tracked `src`
+  // state could keep a previous protocol's avatar — see the key note in GroupBox.
+  const lastInitial = useRef(initialSrc);
+  if (lastInitial.current !== initialSrc) {
+    lastInitial.current = initialSrc;
+    setSrc(initialSrc);
+  }
 
   const handleError = () => {
     if (cached && src === cached && handle) setSrc(unavatar(handle));

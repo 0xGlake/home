@@ -62,7 +62,7 @@ export default function TaxonomyMasonry({ groups }: { groups: Group[] }) {
   }, [groups]);
 
   const rendered = useMemo(
-    () => nodes.map((node, i) => <GroupBox key={i} node={node} />),
+    () => nodes.map((node) => <GroupBox key={node.group.title} node={node} />),
     [nodes],
   );
 

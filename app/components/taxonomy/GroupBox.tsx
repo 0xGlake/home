@@ -1,4 +1,4 @@
-import { PATH_SEP } from "@/app/data/types";
+import { normalizeItem, PATH_SEP } from "@/app/data/types";
 import type { LayoutNode } from "./taxonomyLayout";
 import IconCircle from "./IconCircle";
 import styles from "./taxonomy.module.css";
@@ -33,9 +33,13 @@ export default function GroupBox({
 
       {group.items && group.items.length > 0 && (
         <div className={styles.icons}>
-          {group.items.map((item, i) => (
-            <IconCircle key={i} item={item} path={selfPath} />
-          ))}
+          {group.items.map((item) => {
+            const { name } = normalizeItem(item);
+            // Key by content, not index: the layout engine reshuffles boxes
+            // between columns on resize, and an index key would let React reuse an
+            // IconCircle (with its cached-image state) for a different protocol.
+            return <IconCircle key={name} item={item} path={selfPath} />;
+          })}
         </div>
       )}
 
@@ -45,8 +49,9 @@ export default function GroupBox({
             <div key={bi} className={styles.band}>
               {band.columns.map((col, ci) => (
                 <div key={ci} className={styles.col} style={{ flexGrow: col.weight }}>
-                  {col.nodes.map((child, i) => (
-                    <GroupBox key={i} node={child} path={selfPath} />
+                  {col.nodes.map((child) => (
+                    // Content key (sibling titles are unique) — see note above.
+                    <GroupBox key={child.group.title} node={child} path={selfPath} />
                   ))}
                 </div>
               ))}
