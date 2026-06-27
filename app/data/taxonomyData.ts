@@ -119,6 +119,10 @@ export const taxonomy: Group[] = [
                   },
                 ],
               },
+              {
+                title: "Agentic Brokerage",
+                items: [{ name: "TrueNorth AI", url: "https://x.com/get_truenorth" }],
+              },
             ],
           },
           {
