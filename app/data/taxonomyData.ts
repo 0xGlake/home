@@ -513,7 +513,10 @@ export const taxonomy: Group[] = [
           },
           {
             title: "Provably Fair Casino",
-            items: [{ name: "Rollbit", coingeckoId: "rollbit-coin", ticker: "RLB", url: "https://x.com/rollbit" }],
+            items: [
+              { name: "Rollbit", coingeckoId: "rollbit-coin", ticker: "RLB", url: "https://x.com/rollbit" },
+              { name: "ZINC", coingeckoId: "zinc-2", ticker: "ZINC", url: "https://x.com/zinc_cash" },
+            ],
           },
           {
             title: "Yield Trading / Rate Swaps",
