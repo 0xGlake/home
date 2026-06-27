@@ -75,8 +75,7 @@ export const taxonomy: Group[] = [
               {
                 title: "Perps",
                 items: [
-                  { name: "Rage Trade", coingeckoId: "rage-trade", ticker: "RAGE", url: "https://x.com/rage_trade" },
-                  { name: "Ranger Finance", coingeckoId: "ranger-finance", ticker: "RNGR", url: "https://x.com/ranger_finance" },
+                  { name: "Ranger Finance", coingeckoId: "ranger", ticker: "RNGR", url: "https://x.com/ranger_finance" },
                 ],
               },
             ],
@@ -210,7 +209,7 @@ export const taxonomy: Group[] = [
               {
                 title: "NFT",
                 accent: "pink",
-                items: [{ name: "Milady", coingeckoId: "milady-meme-coin", ticker: "LADYS", url: "https://x.com/MiladyMaker333" }],
+                items: [{ name: "Milady", coingeckoNftId: "milady-maker", url: "https://x.com/MiladyMaker333" }],
                 children: [
                   {
                     title: "Revenue Accruing",
@@ -470,7 +469,7 @@ export const taxonomy: Group[] = [
           },
           {
             title: "Insurance",
-            items: [{ name: "Nexus Mutual", coingeckoId: "nexus-mutual", ticker: "NXM", url: "https://x.com/NexusMutual" }],
+            items: [{ name: "Nexus Mutual", coingeckoId: "nxm", ticker: "NXM", url: "https://x.com/NexusMutual" }],
           },
           {
             title: "Prediction Markets",
@@ -563,7 +562,7 @@ export const taxonomy: Group[] = [
                 title: "Voting and Tooling",
                 items: [
                   {
-                    name: "Metadao", coingeckoId: "meta-dao", ticker: "META",
+                    name: "Metadao", coingeckoId: "meta-2", ticker: "META",
                     url: "https://x.com/MetaDAOProject",
                     description: "Futarchy",
                   },

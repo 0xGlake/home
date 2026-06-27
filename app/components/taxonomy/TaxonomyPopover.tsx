@@ -20,10 +20,12 @@ interface PopoverState {
   name: string;
   twitter: string | null;
   coingecko: string | null;
+  coingeckoNft: string | null;
   ticker: string | null;
 }
 
 const COINGECKO = "https://www.coingecko.com/en/coins/";
+const COINGECKO_NFT = "https://www.coingecko.com/en/nft/";
 
 export default function TaxonomyPopover({
   children,
@@ -44,8 +46,9 @@ export default function TaxonomyPopover({
     const trigger = target.closest<HTMLElement>("[data-protocol]");
     const twitter = trigger?.dataset.twitter ?? null;
     const coingecko = trigger?.dataset.coingecko ?? null;
+    const coingeckoNft = trigger?.dataset.coingeckoNft ?? null;
 
-    if (trigger && (twitter || coingecko)) {
+    if (trigger && (twitter || coingecko || coingeckoNft)) {
       // Keep the tooltip's toggle handler (an ancestor) from firing.
       e.stopPropagation();
       const id = trigger.dataset.path ?? trigger.dataset.name ?? "";
@@ -61,6 +64,7 @@ export default function TaxonomyPopover({
         name: trigger.dataset.name ?? "",
         twitter,
         coingecko,
+        coingeckoNft,
         ticker: trigger.dataset.ticker ?? null,
       });
       return;
@@ -139,7 +143,18 @@ export default function TaxonomyPopover({
               Token{state.ticker ? ` · ${state.ticker}` : ""}
             </a>
           )}
-          {state.coingecko && (
+          {state.coingeckoNft && (
+            <a
+              className={styles.popoverAction}
+              href={`${COINGECKO_NFT}${state.coingeckoNft}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={close}
+            >
+              NFT · floor
+            </a>
+          )}
+          {(state.coingecko || state.coingeckoNft) && (
             <div className={styles.popoverNote}>
               Ticker &amp; token matched by hand — may be inaccurate.
             </div>

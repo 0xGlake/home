@@ -35,7 +35,7 @@ export default function IconCircle({
   item: Item;
   path?: string[];
 }) {
-  const { name, url, img, description, coingeckoId, ticker } =
+  const { name, url, img, description, coingeckoId, coingeckoNftId, ticker } =
     normalizeItem(item);
   const handle = xHandle(url);
   const cached = handle ? manifest[handle.toLowerCase()] : undefined;
@@ -89,7 +89,7 @@ export default function IconCircle({
   // cursor-anchored action popover handled by TaxonomyPopover, which reads these
   // data-* attributes off the nearest [data-protocol]. Items with no destination
   // are inert spans that still surface their breadcrumb on hover.
-  const interactive = Boolean(url || coingeckoId);
+  const interactive = Boolean(url || coingeckoId || coingeckoNftId);
 
   const shared = {
     "data-protocol": "",
@@ -100,8 +100,9 @@ export default function IconCircle({
     ...(ticker ? { "data-ticker": ticker } : {}),
     ...(url ? { "data-twitter": url } : {}),
     ...(coingeckoId ? { "data-coingecko": coingeckoId } : {}),
+    ...(coingeckoNftId ? { "data-coingecko-nft": coingeckoNftId } : {}),
     // Drives the highlight toggle's background (see HighlightToggle / CSS).
-    ...(coingeckoId ? { "data-token": "" } : {}),
+    ...(coingeckoId || coingeckoNftId ? { "data-token": "" } : {}),
   } as const;
 
   if (interactive) {

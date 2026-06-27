@@ -18,6 +18,7 @@ export type Item =
       img?: string;
       description?: string; // optional blurb shown in the hover tooltip
       coingeckoId?: string; // CoinGecko coin id → /en/coins/<id>
+      coingeckoNftId?: string; // CoinGecko NFT id → /en/nft/<id> (floor price)
       ticker?: string; // token symbol, e.g. "LINK"
     };
 
@@ -36,6 +37,7 @@ export interface NormalizedItem {
   img?: string;
   description?: string;
   coingeckoId?: string;
+  coingeckoNftId?: string;
   ticker?: string;
 }
 

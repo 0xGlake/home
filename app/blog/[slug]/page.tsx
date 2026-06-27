@@ -11,6 +11,7 @@ import CanvasPost from './CanvasPost';
 import TaxonomyMap from '../../components/taxonomy/TaxonomyMap';
 import { HighlightProvider } from '../../components/taxonomy/HighlightContext';
 import HighlightToggle from '../../components/taxonomy/HighlightToggle';
+import TokenTerminal from '../../components/taxonomy/TokenTerminal';
 
 interface BlogPostProps {
   params: Promise<{
@@ -107,13 +108,14 @@ export default async function BlogPost({ params }: BlogPostProps) {
                 href="https://x.com/0xGlake"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3.5 py-1.5 font-mono text-sm font-medium text-violet-300 shadow-sm shadow-violet-500/10 transition-all duration-150 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-violet-100 active:scale-[0.97]"
+                className="inline-flex h-[30px] items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-3 font-mono text-sm text-zinc-400 transition-colors duration-150 hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-200"
               >
                 Submit a protocol
-                <span aria-hidden className="text-violet-400/70">
+                <span aria-hidden className="text-zinc-500">
                   ↗
                 </span>
               </a>
+              {isTaxonomy && <TokenTerminal />}
             </div>
           </div>
           {isTaxonomy && <TaxonomyMap />}

@@ -377,6 +377,353 @@
   border-color: rgba(110, 168, 255, 0.6);
 }
 
+/* ── Token terminal: docked right-hand watchlist panel ───────────────────── */
+
+.tkPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-width: 88vw;
+  background: rgba(13, 13, 15, 0.98);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: -12px 0 36px rgba(0, 0, 0, 0.5);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: #d6d6d6;
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+  will-change: transform;
+}
+
+.tkPanelOpen {
+  transform: translateX(0);
+}
+
+.tkHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tkTitle {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #e6e6e6;
+}
+
+.tkRefresh,
+.tkClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #9a9a9a;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.tkRefresh:hover,
+.tkClose:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #e6e6e6;
+}
+
+.tkRefresh:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.tkViewBar,
+.tkSortBar {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+}
+
+.tkSortBar {
+  padding-top: 0;
+}
+
+.tkViewBtn {
+  flex: 1;
+  padding: 5px 0;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  color: #9a9a9a;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.tkViewBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #d6d6d6;
+}
+
+.tkViewActive,
+.tkViewActive:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #f0f0f0;
+}
+
+.tkSortBtn {
+  flex: 1;
+  padding: 4px 0;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: none;
+  color: #7e7e7e;
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.tkSortBtn:hover {
+  color: #c0c0c0;
+}
+
+.tkSortActive {
+  color: #e6e6e6;
+}
+
+.tkBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0 8px;
+}
+
+.tkNotice {
+  padding: 14px 12px;
+  font-size: 11px;
+  color: #8a8a8a;
+}
+
+.tkRetry {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: #6ea8ff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.tkPinned {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.tkPinnedLabel {
+  padding: 7px 12px 3px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6a6a6a;
+}
+
+.tkGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.tkGroupHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 12px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.015);
+  color: #b8b8b8;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  --accent: #6ea8ff;
+  transition: background 0.12s ease;
+}
+
+.tkGroupHead:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tkCaret {
+  width: 10px;
+  font-size: 9px;
+  color: #6a6a6a;
+}
+
+.tkGroupName {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tkGroupCount {
+  font-size: 10px;
+  color: #6a6a6a;
+}
+
+.tkGroupHead[data-accent="sky"] { --accent: #6ea8ff; }
+.tkGroupHead[data-accent="blue"] { --accent: #5b9cff; }
+.tkGroupHead[data-accent="teal"] { --accent: #4cc2c4; }
+.tkGroupHead[data-accent="purple"] { --accent: #b394ff; }
+.tkGroupHead[data-accent="pink"] { --accent: #e879b9; }
+.tkGroupHead[data-accent="amber"] { --accent: #f0b429; }
+.tkGroupHead[data-accent="green"] { --accent: #7bc96f; }
+.tkGroupHead[data-accent="coral"] { --accent: #f08a6c; }
+
+/* Single-line row: logo · symbol · (flex gap) · price · 24h change. */
+.tkRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.1s ease;
+}
+
+.tkRow:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tkStar {
+  flex-shrink: 0;
+  width: 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #4a4a4a;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.tkRow:hover .tkStar {
+  color: #8a8a8a;
+}
+
+/* Direct hover over the star itself: pop and gild it. */
+.tkStar:hover {
+  color: #f0b429;
+  transform: scale(1.3);
+}
+
+.tkStar:active {
+  transform: scale(1.1);
+}
+
+.tkStarActive,
+.tkStarActive:hover,
+.tkRow:hover .tkStarActive {
+  color: #f0b429;
+}
+
+.tkLogo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.tkLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tkSymbol {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e2e2e2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tkPrice {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #cfcfcf;
+  font-variant-numeric: tabular-nums;
+}
+
+.tkChange {
+  flex-shrink: 0;
+  width: 62px;
+  text-align: right;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.changeUp {
+  color: #4cc38a;
+}
+
+.changeDown {
+  color: #e5604d;
+}
+
+.changeFlat {
+  color: #8a8a8a;
+}
+
+.tkFooter {
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 9px;
+  color: #6a6a6a;
+  letter-spacing: 0.02em;
+}
+
 @media (max-width: 640px) {
   .map {
     gap: 8px;

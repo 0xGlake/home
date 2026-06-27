@@ -12,18 +12,18 @@ export default function HighlightToggle() {
       type="button"
       aria-pressed={highlight}
       onClick={() => setHighlight(!highlight)}
-      className={`inline-flex items-center gap-2 rounded-lg border px-3.5 py-1.5 font-mono text-sm font-medium transition-all duration-150 active:scale-[0.97] ${
+      className={`inline-flex h-[30px] items-center gap-2 rounded-md border px-3 font-mono text-sm transition-colors duration-150 ${
         highlight
-          ? "border-emerald-400/70 bg-emerald-500/20 text-emerald-100 shadow-sm shadow-emerald-500/20"
-          : "border-emerald-500/30 bg-emerald-500/5 text-emerald-300/90 hover:border-emerald-400/50 hover:bg-emerald-500/15 hover:text-emerald-200"
+          ? "border-white/25 bg-white/[0.08] text-zinc-100"
+          : "border-white/10 bg-white/[0.03] text-zinc-400 hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-200"
       }`}
     >
       <span
         aria-hidden
         className={`h-2 w-2 rounded-full transition-all duration-150 ${
           highlight
-            ? "bg-emerald-300 shadow-[0_0_6px_1px_rgba(110,231,183,0.7)]"
-            : "bg-emerald-400/20 ring-1 ring-emerald-400/50"
+            ? "bg-emerald-400 shadow-[0_0_6px_1px_rgba(74,195,138,0.7)]"
+            : "bg-zinc-600 ring-1 ring-white/20"
         }`}
       />
       {highlight ? "Tokens shown" : "Highlight tokens"}
