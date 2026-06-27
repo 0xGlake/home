@@ -100,6 +100,7 @@ export const taxonomy: Group[] = [
                   { name: "Pear Protocol", coingeckoId: "pear-protocol", ticker: "PEAR", url: "https://x.com/pear_protocol" },
                   { name: "Tread", url: "https://x.com/tread_fi" },
                   { name: "LorisTools", url: "https://x.com/LorisTools" },
+                  { name: "Liquid", url: "https://x.com/liquidtrading" },
                 ],
               },
               {
@@ -137,6 +138,7 @@ export const taxonomy: Group[] = [
               { name: "Artemis", url: "https://x.com/artemis" },
               { name: "Coingecko", url: "https://x.com/coingecko" },
               { name: "TapeSurf", url: "https://x.com/TapeSurfApp" },
+              { name: "Velo", url: "https://x.com/Velo_xyz" },
             ],
           },
           {
