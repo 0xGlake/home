@@ -1,7 +1,7 @@
 import React from 'react';
 import fs from 'fs';
 import path from 'path';
-import matter from 'gray-matter';
+import { parseFrontmatter } from '../../lib/parseFrontmatter';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
@@ -126,7 +126,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   const filePath = path.join(process.cwd(), 'app', 'content', 'blog', `${post.slug}.md`);
   const fileContents = fs.readFileSync(filePath, 'utf8');
-  const { data, content } = matter(fileContents);
+  const { data, content } = parseFrontmatter(fileContents);
 
   return (
     <div className="container mx-auto px-4 py-8 xs:w-full sm:w-9/12 md:w-8/12 lg:w-7/12 xl:w-5/12">

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import matter from 'gray-matter';
+import { parseFrontmatter } from './parseFrontmatter';
 import { componentPosts } from './ComponentPosts';
 
 interface BlogPost {
@@ -22,7 +22,7 @@ export function getBlogPosts(): BlogPost[] {
     const slug = fileName.replace(/\.md$/, '');
     const fullPath = path.join(postsDirectory, fileName);
     const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const { data } = matter(fileContents);
+    const { data } = parseFrontmatter(fileContents);
     posts.push({
       slug,
       title: data.title,
