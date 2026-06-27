@@ -3,7 +3,6 @@ import yaml from 'js-yaml';
 interface Frontmatter {
   // Frontmatter is trusted, in-repo content; mirror gray-matter's loose typing
   // so existing call sites keep working without casts.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
