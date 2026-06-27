@@ -422,7 +422,7 @@ export const taxonomy: Group[] = [
                     ],
                     children: [
                       {
-                        title: "Portfolio-Margin",
+                        title: "Unified-Margin",
                         items: [
                           { name: "Hyperliquid", coingeckoId: "hyperliquid", ticker: "HYPE", url: "https://x.com/HyperliquidX" },
                           { name: "GRVT", url: "https://x.com/grvt_io" },
