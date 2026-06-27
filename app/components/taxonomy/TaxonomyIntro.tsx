@@ -18,6 +18,11 @@ export default function TaxonomyIntro() {
           Click on an asset for additional information.
         </p>
         <p className={styles.introText}>
+          Open the menu (☰, top-right next to “Submit a protocol”) for the live
+          price sidebar — current price and 24h change for every token, grouped
+          or sorted, with ★ favourites you can pin to the top.
+        </p>
+        <p className={styles.introText}>
           The X / Twitter handles behind each logo and coingecko links are
           matched by hand and may be attributed incorrectly — please
           double-check before relying on them.

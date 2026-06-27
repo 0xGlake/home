@@ -435,6 +435,7 @@ export const taxonomy: Group[] = [
                     items: [
                       { name: "GMX", coingeckoId: "gmx", ticker: "GMX", url: "https://x.com/GMX_IO" },
                       { name: "Jupiter", coingeckoId: "jupiter", ticker: "JUP", url: "https://x.com/JupiterExchange" },
+                      { name: "Ostium", url: "https://x.com/Ostium" },
                     ],
                   },
                   {
