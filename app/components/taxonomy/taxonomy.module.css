@@ -691,6 +691,8 @@
 
 .tkPrice {
   flex-shrink: 0;
+  width: 78px;
+  text-align: right;
   font-size: 11px;
   color: #cfcfcf;
   font-variant-numeric: tabular-nums;
@@ -698,10 +700,63 @@
 
 .tkChange {
   flex-shrink: 0;
-  width: 62px;
+  width: 72px;
   text-align: right;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
+}
+
+/* Sticky column header for the All view. Widths mirror the row columns above so
+   the labels line up over their values; the spacer covers the star + logo. */
+.tkColHead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(13, 13, 15, 0.98);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #7e7e7e;
+}
+
+.tkColSpacer {
+  flex-shrink: 0;
+  width: 44px;
+}
+
+.tkColSymbol {
+  flex: 1;
+  min-width: 0;
+}
+
+.tkColPrice {
+  flex-shrink: 0;
+  width: 78px;
+  text-align: right;
+}
+
+.tkColChange {
+  flex-shrink: 0;
+  width: 72px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: right;
+  color: #b8b8b8;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.tkColChange:hover {
+  color: #e6e6e6;
 }
 
 .changeUp {

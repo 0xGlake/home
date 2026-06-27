@@ -332,18 +332,6 @@ export default function TokenTerminal() {
           </div>
         )}
 
-        {view === "all" && (
-          <div className={styles.tkSortBar}>
-            <button
-              type="button"
-              className={`${styles.tkSortBtn} ${styles.tkSortActive}`}
-              onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
-            >
-              24h % {sortDir === "asc" ? "↑" : "↓"}
-            </button>
-          </div>
-        )}
-
         <div className={styles.tkBody}>
           {error && (
             <div className={styles.tkNotice}>
@@ -355,6 +343,22 @@ export default function TokenTerminal() {
           )}
           {!error && !prices && loading && (
             <div className={styles.tkNotice}>Loading prices…</div>
+          )}
+
+          {view === "all" && (
+            <div className={styles.tkColHead}>
+              <span className={styles.tkColSpacer} />
+              <span className={styles.tkColSymbol}>Symbol</span>
+              <span className={styles.tkColPrice}>Last</span>
+              <button
+                type="button"
+                className={styles.tkColChange}
+                onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
+                title="Sort by 24h change"
+              >
+                24h Chg % {sortDir === "asc" ? "↑" : "↓"}
+              </button>
+            </div>
           )}
 
           {favRows.length > 0 && (
