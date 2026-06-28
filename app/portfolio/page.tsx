@@ -10,7 +10,13 @@ const projects = [
     description:
       "Self improvement tool which allows the LLM to write to a database which can then be visualised in a mermaid diagram.",
     type: "screenshot",
-    imageUrls: ["/eudaimonai.png"],
+    imageUrls: [
+      "/eudaimonai.png",
+      "/eudaimonai1.png",
+      "/eudaimonai2.png",
+      "/eudaimonai3.png",
+      "/eudaimonai4.png",
+    ],
     tech: ["Next.js", "LLM Chat", "postgres"],
     demoUrl: "https://eudaimonai.vercel.app/",
   },
