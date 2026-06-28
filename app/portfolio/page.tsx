@@ -123,12 +123,14 @@ export default function ProjectPage() {
             })}
           >
             <div className="relative bg-violet-100 rounded-lg shadow-md overflow-hidden h-full hover:shadow-xl transition-shadow duration-300 hover:text-violet-100 hover:bg-violet-200">
-              <div className="absolute inset-0 z-20 flex items-center justify-center bg-violet-900/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                <span className="flex items-center gap-2 text-white text-xl font-mono font-bold">
-                  {project.demoUrl ? "Visit Live Site" : "View Project"}
-                  <span aria-hidden="true">&#8599;</span>
-                </span>
-              </div>
+              {!project.vimeoId && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-violet-900/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                  <span className="flex items-center gap-2 text-white text-xl font-mono font-bold">
+                    {project.demoUrl ? "Visit Live Site" : "View Project"}
+                    <span aria-hidden="true">&#8599;</span>
+                  </span>
+                </div>
+              )}
               <div className="p-6">
                 <h2 className="text-violet-900 text-2xl font-mono font-bold mb-1">
                   {project.title}
