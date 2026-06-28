@@ -157,7 +157,7 @@ const ImageSlideshow = ({
             role="dialog"
             aria-modal="true"
             aria-label={`${alt} expanded`}
-            onClick={close}
+            onClick={(e) => handleNav(e, close)}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:p-8"
           >
             <button

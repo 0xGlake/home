@@ -5,6 +5,16 @@ import ImageSlideshow from "./ImageSlideshow";
 // Project data ordered from newest to oldest
 const projects = [
   {
+    id: 7,
+    title: "Crypto Taxonomy Map",
+    description:
+      "An interactive classification map of the crypto ecosystem, organizing protocols and services across communication infrastructure, trading venues, financial primitives, and L1/L2 networks, with live price data and direct protocol links.",
+    type: "screenshot",
+    imageUrls: ["/crypto-taxonomy.png"],
+    tech: ["Next.js", "TypeScript", "DeFi", "Data Viz"],
+    demoUrl: "https://home-lake-alpha.vercel.app/blog/crypto-taxonomy",
+  },
+  {
     id: 6,
     title: "Eudaimonai",
     description:
@@ -39,7 +49,7 @@ const projects = [
     imageUrls: [
       "/island-preview.png",
       "/island-preview1.png",
-      "/island-preview.png2",
+      "/island-preview2.png",
     ],
     tech: ["p5.js", "Procedural Generation", "Isometric"],
     slug: "island",
