@@ -112,16 +112,8 @@ export default function ProjectPage() {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        {projects.map((project) => (
-          <Link
-            href={project.demoUrl || `/projects/${project.slug}`}
-            key={project.id}
-            className="group"
-            {...(project.demoUrl && {
-              target: "_blank",
-              rel: "noopener noreferrer",
-            })}
-          >
+        {projects.map((project) => {
+          const card = (
             <div className="relative bg-violet-100 rounded-lg shadow-md overflow-hidden h-full hover:shadow-xl transition-shadow duration-300 hover:text-violet-100 hover:bg-violet-200">
               {!project.vimeoId && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-violet-900/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
@@ -170,8 +162,31 @@ export default function ProjectPage() {
                 </div>
               </div>
             </div>
-          </Link>
-        ))}
+          );
+
+          // Video projects are self-contained — no link wrapper.
+          if (project.vimeoId) {
+            return (
+              <div key={project.id} className="group">
+                {card}
+              </div>
+            );
+          }
+
+          return (
+            <Link
+              href={project.demoUrl || `/projects/${project.slug}`}
+              key={project.id}
+              className="group"
+              {...(project.demoUrl && {
+                target: "_blank",
+                rel: "noopener noreferrer",
+              })}
+            >
+              {card}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
