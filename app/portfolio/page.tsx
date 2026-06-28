@@ -140,7 +140,7 @@ export default function ProjectPage() {
                     {project.date}
                   </p>
                 )}
-                <div className="aspect-video w-full relative mb-4">
+                <div className="aspect-video w-full relative z-30 mb-4">
                   {project.type === "sketch" ||
                   project.type === "screenshot" ? (
                     <ImageSlideshow
