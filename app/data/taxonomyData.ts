@@ -515,6 +515,7 @@ export const taxonomy: Group[] = [
             title: "Provably Fair Casino",
             items: [
               { name: "Rollbit", coingeckoId: "rollbit-coin", ticker: "RLB", url: "https://x.com/rollbit" },
+              { name: "ORE", coingeckoId: "ore", ticker: "ORE", url: "https://x.com/ORE" },
               { name: "ZINC", coingeckoId: "zinc-2", ticker: "ZINC", url: "https://x.com/zinc_cash" },
             ],
           },
