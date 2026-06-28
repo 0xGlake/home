@@ -36,7 +36,11 @@ const projects = [
     description:
       "A procedurally generated isometric city simulation on a floating island. Watch as cities grow, roads connect, and artificial islands emerge from the water.",
     type: "sketch",
-    imageUrls: ["/island-preview.png"],
+    imageUrls: [
+      "/island-preview.png",
+      "/island-preview1.png",
+      "/island-preview.png2",
+    ],
     tech: ["p5.js", "Procedural Generation", "Isometric"],
     slug: "island",
   },
