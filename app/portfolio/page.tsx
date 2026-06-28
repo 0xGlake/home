@@ -114,7 +114,13 @@ export default function ProjectPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         {projects.map((project) => {
           const card = (
-            <div className="relative bg-violet-100 rounded-lg shadow-md overflow-hidden h-full hover:shadow-xl transition-shadow duration-300 hover:text-violet-100 hover:bg-violet-200">
+            <div
+              className={`relative bg-violet-100 rounded-lg shadow-md overflow-hidden h-full ${
+                project.vimeoId
+                  ? ""
+                  : "transition-shadow duration-300 hover:shadow-xl hover:text-violet-100 hover:bg-violet-200"
+              }`}
+            >
               {!project.vimeoId && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-violet-900/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <span className="flex items-center gap-2 text-white text-xl font-mono font-bold">
