@@ -5,8 +5,20 @@ import ImageSlideshow from "./ImageSlideshow";
 // Project data ordered from newest to oldest
 const projects = [
   {
+    id: 8,
+    title: "TradeBoard",
+    date: "2026",
+    description:
+      "A lightweight social trading idea marketplace built on top of Hyperliquid. Users create structured trade ideas (baskets of long/short positions across crypto perps, commodities, equities, and spot assets), publish them to a public feed, and earn fees when other users manually allocate capital to those ideas.",
+    type: "screenshot",
+    imageUrls: ["/tradeboard.png"],
+    tech: ["Next.js", "TypeScript", "Hyperliquid", "DeFi"],
+    demoUrl: "https://trade-board.vercel.app/",
+  },
+  {
     id: 7,
     title: "Crypto Taxonomy Map",
+    date: "2026",
     description:
       "An interactive classification map of the crypto ecosystem, organizing protocols and services across communication infrastructure, trading venues, financial primitives, and L1/L2 networks, with live price data and direct protocol links.",
     type: "screenshot",
@@ -17,6 +29,7 @@ const projects = [
   {
     id: 6,
     title: "Eudaimonai",
+    date: "2025",
     description:
       "Self improvement tool which allows the LLM to write to a database which can then be visualised in a mermaid diagram.",
     type: "screenshot",
@@ -33,6 +46,7 @@ const projects = [
   {
     id: 5,
     title: "Perpetual DEX Analytics",
+    date: "2025",
     description:
       "A comprehensive comparison tool for perpetual trading decentralized exchanges, analyzing funding rates, orderbook depth, and open interest distributions across multiple platforms.",
     type: "screenshot",
@@ -43,6 +57,7 @@ const projects = [
   {
     id: 4,
     title: "Floating Island City",
+    date: "2025",
     description:
       "A procedurally generated isometric city simulation on a floating island. Watch as cities grow, roads connect, and artificial islands emerge from the water.",
     type: "sketch",
@@ -57,6 +72,7 @@ const projects = [
   {
     id: 3,
     title: "OnlyPerps",
+    date: "2024",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras porttitor metus justo, ut condimentum felis sagittis at.",
     vimeoId: "1024627383",
@@ -66,6 +82,7 @@ const projects = [
   {
     id: 2,
     title: "Real Time Jupiter Limit Orders",
+    date: "2024",
     description:
       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.",
     vimeoId: "1024626992",
@@ -75,6 +92,7 @@ const projects = [
   {
     id: 1,
     title: "BackPack Swap (Mayan)",
+    date: "2023",
     description:
       "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
     vimeoId: "1024627026",
@@ -112,9 +130,14 @@ export default function ProjectPage() {
                 </span>
               </div>
               <div className="p-6">
-                <h2 className="text-violet-900 text-2xl font-mono font-bold mb-4">
+                <h2 className="text-violet-900 text-2xl font-mono font-bold mb-1">
                   {project.title}
                 </h2>
+                {project.date && (
+                  <p className="text-violet-500 text-sm font-mono mb-4">
+                    {project.date}
+                  </p>
+                )}
                 <div className="aspect-video w-full relative mb-4">
                   {project.type === "sketch" ||
                   project.type === "screenshot" ? (
