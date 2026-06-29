@@ -1,0 +1,306 @@
+/* Tokenomics taxonomy — swimlane layout.
+   Four fixed horizontal tiers (Supply → Distribution → Value → Governance) each
+   with a left rail label and a content area of concept cards. Tiers are split by
+   dotted dividers, echoing the original hand-drawn map. Shares the crypto
+   taxonomy's dark box aesthetic and cursor-following tooltip. */
+
+.map {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 14px 40px;
+  max-width: 1280px;
+  margin: 0 auto;
+  background: rgb(16, 16, 16);
+  color: #e6e6e6;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+/* ── Accent palette (shared keys with the crypto map). Scoped under .map so the
+   selectors stay "pure" for CSS Modules while still resolving on any descendant
+   carrying data-accent. ──────────────────────────────────────────────────── */
+.map [data-accent="sky"] { --accent: #6ea8ff; }
+.map [data-accent="blue"] { --accent: #5b9cff; }
+.map [data-accent="teal"] { --accent: #4cc2c4; }
+.map [data-accent="purple"] { --accent: #b394ff; }
+.map [data-accent="pink"] { --accent: #e879b9; }
+.map [data-accent="amber"] { --accent: #f0b429; }
+.map [data-accent="green"] { --accent: #7bc96f; }
+.map [data-accent="coral"] { --accent: #f08a6c; }
+
+/* ── Intro ───────────────────────────────────────────────────────────────── */
+.intro {
+  max-width: 760px;
+}
+
+.introText {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #b6b6bd;
+}
+
+.introText strong {
+  color: #e9e9ec;
+  font-weight: 600;
+}
+
+/* ── Lifecycle nav strip ─────────────────────────────────────────────────── */
+.lifecycle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding-bottom: 4px;
+}
+
+.lifecycleItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lifecyclePill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: background 0.12s ease, transform 0.12s ease;
+}
+
+.lifecyclePill:hover {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+.lifecycleArrow {
+  color: #5a5a5a;
+  font-size: 13px;
+}
+
+/* ── Tiers ───────────────────────────────────────────────────────────────── */
+.tiers {
+  display: flex;
+  flex-direction: column;
+}
+
+.tier {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.16);
+  scroll-margin-top: 12px;
+}
+
+.tier:first-child {
+  border-top: 0;
+  padding-top: 6px;
+}
+
+.rail {
+  position: sticky;
+  top: 12px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 12px;
+  border-left: 3px solid var(--accent);
+}
+
+.railLabel {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.05;
+  color: var(--accent);
+}
+
+.railBlurb {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #8a8a8a;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: flex-start;
+}
+
+.card {
+  flex: 1 1 300px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.cardFull {
+  flex-basis: 100%;
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.kind {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.kind[data-kind="policy"] {
+  background: rgba(110, 168, 255, 0.16);
+  color: #9cc1ff;
+}
+
+.kind[data-kind="mechanism"] {
+  background: rgba(240, 138, 108, 0.16);
+  color: #f0a98c;
+}
+
+.cardNote {
+  flex-basis: 100%;
+  font-style: italic;
+  font-size: 10.5px;
+  color: #7e7e7e;
+}
+
+/* ── Concepts ────────────────────────────────────────────────────────────── */
+.concepts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* The pipeline card lays its stages out in a responsive grid. */
+.pipelineGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 6px 14px;
+}
+
+.concept {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: default;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.concept:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.conceptName {
+  font-size: 12.5px;
+  color: #d6d6d6;
+}
+
+.concept:hover .conceptName {
+  color: var(--accent);
+}
+
+/* Inline variant list for pipeline stages. */
+.options {
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: #8a8a8a;
+}
+
+.optionSep {
+  color: #4a4a4a;
+}
+
+.crossRef {
+  font-size: 10px;
+  font-style: italic;
+  color: color-mix(in srgb, var(--accent) 75%, #888);
+}
+
+/* ── Tooltip (mirrors the crypto map) ────────────────────────────────────── */
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  max-width: 320px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(10, 10, 12, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.tooltipTerm {
+  color: #ececec;
+  font-weight: 600;
+}
+
+.tooltipDef {
+  margin-top: 3px;
+  color: #9aa0a6;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .map {
+    padding: 8px 10px 32px;
+  }
+
+  .tier {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .rail {
+    position: static;
+    border-left: 0;
+    border-bottom: 2px solid var(--accent);
+    padding-left: 0;
+    padding-bottom: 6px;
+  }
+
+  .railLabel {
+    font-size: 22px;
+  }
+
+  .card {
+    flex-basis: 100%;
+  }
+}

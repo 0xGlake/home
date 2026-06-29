@@ -16,6 +16,12 @@ export const componentPosts: ComponentPostMeta[] = [
     date: "2026-06-26",
     category: "Crypto",
   },
+  {
+    slug: "tokenomics-taxonomy",
+    title: "Tokenomics Taxonomy",
+    date: "2026-06-29",
+    category: "Crypto",
+  },
 ];
 
 export function getComponentPost(slug: string): ComponentPostMeta | undefined {

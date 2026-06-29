@@ -12,6 +12,7 @@ import TaxonomyMap from '../../components/taxonomy/TaxonomyMap';
 import { HighlightProvider } from '../../components/taxonomy/HighlightContext';
 import HighlightToggle from '../../components/taxonomy/HighlightToggle';
 import TokenTerminal from '../../components/taxonomy/TokenTerminal';
+import TokenomicsMap from '../../components/tokenomics/TokenomicsMap';
 
 interface BlogPostProps {
   params: Promise<{
@@ -94,6 +95,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   if (post.type === "component") {
     const isTaxonomy = post.slug === "crypto-taxonomy";
+    const isTokenomics = post.slug === "tokenomics-taxonomy";
     return (
       <HighlightProvider>
         <div style={{ background: "rgb(16, 16, 16)", minHeight: "100vh" }}>
@@ -104,21 +106,24 @@ export default async function BlogPost({ params }: BlogPostProps) {
             <span className="text-gray-400 font-mono text-sm">{post.title}</span>
             <div className="ml-auto flex items-center gap-3">
               {isTaxonomy && <HighlightToggle />}
-              <a
-                href="https://x.com/0xGlake"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-[30px] items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-3 font-mono text-sm text-zinc-400 transition-colors duration-150 hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-200"
-              >
-                Submit a protocol
-                <span aria-hidden className="text-zinc-500">
-                  ↗
-                </span>
-              </a>
+              {isTaxonomy && (
+                <a
+                  href="https://x.com/0xGlake"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-[30px] items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-3 font-mono text-sm text-zinc-400 transition-colors duration-150 hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-200"
+                >
+                  Submit a protocol
+                  <span aria-hidden className="text-zinc-500">
+                    ↗
+                  </span>
+                </a>
+              )}
               {isTaxonomy && <TokenTerminal />}
             </div>
           </div>
           {isTaxonomy && <TaxonomyMap />}
+          {isTokenomics && <TokenomicsMap />}
         </div>
       </HighlightProvider>
     );
