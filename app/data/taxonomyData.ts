@@ -157,6 +157,16 @@ export const taxonomy: Group[] = [
               { name: "aixbt", coingeckoId: "aixbt", ticker: "AIXBT", url: "https://x.com/aixbt_agent" },
             ],
           },
+          {
+            title: "DeAI",
+            items: [
+              {
+                name: "Venice", coingeckoId: "venice-token", ticker: "VVV",
+                url: "https://x.com/AskVenice",
+                description: "DeAI Inference Capacity Token",
+              },
+            ],
+          },
         ],
       },
       {
