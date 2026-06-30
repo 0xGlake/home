@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Group } from "@/app/data/types";
-import { useHighlight } from "./HighlightContext";
+import { useHighlight, usePriceFeed } from "./HighlightContext";
 import GroupBox from "./GroupBox";
 import {
   createLayoutEngine,
@@ -68,6 +68,10 @@ export default function TaxonomyMasonry({ groups }: { groups: Group[] }) {
   );
 
   const { highlight } = useHighlight();
+  // Fetch prices on page load (not just when the panel opens or highlight turns
+  // on) and keep the shared 60s refresh running while the map is mounted, so map
+  // colours are live the moment you toggle and never show stale data on revisit.
+  usePriceFeed(true);
 
   return (
     <div

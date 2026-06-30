@@ -9,7 +9,7 @@ import {
   type TokenRow,
   type TokenTreeNode,
 } from "./tokenList";
-import type { PriceMap } from "@/app/api/prices/route";
+import { useHighlight, usePriceFeed } from "./HighlightContext";
 
 // Slide-out "terminal" watchlist for the taxonomy page. A burger in the page
 // header toggles a docked right-hand panel listing every tokenised protocol with
@@ -25,10 +25,18 @@ import type { PriceMap } from "@/app/api/prices/route";
 // (star · logo · symbol · price · 24h) whose full taxonomy path shows on hover;
 // clicking the row opens the coin's CoinGecko page.
 
-const REFRESH_MS = 60_000;
 const INDENT = 12; // px added per tree depth
 const FAVS_KEY = "taxonomy:favs";
 const FAVS_COLLAPSED_KEY = "taxonomy:favsCollapsed";
+const WIDTH_KEY = "taxonomy:panelWidth";
+const DEFAULT_WIDTH = 340; // matches the CSS fallback
+const MIN_WIDTH = 280;
+
+function clampWidth(px: number): number {
+  if (!Number.isFinite(px)) return DEFAULT_WIDTH;
+  const max = Math.round(window.innerWidth * 0.95);
+  return Math.min(Math.max(px, MIN_WIDTH), max);
+}
 
 type View = "grouped" | "all";
 type SortDir = "desc" | "asc";
@@ -60,9 +68,12 @@ export default function TokenTerminal() {
   const [favs, setFavs] = useState<Set<string>>(() => new Set());
   const [favsCollapsed, setFavsCollapsed] = useState(false);
 
-  const [prices, setPrices] = useState<PriceMap | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const { prices, loading, error, load } = useHighlight();
+  usePriceFeed(open);
+
+  // Resizable panel width, persisted across sessions; clamped on apply.
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const resizing = useRef(false);
 
   // Hydrate favourites (and their collapsed state) from localStorage after mount
   // — keeps SSR markup stable — then persist on every change. localStorage has no
@@ -89,26 +100,34 @@ export default function TokenTerminal() {
     } catch {}
   }, [favsCollapsed]);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(false);
+  // Hydrate persisted panel width after mount (keeps SSR markup stable).
+  useEffect(() => {
     try {
-      const res = await fetch("/api/prices");
-      if (!res.ok) throw new Error();
-      setPrices((await res.json()) as PriceMap);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+      const raw = localStorage.getItem(WIDTH_KEY);
+      if (raw) setWidth(clampWidth(Number(raw)));
+    } catch {}
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    if (!prices) load();
-    const id = setInterval(load, REFRESH_MS);
-    return () => clearInterval(id);
-  }, [open, prices, load]);
+  // Drag the left edge to resize; width is clamped and persisted on each move.
+  const startResize = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    resizing.current = true;
+    const onMove = (ev: PointerEvent) => {
+      if (!resizing.current) return;
+      const next = clampWidth(window.innerWidth - ev.clientX);
+      setWidth(next);
+      try {
+        localStorage.setItem(WIDTH_KEY, String(next));
+      } catch {}
+    };
+    const onUp = () => {
+      resizing.current = false;
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -279,8 +298,16 @@ export default function TokenTerminal() {
 
       <aside
         className={`${styles.tkPanel} ${open ? styles.tkPanelOpen : ""}`}
+        style={{ width }}
         aria-hidden={!open}
       >
+        <div
+          className={styles.tkResize}
+          onPointerDown={startResize}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize panel"
+        />
         <header className={styles.tkHeader}>
           <span className={styles.tkTitle}>Markets</span>
           <button

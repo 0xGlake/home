@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { Item } from "@/app/data/types";
 import { normalizeItem, PATH_SEP } from "@/app/data/types";
 import avatarManifest from "@/app/data/avatarManifest.json";
+import { useHighlight } from "./HighlightContext";
 import styles from "./taxonomy.module.css";
 
 const manifest = avatarManifest as Record<string, string>;
@@ -61,6 +62,14 @@ export default function IconCircle({
     else setSrc(null);
   };
 
+  const { prices } = useHighlight();
+
+  // Colour the highlight by 24h move: red when the token is down, otherwise green
+  // (gainers, flat, and assets with no 24h data all default to green).
+  const priceKey = coingeckoId ?? coingeckoNftId;
+  const change = priceKey ? prices?.[priceKey]?.usd_24h_change : undefined;
+  const tokenDir = change != null && change < 0 ? "down" : "up";
+
   // Full chain incl. the protocol itself, read by the tooltip on hover.
   const fullPath = [...path, name].join(PATH_SEP);
 
@@ -101,8 +110,9 @@ export default function IconCircle({
     ...(url ? { "data-twitter": url } : {}),
     ...(coingeckoId ? { "data-coingecko": coingeckoId } : {}),
     ...(coingeckoNftId ? { "data-coingecko-nft": coingeckoNftId } : {}),
-    // Drives the highlight toggle's background (see HighlightToggle / CSS).
-    ...(coingeckoId || coingeckoNftId ? { "data-token": "" } : {}),
+    // Drives the highlight toggle's background (see HighlightToggle / CSS):
+    // data-token marks a priced protocol, data-token-dir tints it up/down.
+    ...(priceKey ? { "data-token": "", "data-token-dir": tokenDir } : {}),
   } as const;
 
   if (interactive) {
