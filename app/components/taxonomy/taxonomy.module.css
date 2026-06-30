@@ -421,7 +421,7 @@
   bottom: 0;
   width: 6px;
   cursor: ew-resize;
-  z-index: 1;
+  z-index: 3; /* above the sticky "All" column header (z-index 2) */
   touch-action: none;
 }
 
