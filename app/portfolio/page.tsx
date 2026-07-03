@@ -11,7 +11,7 @@ const projects = [
     description:
       "A lightweight social trading idea marketplace built on top of Hyperliquid. Users create structured trade ideas (baskets of long/short positions across crypto perps, commodities, equities, and spot assets), publish them to a public feed, and earn fees when other users manually allocate capital to those ideas.",
     type: "screenshot",
-    imageUrls: ["/tradeboard.png"],
+    imageUrls: ["/tradeboard.png", "/tradeboard1.png", "/tradeboard2.png"],
     tech: ["Next.js", "TypeScript", "Hyperliquid", "DeFi"],
     demoUrl: "https://trade-board.vercel.app/",
   },
@@ -22,7 +22,7 @@ const projects = [
     description:
       "An interactive classification map of the crypto ecosystem, organizing protocols and services across communication infrastructure, trading venues, financial primitives, and L1/L2 networks, with live price data and direct protocol links.",
     type: "screenshot",
-    imageUrls: ["/crypto-taxonomy.png"],
+    imageUrls: ["/cryptoTaxonomy.png"],
     tech: ["Next.js", "TypeScript", "DeFi", "Data Viz"],
     demoUrl: "https://home-lake-alpha.vercel.app/blog/crypto-taxonomy",
   },
@@ -45,12 +45,18 @@ const projects = [
   },
   {
     id: 5,
-    title: "Perpetual DEX Analytics",
+    title: "Perpetual DEX Analytics (Parallax)",
     date: "2025",
     description:
       "A comprehensive comparison tool for perpetual trading decentralized exchanges, analyzing funding rates, orderbook depth, and open interest distributions across multiple platforms.",
     type: "screenshot",
-    imageUrls: ["/perp-dex-preview.png"],
+    imageUrls: [
+      "/parallax.png",
+      "/parallax1.png",
+      "/parallax2.png",
+      "/parallax3.png",
+      "/parallax4.png",
+    ],
     tech: ["React", "Next.js", "DeFi", "Real-time Data"],
     demoUrl: "https://parallax-one-flame.vercel.app/",
   },
