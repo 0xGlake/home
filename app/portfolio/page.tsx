@@ -85,26 +85,6 @@ const projects = [
     tech: ["React", "Next.js", "Tailwind"],
     slug: "onlyperps",
   },
-  {
-    id: 2,
-    title: "Real Time Jupiter Limit Orders",
-    date: "2024",
-    description:
-      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.",
-    vimeoId: "1024626992",
-    tech: ["TypeScript", "Node.js", "MongoDB"],
-    slug: "jupiterlim",
-  },
-  {
-    id: 1,
-    title: "BackPack Swap (Mayan)",
-    date: "2023",
-    description:
-      "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-    vimeoId: "1024627026",
-    tech: ["JavaScript", "Express", "PostgreSQL"],
-    slug: "backpackswap",
-  },
 ];
 
 export default function ProjectPage() {
