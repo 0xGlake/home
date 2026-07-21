@@ -263,6 +263,26 @@
   letter-spacing: 0.02em;
 }
 
+/* Rebrand trail line in the hover tooltip (e.g. "Maker → Sky"). */
+.tooltipRebrand {
+  margin-top: 3px;
+  color: #c9b8e8;
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+}
+
+.tooltipRebrandLabel {
+  margin-right: 5px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: rgba(150, 120, 220, 0.22);
+  color: #b9a0e6;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* Cursor-anchored action popover (single instance, see TaxonomyPopover). */
 .popover {
   position: fixed;
@@ -284,6 +304,25 @@
   font-weight: 600;
   color: #e6e6e6;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Rebrand trail shown under the protocol name in the action popover. */
+.popoverRebrand {
+  padding: 4px 2px 2px;
+  color: #c9b8e8;
+  font-size: 10px;
+  line-height: 1.35;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.popoverRebrandLabel {
+  display: block;
+  margin-bottom: 2px;
+  color: #9a86c4;
+  font-size: 8.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .popoverAction {
@@ -758,6 +797,20 @@
 .tkColSymbol {
   flex: 1;
   min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: left;
+  color: #b8b8b8;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.tkColSymbol:hover {
+  color: #e6e6e6;
 }
 
 .tkColPrice {

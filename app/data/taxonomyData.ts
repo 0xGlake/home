@@ -263,6 +263,13 @@ export const taxonomy: Group[] = [
                       },
                     ],
                   },
+                  {
+                    title: "Tokenisation Gateway",
+                    caption: "cross-chain assets → canonical Solana markets",
+                    items: [
+                      { name: "Sunrise", url: "https://x.com/sunrisedefi", description: "Solana asset gateway for tokenised RWAs & cross-chain tokens" },
+                    ],
+                  },
                 ],
               },
               {
@@ -358,7 +365,7 @@ export const taxonomy: Group[] = [
               {
                 title: "CLOB",
                 items: [
-                  { name: "Openbook", url: "https://x.com/OpenBookDEX" },
+                  { name: "Manifest", url: "https://x.com/ManifestTrade", rebrandFrom: ["Serum", "OpenBook"], description: "3rd-gen CLOB DEX on Solana; successor to Serum & OpenBook" },
                   { name: "Hyperliquid", coingeckoId: "hyperliquid", ticker: "HYPE", url: "https://x.com/HyperliquidX" },
                 ],
               },
@@ -443,6 +450,7 @@ export const taxonomy: Group[] = [
                         items: [
                           { name: "Hyperliquid", coingeckoId: "hyperliquid", ticker: "HYPE", url: "https://x.com/HyperliquidX" },
                           { name: "GRVT", url: "https://x.com/grvt_io" },
+                          { name: "Nado", url: "https://x.com/nadohq", description: "Orderbook DEX on Ink L2 with unified spot + perps margin" },
                         ],
                       },
                     ],
@@ -471,6 +479,13 @@ export const taxonomy: Group[] = [
                     title: "Dark Pool",
                     caption: "in development",
                   },
+                ],
+              },
+              {
+                title: "Compute",
+                caption: "perps on GPU / compute pricing",
+                items: [
+                  { name: "Architect", url: "https://x.com/Architect_Fi", description: "Perpetual futures on GPU rental & compute prices" },
                 ],
               },
               {
@@ -527,6 +542,12 @@ export const taxonomy: Group[] = [
               { name: "Rollbit", coingeckoId: "rollbit-coin", ticker: "RLB", url: "https://x.com/rollbit" },
               { name: "ORE", coingeckoId: "ore", ticker: "ORE", url: "https://x.com/ORE" },
               { name: "ZINC", coingeckoId: "zinc-2", ticker: "ZINC", url: "https://x.com/zinc_cash" },
+              {
+                name: "Variance Vault",
+                url: "https://www.variancevault.xyz/",
+                img: "https://unavatar.io/variancevault.xyz",
+                description: "The pool is the house — depositors take the other side of every bet",
+              },
             ],
           },
           {
@@ -630,7 +651,7 @@ export const taxonomy: Group[] = [
         children: [
           {
             title: "Collateralised Debt Position",
-            items: [{ name: "Sky", coingeckoId: "sky", ticker: "SKY", url: "https://x.com/SkyEcosystem" }],
+            items: [{ name: "Sky", coingeckoId: "sky", ticker: "SKY", url: "https://x.com/SkyEcosystem", rebrandFrom: ["MakerDAO"] }],
           },
           {
             title: "Collateralised Lending",
@@ -752,6 +773,14 @@ export const taxonomy: Group[] = [
               {
                 title: "Decentralised Compute",
                 items: [{ name: "Bittensor", coingeckoId: "bittensor", ticker: "TAO", url: "https://x.com/bittensor" }],
+              },
+              {
+                title: "GPU Networks",
+                caption: "provide idle GPUs for rewards — rendering & AI compute",
+                items: [
+                  { name: "Render", coingeckoId: "render-token", ticker: "RENDER", url: "https://x.com/rendernetwork", rebrandFrom: ["RNDR"] },
+                  { name: "io.net", coingeckoId: "io", ticker: "IO", url: "https://x.com/ionet" },
+                ],
               },
             ],
           },

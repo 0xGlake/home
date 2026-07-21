@@ -40,6 +40,7 @@ function clampWidth(px: number): number {
 
 type View = "grouped" | "all";
 type SortDir = "desc" | "asc";
+type SortKey = "change" | "symbol";
 
 function fmtPrice(n: number | undefined | null): string {
   if (n == null) return "—";
@@ -64,6 +65,7 @@ export default function TokenTerminal() {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<View>("grouped");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortKey, setSortKey] = useState<SortKey>("change");
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
   const [favs, setFavs] = useState<Set<string>>(() => new Set());
   const [favsCollapsed, setFavsCollapsed] = useState(false);
@@ -175,9 +177,27 @@ export default function TokenTerminal() {
     [changeOf],
   );
 
+  // Clicking a column header sorts by it: same column flips direction, a new
+  // column adopts its natural default (A→Z for symbol, biggest gainers first
+  // for 24h change).
+  const applySort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortDir((d) => (d === "desc" ? "asc" : "desc"));
+    } else {
+      setSortKey(key);
+      setSortDir(key === "symbol" ? "asc" : "desc");
+    }
+  };
+
   const flatSorted = useMemo(() => {
     const rows = [...flatTokens];
     rows.sort((a, b) => {
+      if (sortKey === "symbol") {
+        const cmp = a.symbol.localeCompare(b.symbol, undefined, {
+          sensitivity: "base",
+        });
+        return sortDir === "asc" ? cmp : -cmp;
+      }
       const av = changeOf(a);
       const bv = changeOf(b);
       if (av == null && bv == null) return 0;
@@ -186,7 +206,7 @@ export default function TokenTerminal() {
       return sortDir === "asc" ? av - bv : bv - av;
     });
     return rows;
-  }, [sortDir, changeOf]);
+  }, [sortKey, sortDir, changeOf]);
 
   const favRows = useMemo(
     () => flatTokens.filter((t) => favs.has(t.priceKey)).sort(byChangeDesc),
@@ -375,15 +395,24 @@ export default function TokenTerminal() {
           {view === "all" && (
             <div className={styles.tkColHead}>
               <span className={styles.tkColSpacer} />
-              <span className={styles.tkColSymbol}>Symbol</span>
+              <button
+                type="button"
+                className={styles.tkColSymbol}
+                onClick={() => applySort("symbol")}
+                title="Sort by symbol"
+              >
+                Symbol{" "}
+                {sortKey === "symbol" ? (sortDir === "asc" ? "↑" : "↓") : ""}
+              </button>
               <span className={styles.tkColPrice}>Last</span>
               <button
                 type="button"
                 className={styles.tkColChange}
-                onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
+                onClick={() => applySort("change")}
                 title="Sort by 24h change"
               >
-                24h Chg % {sortDir === "asc" ? "↑" : "↓"}
+                24h Chg %{" "}
+                {sortKey === "change" ? (sortDir === "asc" ? "↑" : "↓") : ""}
               </button>
             </div>
           )}

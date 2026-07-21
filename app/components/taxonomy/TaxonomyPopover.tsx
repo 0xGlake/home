@@ -22,6 +22,7 @@ interface PopoverState {
   coingecko: string | null;
   coingeckoNft: string | null;
   ticker: string | null;
+  rebrand: string | null;
 }
 
 const COINGECKO = "https://www.coingecko.com/en/coins/";
@@ -66,6 +67,7 @@ export default function TaxonomyPopover({
         coingecko,
         coingeckoNft,
         ticker: trigger.dataset.ticker ?? null,
+        rebrand: trigger.dataset.rebrand ?? null,
       });
       return;
     }
@@ -121,6 +123,12 @@ export default function TaxonomyPopover({
       {state && (
         <div ref={popRef} className={styles.popover} style={placement}>
           <div className={styles.popoverName}>{state.name}</div>
+          {state.rebrand && (
+            <div className={styles.popoverRebrand}>
+              <span className={styles.popoverRebrandLabel}>rebrand trail</span>
+              {state.rebrand}
+            </div>
+          )}
           {state.twitter && (
             <a
               className={styles.popoverAction}
@@ -129,7 +137,7 @@ export default function TaxonomyPopover({
               rel="noopener noreferrer"
               onClick={close}
             >
-              X / Twitter
+              {/^https?:\/\/(www\.)?(x|twitter)\.com/i.test(state.twitter) ? "X / Twitter" : "Website"}
             </a>
           )}
           {state.coingecko && (

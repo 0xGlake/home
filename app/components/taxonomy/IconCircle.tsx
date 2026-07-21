@@ -36,7 +36,7 @@ export default function IconCircle({
   item: Item;
   path?: string[];
 }) {
-  const { name, url, img, description, coingeckoId, coingeckoNftId, ticker } =
+  const { name, url, img, description, coingeckoId, coingeckoNftId, ticker, rebrandFrom } =
     normalizeItem(item);
   const handle = xHandle(url);
   const cached = handle ? manifest[handle.toLowerCase()] : undefined;
@@ -107,6 +107,9 @@ export default function IconCircle({
     "data-path": fullPath,
     ...(description ? { "data-desc": description } : {}),
     ...(ticker ? { "data-ticker": ticker } : {}),
+    ...(rebrandFrom && rebrandFrom.length
+      ? { "data-rebrand": [...rebrandFrom, name].join(PATH_SEP) }
+      : {}),
     ...(url ? { "data-twitter": url } : {}),
     ...(coingeckoId ? { "data-coingecko": coingeckoId } : {}),
     ...(coingeckoNftId ? { "data-coingecko-nft": coingeckoNftId } : {}),

@@ -20,6 +20,7 @@ export type Item =
       coingeckoId?: string; // CoinGecko coin id → /en/coins/<id>
       coingeckoNftId?: string; // CoinGecko NFT id → /en/nft/<id> (floor price)
       ticker?: string; // token symbol, e.g. "LINK"
+      rebrandFrom?: string[]; // former names, oldest → newest (rebrand trail)
     };
 
 export interface Group {
@@ -39,6 +40,7 @@ export interface NormalizedItem {
   coingeckoId?: string;
   coingeckoNftId?: string;
   ticker?: string;
+  rebrandFrom?: string[];
 }
 
 // Turns a bare string item into the object form.

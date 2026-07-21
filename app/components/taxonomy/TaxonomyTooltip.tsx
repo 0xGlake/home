@@ -21,6 +21,7 @@ export default function TaxonomyTooltip({
     path: string;
     desc: string | null;
     ticker: string | null;
+    rebrand: string | null;
   } | null>(null);
 
   const tipRef = useRef<HTMLDivElement>(null);
@@ -66,6 +67,7 @@ export default function TaxonomyTooltip({
             path: key,
             desc: el.dataset.desc ?? null,
             ticker: el.dataset.ticker ?? null,
+            rebrand: el.dataset.rebrand ?? null,
           });
         }
       });
@@ -115,6 +117,12 @@ export default function TaxonomyTooltip({
             <span className={styles.tooltipTicker}>${content.ticker}</span>
           )}
         </div>
+        {content?.rebrand && (
+          <div className={styles.tooltipRebrand}>
+            <span className={styles.tooltipRebrandLabel}>rebrand</span>
+            {content.rebrand}
+          </div>
+        )}
         {content?.desc && <div className={styles.tooltipDesc}>{content.desc}</div>}
       </div>
     </div>

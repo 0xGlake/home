@@ -99,24 +99,27 @@ export default async function BlogPost({ params }: BlogPostProps) {
     return (
       <HighlightProvider>
         <div style={{ background: "rgb(16, 16, 16)", minHeight: "100vh" }}>
-          <div className="px-4 py-3 flex items-center gap-4">
-            <Link href="/blog" className="text-lg font-mono font-bold text-violet-400 hover:text-violet-300">
+          <div className="px-3 sm:px-4 py-3 flex items-center gap-2 sm:gap-4">
+            <Link href="/blog" className="shrink-0 text-lg font-mono font-bold text-violet-400 hover:text-violet-300">
               &lt; Blog
             </Link>
-            <span className="text-gray-400 font-mono text-sm">{post.title}</span>
-            <div className="ml-auto flex items-center gap-3">
+            <span className="min-w-0 truncate text-gray-400 font-mono text-sm">{post.title}</span>
+            <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
               {isTaxonomy && <HighlightToggle />}
               {isTaxonomy && (
                 <a
                   href="https://x.com/0xGlake"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-[30px] items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.03] px-3 font-mono text-sm text-zinc-400 transition-colors duration-150 hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-200"
+                  aria-label="Submit a protocol"
+                  title="Submit a protocol"
+                  className="inline-flex h-[30px] w-[30px] items-center justify-center gap-0 rounded-md border border-white/10 bg-white/[0.03] px-0 font-mono text-sm text-zinc-400 transition-colors duration-150 hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-200 sm:w-auto sm:gap-1.5 sm:px-3"
                 >
-                  Submit a protocol
-                  <span aria-hidden className="text-zinc-500">
-                    ↗
-                  </span>
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden className="shrink-0">
+                    <path d="M8 3.2v9.6M3.2 8h9.6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                  <span className="hidden sm:inline">Submit a protocol</span>
+                  <span aria-hidden className="hidden text-zinc-500 sm:inline">↗</span>
                 </a>
               )}
               {isTaxonomy && <TokenTerminal />}
