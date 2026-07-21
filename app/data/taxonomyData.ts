@@ -122,7 +122,7 @@ export const taxonomy: Group[] = [
               },
               {
                 title: "Agentic Brokerage",
-                items: [{ name: "TrueNorth AI", url: "https://x.com/get_truenorth" }],
+                items: [{ name: "TrueNorth AI", url: "https://x.com/get_truenorth" }, { name: "Stingray", url: "https://x.com/Stingray_fi", description: "agentic brokerage" }],
               },
             ],
           },
@@ -267,7 +267,7 @@ export const taxonomy: Group[] = [
                     title: "Tokenisation Gateway",
                     caption: "cross-chain assets → canonical Solana markets",
                     items: [
-                      { name: "Sunrise", url: "https://x.com/sunrisedefi", description: "Solana asset gateway for tokenised RWAs & cross-chain tokens" },
+                      { name: "Sunrise", url: "https://x.com/sunrise", description: "Solana asset gateway for tokenised RWAs & cross-chain tokens" },
                     ],
                   },
                 ],
@@ -407,8 +407,16 @@ export const taxonomy: Group[] = [
                   { name: "Derive", coingeckoId: "derive", ticker: "DRV", url: "https://x.com/derivexyz" },
                   {
                     name: "Hypercall", coingeckoId: "synapse-2", ticker: "SYN",
-                    url: "https://x.com/SynapseProtocol",
+                    url: "https://x.com/SynapseProtocol", rebrandFrom: ["Synapse"],
                   },
+                ],
+              },
+              {
+                title: "Pre-Market",
+                items: [
+                  { name: "Premarket", url: "https://x.com/premarket_xyz", description: "pre-market token trading by Stryke" },
+                  { name: "Lighter", coingeckoId: "lighter", ticker: "LIT", url: "https://x.com/Lighter_xyz" },
+                  { name: "Aevo", coingeckoId: "aevo", ticker: "AEVO", url: "https://x.com/aevoxyz", rebrandFrom: ["Ribbon Finance"] },
                 ],
               },
               {
@@ -426,11 +434,11 @@ export const taxonomy: Group[] = [
                   {
                     title: "CLOB",
                     items: [
-                      { name: "DyDx", coingeckoId: "dydx-chain", ticker: "DYDX", url: "https://x.com/dYdX" },
+                      { name: "Arcus", coingeckoId: "dydx-chain", ticker: "DYDX", url: "https://x.com/arcus_xyz", rebrandFrom: ["dYdX"] },
                       { name: "Lighter", coingeckoId: "lighter", ticker: "LIT", url: "https://x.com/Lighter_xyz" },
                       { name: "Aster", coingeckoId: "aster-2", ticker: "ASTER", url: "https://x.com/Aster_DEX" },
                       { name: "Extended", url: "https://x.com/extendedapp" },
-                      { name: "Bullet", coingeckoId: "zeta", ticker: "ZEX", url: "https://x.com/Bulletxyz" },
+                      { name: "Bullet", coingeckoId: "zeta", ticker: "ZEX", url: "https://x.com/Bulletxyz", rebrandFrom: ["Zeta"] },
                       { name: "Bulk Trade", url: "https://x.com/BulkTrade" },
                       {
                         name: "Meridian",
@@ -628,9 +636,9 @@ export const taxonomy: Group[] = [
             caption: "automated strategy vaults",
             items: [
               {
-                name: "Ribbon", coingeckoId: "aevo", ticker: "AEVO",
-                url: "https://x.com/RibbonFinance",
-                description: "Defunct",
+                name: "Aevo", coingeckoId: "aevo", ticker: "AEVO",
+                url: "https://x.com/aevoxyz",
+                rebrandFrom: ["Ribbon Finance"],
               },
             ],
           },
