@@ -26,7 +26,7 @@ export default function QRPage() {
   }, []);
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-[#161232]">
+    <main className="relative w-screen h-screen overflow-hidden bg-[#0a0d17]">
       {size && url && (
         <QRSketch
           key={`${size.width}-${size.height}`}
