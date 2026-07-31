@@ -458,7 +458,7 @@ export const taxonomy: Group[] = [
                         items: [
                           { name: "Hyperliquid", coingeckoId: "hyperliquid", ticker: "HYPE", url: "https://x.com/HyperliquidX" },
                           { name: "GRVT", url: "https://x.com/grvt_io" },
-                          { name: "Nado", url: "https://x.com/nadohq", description: "Orderbook DEX on Ink L2 with unified spot + perps margin" },
+                          { name: "Nado", url: "https://x.com/nadohq", description: "Kraken's orderbook DEX on Ink L2 with unified spot + perps margin" },
                         ],
                       },
                     ],
