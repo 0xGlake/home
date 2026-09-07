@@ -248,13 +248,39 @@ export const taxonomy: Group[] = [
               },
               { title: "DATs", caption: "Digital Asset Treasury" },
               {
-                title: "NFT",
+                title: "Collectibles",
                 accent: "pink",
-                items: [{ name: "Milady", coingeckoNftId: "milady-maker", url: "https://x.com/MiladyMaker333" }],
                 children: [
                   {
-                    title: "Revenue Accruing",
-                    caption: "Music NFT, Tokenised Front End",
+                    title: "NFT",
+                    items: [{ name: "Milady", coingeckoNftId: "milady-maker", url: "https://x.com/MiladyMaker333" }],
+                    children: [
+                      {
+                        title: "Revenue Accruing",
+                        caption: "Music NFT, Tokenised Front End",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Native Card Games",
+                    items: [
+                      {
+                        name: "Parallel", coingeckoId: "echelon-prime", ticker: "PRIME",
+                        url: "https://x.com/ParallelTCG",
+                        description: "sci-fi TCG, tradable NFT cards",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Licensed Cards",
+                    items: [
+                      {
+                        name: "Sorare",
+                        url: "https://x.com/Sorare",
+                        description: "licensed fantasy sports cards, Solana cNFTs",
+                      },
+                      { name: "NBA Top Shot", url: "https://x.com/nbatopshot", description: "licensed Moments on Flow" },
+                    ],
                   },
                 ],
               },
@@ -287,6 +313,28 @@ export const taxonomy: Group[] = [
                         url: "https://x.com/SuperstateInc",
                         description: "tokenized equities w/ full shareholder rights",
                       },
+                    ],
+                  },
+                  {
+                    title: "Vaulted Physical",
+                    items: [
+                      {
+                        name: "Collector Crypt", coingeckoId: "collector-crypt", ticker: "CARDS",
+                        url: "https://x.com/Collector_Crypt",
+                        description: "graded cards vaulted 1:1; the inventory other pack products rent",
+                      },
+                      {
+                        name: "Courtyard",
+                        url: "https://x.com/Courtyard_io",
+                        description: "Polygon vault, Brink's custody, ~90% buyback",
+                      },
+                      {
+                        name: "Phygitals",
+                        url: "https://x.com/phygitals",
+                        description: "Solana vault; storefront inside Fanatics Collect",
+                      },
+                      { name: "Beezie", url: "https://x.com/Beezie", description: "cards, sealed, sneakers, Birkins" },
+                      { name: "BAXUS", url: "https://x.com/BAXUSco", description: "collectible spirits, vault & redeem" },
                     ],
                   },
                   {
@@ -394,18 +442,6 @@ export const taxonomy: Group[] = [
               {
                 title: "Restaking",
                 items: [{ name: "EigenLayer", coingeckoId: "eigenlayer", ticker: "EIGEN", url: "https://x.com/eigen_da" }],
-              },
-              {
-                title: "Proof-of-Work Minting",
-                caption: "burn compute to mint",
-                items: [
-                  { name: "ORE", coingeckoId: "ore", ticker: "ORE", url: "https://x.com/OREsupply" },
-                  {
-                    name: "ZINC", coingeckoId: "zinc-2", ticker: "ZINC",
-                    url: "https://x.com/zinc_cash",
-                    description: "privacy-preserving proof-of-work mint",
-                  },
-                ],
               },
             ],
           },
@@ -534,6 +570,22 @@ export const taxonomy: Group[] = [
                           { name: "Nado", url: "https://x.com/nadohq", description: "Kraken's orderbook DEX on Ink L2 with unified spot + perps margin" },
                         ],
                       },
+                      {
+                        title: "HIP-3 Markets",
+                        caption: "permissionless markets on Hyperliquid",
+                        items: [
+                          {
+                            name: "Trade[XYZ]",
+                            url: "https://x.com/tradexyz",
+                            description: "largest deployer — equities, commodities, FX; pre-IPO priced off its own book",
+                          },
+                          {
+                            name: "Entropy",
+                            url: "https://x.com/entropyIO",
+                            description: "equities, commodities, FX + long-dated pre-IPO perps",
+                          },
+                        ],
+                      },
                     ],
                   },
                   {
@@ -559,17 +611,6 @@ export const taxonomy: Group[] = [
                   {
                     title: "Dark Pool",
                     caption: "in development",
-                  },
-                  {
-                    title: "HIP-3 Market Deployers",
-                    caption: "permissionless market issuance on Hyperliquid",
-                    items: [
-                      {
-                        name: "Entropy",
-                        url: "https://x.com/entropyIO",
-                        description: "perps on equities, commodities, FX + long-dated pre-IPO",
-                      },
-                    ],
                   },
                 ],
               },
@@ -632,11 +673,48 @@ export const taxonomy: Group[] = [
             title: "Provably Fair Casino",
             items: [
               { name: "Rollbit", coingeckoId: "rollbit-coin", ticker: "RLB", url: "https://x.com/rollbit" },
+            ],
+            children: [
               {
-                name: "Variance Vault",
-                url: "https://www.variancevault.xyz/",
-                img: "https://unavatar.io/variancevault.xyz",
-                description: "The pool is the house — depositors take the other side of every bet",
+                title: "Meta Casino",
+                caption: "anyone ships a game, anyone joins the house",
+                items: [
+                  {
+                    name: "Variance Vault",
+                    url: "https://www.variancevault.xyz/",
+                    img: "https://unavatar.io/variancevault.xyz",
+                    description: "permissionless games; depositors take the other side of every bet",
+                  },
+                ],
+              },
+              {
+                title: "Mining Games",
+                caption: "casino dressed as proof-of-work minting",
+                items: [
+                  { name: "ORE", coingeckoId: "ore", ticker: "ORE", url: "https://x.com/OREsupply" },
+                  {
+                    name: "ZINC", coingeckoId: "zinc-2", ticker: "ZINC",
+                    url: "https://x.com/zinc_cash",
+                    description: "privacy-preserving PoW mint",
+                  },
+                ],
+              },
+              {
+                title: "Gacha / Pack Opening",
+                caption: "loot box over vaulted cards — published odds, 85-90% buyback floor",
+                items: [
+                  {
+                    name: "rip.fun",
+                    url: "https://x.com/ripdotfun",
+                    description: "rips sealed modern product, not graded singles",
+                  },
+                  {
+                    name: "Gacha Sports",
+                    url: "https://x.com/gachasports",
+                    description: "sports-only packs on Collector Crypt rails",
+                  },
+                  { name: "Lastpack", url: "https://x.com/trylastpack" },
+                ],
               },
             ],
           },
@@ -656,79 +734,6 @@ export const taxonomy: Group[] = [
                 url: "https://x.com/LoopScale",
                 description: "fixed-rate lending; Collectibles Vault borrows USDC against vaulted cards",
               },
-            ],
-          },
-        ],
-      },
-
-      {
-        title: "Collectibles",
-        accent: "pink",
-        children: [
-          {
-            title: "Vaulted Physical",
-            caption: "graded slab or authenticated bottle in custody ↔ 1:1 redeemable token",
-            items: [
-              {
-                name: "Collector Crypt", coingeckoId: "collector-crypt", ticker: "CARDS",
-                url: "https://x.com/Collector_Crypt",
-                description: "also the inventory backend the Jupiter / Magic Eden / Solflare pack products rent — they own no vault",
-              },
-              {
-                name: "Courtyard",
-                url: "https://x.com/Courtyard_io",
-                description: "Polygon vault, Brink's custody, ~90% instant buyback",
-              },
-              {
-                name: "Phygitals",
-                url: "https://x.com/phygitals",
-                description: "Solana vault; storefront inside Fanatics Collect",
-              },
-              {
-                name: "Beezie",
-                url: "https://x.com/Beezie",
-                description: "multi-category — cards, sealed, sneakers, Birkins",
-              },
-              {
-                name: "BAXUS",
-                url: "https://x.com/BAXUSco",
-                description: "collectible spirits — same authenticate, vault & redeem shape",
-              },
-            ],
-          },
-          {
-            title: "Gacha / Pack Opening",
-            caption: "loot-box economics — published odds, 85-90% buyback floor",
-            items: [
-              {
-                name: "rip.fun",
-                url: "https://x.com/ripdotfun",
-                description: "rips sealed modern product rather than selling graded singles",
-              },
-              {
-                name: "Gacha Sports",
-                url: "https://x.com/gachasports",
-                description: "sports-only packs on Collector Crypt rails",
-              },
-              { name: "Lastpack", url: "https://x.com/trylastpack" },
-            ],
-          },
-          {
-            title: "Native Card Games",
-            caption: "no physical claim — value is licence + game utility",
-            items: [
-              { name: "Parallel", coingeckoId: "echelon-prime", ticker: "PRIME", url: "https://x.com/ParallelTCG" },
-            ],
-          },
-          {
-            title: "Licensed Cards",
-            items: [
-              {
-                name: "Sorare",
-                url: "https://x.com/Sorare",
-                description: "licensed fantasy sports cards, migrated to Solana cNFTs",
-              },
-              { name: "NBA Top Shot", url: "https://x.com/nbatopshot", description: "licensed Moments on Flow" },
             ],
           },
         ],
