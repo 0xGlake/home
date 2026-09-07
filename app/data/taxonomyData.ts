@@ -78,6 +78,27 @@ export const taxonomy: Group[] = [
                   { name: "Ranger Finance", coingeckoId: "ranger", ticker: "RNGR", url: "https://x.com/ranger_finance" },
                 ],
               },
+              {
+                title: "Private / No-KYC Routing",
+                caption: "break sender ↔ receiver link across chains",
+                items: [
+                  {
+                    name: "HoudiniSwap", coingeckoId: "houdini-swap", ticker: "LOCK",
+                    url: "https://x.com/HoudiniSwap",
+                    description: "two non-custodial exchange legs with an XMR hop between them",
+                  },
+                  {
+                    name: "Husher Exchange",
+                    url: "https://x.com/HusherExchange",
+                    description: "no-KYC swap router, optional XMR/ZEC routing",
+                  },
+                  {
+                    name: "Relay",
+                    url: "https://x.com/RelayProtocol",
+                    description: "intent bridge — no account, deposit-address flow, arbitrary recipient; solver-visible, not cryptographic privacy",
+                  },
+                ],
+              },
             ],
           },
           {
@@ -101,6 +122,7 @@ export const taxonomy: Group[] = [
                   { name: "Tread", url: "https://x.com/tread_fi" },
                   { name: "LorisTools", url: "https://x.com/LorisTools" },
                   { name: "Liquid", url: "https://x.com/liquidtrading" },
+                  { name: "Insilico Terminal", url: "https://x.com/InsilicoTrading", description: "CEX + Hyperliquid execution — TWAP, limit chase, CLI hotkeys" },
                 ],
               },
               {
@@ -139,6 +161,8 @@ export const taxonomy: Group[] = [
               { name: "Coingecko", url: "https://x.com/coingecko" },
               { name: "TapeSurf", url: "https://x.com/TapeSurfApp" },
               { name: "Velo", url: "https://x.com/Velo_xyz" },
+              { name: "Derivatives Monkey", url: "https://x.com/derivativemonky", description: "free options flow analytics" },
+              { name: "Hyperdash", url: "https://x.com/hypurrdash", description: "Hyperliquid trader, vault & PnL analytics" },
             ],
           },
           {
@@ -155,6 +179,7 @@ export const taxonomy: Group[] = [
               { name: "DefiLlama Agent", url: "https://x.com/DefiLlama" },
               { name: "Artemis Agent", url: "https://x.com/Artemis" },
               { name: "aixbt", coingeckoId: "aixbt", ticker: "AIXBT", url: "https://x.com/aixbt_agent" },
+              { name: "Quotient", url: "https://x.com/QuotientHQ", description: "AI forecaster trained on resolved prediction markets" },
             ],
           },
           {
@@ -249,19 +274,24 @@ export const taxonomy: Group[] = [
                     items: [{ name: "PAXG", coingeckoId: "pax-gold", ticker: "PAXG", url: "https://x.com/Paxos" }],
                   },
                   {
-                    title: "Physical Asset",
-                    caption: "real estate, wrapped bonds/shares, cards, skins",
+                    title: "Tokenised Equities / Pre-IPO",
+                    caption: "SPV-backed claims on private & public equity",
                     items: [
+                      {
+                        name: "PreStocks",
+                        url: "https://x.com/PreStocks",
+                        description: "pre-IPO equity as SPL tokens, USDC-redeemable any time",
+                      },
                       {
                         name: "Superstate",
                         url: "https://x.com/SuperstateInc",
                         description: "tokenized equities w/ full shareholder rights",
                       },
-                      {
-                        name: "Collector Crypt", coingeckoId: "collector-crypt", ticker: "CARDS",
-                        url: "https://x.com/Collector_Crypt",
-                      },
                     ],
+                  },
+                  {
+                    title: "Physical Asset",
+                    caption: "real estate, wrapped bonds/shares, skins",
                   },
                   {
                     title: "Tokenisation Gateway",
@@ -308,15 +338,46 @@ export const taxonomy: Group[] = [
             caption: "batch sending, burning, primary usage",
             children: [
               {
-                title: "Privacy Payment",
-                items: [
-                  { name: "Tornado", coingeckoId: "tornado-cash", ticker: "TORN", url: "https://x.com/TornadoCash" },
-                  { name: "Light", url: "https://x.com/LightProtocol" },
-                  { name: "Railway", coingeckoId: "railgun", ticker: "RAIL", url: "https://x.com/RAILGUN_Project" },
-                  { name: "Umbra", coingeckoId: "umbra", ticker: "UMBRA", url: "https://x.com/UmbraCash" },
+                title: "Private Transfers",
+                children: [
                   {
-                    name: "Husher Exchange",
-                    url: "https://x.com/HusherExchange",
+                    title: "Shielded Pools",
+                    caption: "deposit → ZK note → unlinkable withdraw",
+                    items: [
+                      { name: "Tornado", coingeckoId: "tornado-cash", ticker: "TORN", url: "https://x.com/TornadoCash" },
+                      {
+                        name: "RAILGUN", coingeckoId: "railgun", ticker: "RAIL",
+                        url: "https://x.com/RAILGUN_Project",
+                        description: "shielded pool + shielded DeFi calls",
+                      },
+                      {
+                        name: "Privacy Cash",
+                        url: "https://x.com/theprivacycash",
+                        description: "Groth16 note pool on Solana, relayer network",
+                      },
+                    ],
+                  },
+                  {
+                    title: "Confidential Balances / Stealth Addresses",
+                    caption: "hide balance or recipient, no mixing",
+                    items: [
+                      {
+                        name: "Umbra", coingeckoId: "umbra", ticker: "UMBRA",
+                        url: "https://x.com/UmbraPrivacy",
+                        description: "Solana: encrypted token accounts + stealth pool",
+                      },
+                      {
+                        name: "Umbra Cash",
+                        url: "https://x.com/UmbraCash",
+                        description: "Ethereum stealth addresses (ScopeLift) — no token, unrelated to UMBRA",
+                      },
+                      {
+                        name: "Helius Rings",
+                        url: "https://x.com/Helius",
+                        rebrandFrom: ["Light Protocol"],
+                        description: "encrypts asset + amount; devnet beta",
+                      },
+                    ],
                   },
                 ],
               },
@@ -333,6 +394,18 @@ export const taxonomy: Group[] = [
               {
                 title: "Restaking",
                 items: [{ name: "EigenLayer", coingeckoId: "eigenlayer", ticker: "EIGEN", url: "https://x.com/eigen_da" }],
+              },
+              {
+                title: "Proof-of-Work Minting",
+                caption: "burn compute to mint",
+                items: [
+                  { name: "ORE", coingeckoId: "ore", ticker: "ORE", url: "https://x.com/OREsupply" },
+                  {
+                    name: "ZINC", coingeckoId: "zinc-2", ticker: "ZINC",
+                    url: "https://x.com/zinc_cash",
+                    description: "privacy-preserving proof-of-work mint",
+                  },
+                ],
               },
             ],
           },
@@ -487,6 +560,17 @@ export const taxonomy: Group[] = [
                     title: "Dark Pool",
                     caption: "in development",
                   },
+                  {
+                    title: "HIP-3 Market Deployers",
+                    caption: "permissionless market issuance on Hyperliquid",
+                    items: [
+                      {
+                        name: "Entropy",
+                        url: "https://x.com/entropyIO",
+                        description: "perps on equities, commodities, FX + long-dated pre-IPO",
+                      },
+                    ],
+                  },
                 ],
               },
               {
@@ -548,8 +632,6 @@ export const taxonomy: Group[] = [
             title: "Provably Fair Casino",
             items: [
               { name: "Rollbit", coingeckoId: "rollbit-coin", ticker: "RLB", url: "https://x.com/rollbit" },
-              { name: "ORE", coingeckoId: "ore", ticker: "ORE", url: "https://x.com/ORE" },
-              { name: "ZINC", coingeckoId: "zinc-2", ticker: "ZINC", url: "https://x.com/zinc_cash" },
               {
                 name: "Variance Vault",
                 url: "https://www.variancevault.xyz/",
@@ -568,7 +650,86 @@ export const taxonomy: Group[] = [
           },
           {
             title: "Credit Markets",
-            items: [{ name: "LoopScale", url: "https://x.com/LoopScale" }],
+            items: [
+              {
+                name: "LoopScale",
+                url: "https://x.com/LoopScale",
+                description: "fixed-rate lending; Collectibles Vault borrows USDC against vaulted cards",
+              },
+            ],
+          },
+        ],
+      },
+
+      {
+        title: "Collectibles",
+        accent: "pink",
+        children: [
+          {
+            title: "Vaulted Physical",
+            caption: "graded slab or authenticated bottle in custody ↔ 1:1 redeemable token",
+            items: [
+              {
+                name: "Collector Crypt", coingeckoId: "collector-crypt", ticker: "CARDS",
+                url: "https://x.com/Collector_Crypt",
+                description: "also the inventory backend the Jupiter / Magic Eden / Solflare pack products rent — they own no vault",
+              },
+              {
+                name: "Courtyard",
+                url: "https://x.com/Courtyard_io",
+                description: "Polygon vault, Brink's custody, ~90% instant buyback",
+              },
+              {
+                name: "Phygitals",
+                url: "https://x.com/phygitals",
+                description: "Solana vault; storefront inside Fanatics Collect",
+              },
+              {
+                name: "Beezie",
+                url: "https://x.com/Beezie",
+                description: "multi-category — cards, sealed, sneakers, Birkins",
+              },
+              {
+                name: "BAXUS",
+                url: "https://x.com/BAXUSco",
+                description: "collectible spirits — same authenticate, vault & redeem shape",
+              },
+            ],
+          },
+          {
+            title: "Gacha / Pack Opening",
+            caption: "loot-box economics — published odds, 85-90% buyback floor",
+            items: [
+              {
+                name: "rip.fun",
+                url: "https://x.com/ripdotfun",
+                description: "rips sealed modern product rather than selling graded singles",
+              },
+              {
+                name: "Gacha Sports",
+                url: "https://x.com/gachasports",
+                description: "sports-only packs on Collector Crypt rails",
+              },
+              { name: "Lastpack", url: "https://x.com/trylastpack" },
+            ],
+          },
+          {
+            title: "Native Card Games",
+            caption: "no physical claim — value is licence + game utility",
+            items: [
+              { name: "Parallel", coingeckoId: "echelon-prime", ticker: "PRIME", url: "https://x.com/ParallelTCG" },
+            ],
+          },
+          {
+            title: "Licensed Cards",
+            items: [
+              {
+                name: "Sorare",
+                url: "https://x.com/Sorare",
+                description: "licensed fantasy sports cards, migrated to Solana cNFTs",
+              },
+              { name: "NBA Top Shot", url: "https://x.com/nbatopshot", description: "licensed Moments on Flow" },
+            ],
           },
         ],
       },
@@ -737,7 +898,8 @@ export const taxonomy: Group[] = [
             ],
           },
           {
-            title: "Privacy",
+            title: "Privacy Chains",
+            caption: "privacy at the base layer",
             items: [
               { name: "Monero", coingeckoId: "monero", ticker: "XMR", url: "https://x.com/monero" },
               { name: "Zcash", coingeckoId: "zcash", ticker: "ZEC", url: "https://x.com/Zcash" },
@@ -774,9 +936,24 @@ export const taxonomy: Group[] = [
             title: "Compute",
             children: [
               {
-                title: "Encrypted Computation",
-                caption: "ZKPs",
-                items: [{ name: "Arcium", coingeckoId: "arcium", ticker: "ARX", url: "https://x.com/Arcium" }],
+                title: "Confidential Compute",
+                caption: "compute over data that is never decrypted",
+                children: [
+                  {
+                    title: "FHE",
+                    items: [
+                      {
+                        name: "Zama", coingeckoId: "zama", ticker: "ZAMA",
+                        url: "https://x.com/zama",
+                        description: "FHE coprocessor for encrypted EVM state",
+                      },
+                    ],
+                  },
+                  {
+                    title: "MPC",
+                    items: [{ name: "Arcium", coingeckoId: "arcium", ticker: "ARX", url: "https://x.com/Arcium" }],
+                  },
+                ],
               },
               {
                 title: "Decentralised Compute",
