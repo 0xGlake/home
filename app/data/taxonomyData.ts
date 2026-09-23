@@ -28,7 +28,7 @@ export const taxonomy: Group[] = [
           {
             name: "Relay",
             url: "https://x.com/RelayProtocol",
-            description: "solver-filled intent bridge across 85+ chains incl. BTC/SOL; ~3s median fill",
+            description: "solver-filled intent bridge, 85+ chains incl. BTC/SOL, ~3s fills; no account — deposit address, arbitrary recipient, but solver-visible",
           },
         ],
       },
@@ -96,11 +96,6 @@ export const taxonomy: Group[] = [
                     name: "Husher Exchange",
                     url: "https://x.com/HusherExchange",
                     description: "no-KYC swap router, optional XMR/ZEC routing",
-                  },
-                  {
-                    name: "Relay",
-                    url: "https://x.com/RelayProtocol",
-                    description: "intent bridge — no account, deposit-address flow, arbitrary recipient; solver-visible, not cryptographic privacy",
                   },
                 ],
               },
