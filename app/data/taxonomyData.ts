@@ -25,6 +25,11 @@ export const taxonomy: Group[] = [
         items: [
           { name: "Wormhole", coingeckoId: "wormhole", ticker: "W", url: "https://x.com/wormhole" },
           { name: "GardenFinance", coingeckoId: "garden-finance", ticker: "SEED", url: "https://x.com/gardenfi" },
+          {
+            name: "Relay",
+            url: "https://x.com/RelayProtocol",
+            description: "solver-filled intent bridge across 85+ chains incl. BTC/SOL; ~3s median fill",
+          },
         ],
       },
       {
@@ -584,6 +589,11 @@ export const taxonomy: Group[] = [
                             url: "https://x.com/entropyIO",
                             description: "equities, commodities, FX + long-dated pre-IPO perps",
                           },
+                          {
+                            name: "Paragon",
+                            url: "https://x.com/tradeparagon",
+                            description: "index perps — BTC.D, TOTAL2, OTHERS + equities & rates; also lists pre-TGE token perps",
+                          },
                         ],
                       },
                     ],
@@ -642,7 +652,11 @@ export const taxonomy: Group[] = [
             items: [
               { name: "Polymarket", url: "https://x.com/Polymarket" },
               { name: "Augur", coingeckoId: "augur", ticker: "REP", url: "https://x.com/AugurProject" },
-              { name: "Azuro", coingeckoId: "azuro-protocol", ticker: "AZUR", url: "https://x.com/AzuroProtocol" },
+              {
+                name: "Trueo",
+                url: "https://x.com/Trueo_",
+                description: "fully on-chain book + optimistic oracle; collateral is yield-bearing TYD — migrating Base → Ethereum L1",
+              },
               { name: "Melee Markets", url: "https://x.com/meleemarkets" },
               { name: "HIP-4", coingeckoId: "hyperliquid", ticker: "HYPE", url: "https://x.com/HyperliquidX" },
             ],
@@ -664,6 +678,17 @@ export const taxonomy: Group[] = [
                     name: "Lattica Finance",
                     url: "https://x.com/LatticaFinance",
                     description: "margin/leverage for prediction markets",
+                  },
+                ],
+              },
+              {
+                title: "Peer-to-Pool Liquidity Layer",
+                caption: "bettors face a singleton LP pool, not an order book",
+                items: [
+                  {
+                    name: "Azuro", coingeckoId: "azuro-protocol", ticker: "AZUR",
+                    url: "https://x.com/AzuroProtocol",
+                    description: "vAMM odds over one shared pool; powers 40+ sportsbook front-ends",
                   },
                 ],
               },
